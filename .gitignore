@@ -42,3 +42,6 @@ yarn-debug.log*
 yarn-error.log*
 
 app-server/tiweb/data/*
+app-client/node_modules/
+
+
