@@ -102,31 +102,35 @@ def login():
             if check_password_hash(user.password, form.password.data):
                 access_token = create_access_token(identity = {'username': form.username.data})
                 result = access_token
-                if(user.db_ip is None or user.db_port is None):
-                    c = client(bearer, urlBase, projectid, clusterid, None, ClusterIP)
-                    r = c.add_database()
-                    if(r and r["status"]):
-                        print("Created Database: " + r["data"]["id"])
-                    else:
-                        print("Error: " + r["error"])
-                        r = c.get_database_info()
-                        if(r and r["status"]):
-                            user = User.query.filter_by(username=form.username.data).first()
-                            user.db_ip = r['data']['ip']
-                            user.db_port = r['data']['port']
-                            db.session.commit() 
-                    return result
+                # if(user.db_ip is None or user.db_port is None):
+                #     c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
+                #     r = c.add_database()
+                #     if(r and r["status"]):
+                #         print("Created Database: " + r["data"]["id"])
+                #     else:
+                #         print("Error: " + r["error"])
+                #         r = c.get_database_info()
+                #         if(r and r["status"]):
+                #             user = User.query.filter_by(username=form.username.data).first()
+                #             user.db_ip = r['data']['ip']
+                #             user.db_port = r['data']['port']
+                #             db.session.commit() 
+                #     return result
                             
-                else:
-                    access_token = create_access_token(identity = {'username': form.username.data})
-                    result = access_token
-                    return result
+                # else:
+                access_token = create_access_token(identity = {'username': form.username.data})
+                result = access_token
+                return result
+                
+            else:
+                result = jsonify({"Error":"Invalid username and password"})
+                return result
 
         else:
             result = jsonify({"Error":"Invalid username and password"})
             return result
     else:
-        return jsonify({"Error" : "Invalid form"})
+        return jsonify({"Error" : "Invalid form", "Data" : form.validate_on_submit()})
 	
 @app.route('/remove', methods = ['POST'])
 def delete():

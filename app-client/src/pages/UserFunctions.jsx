@@ -20,8 +20,7 @@ export const login = user => {
     })
     .then(res => {
       console.log(res.data);
-      localStorage.setItem('usertoken', res.data);
-      alert(`${user.username} is logged in`);
+      localStorage.setItem('token', JSON.stringify(res.data));
       return res.data;
     })
     .catch(err => {
