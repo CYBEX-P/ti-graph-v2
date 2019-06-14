@@ -8,8 +8,8 @@ def processExport(dataObject):
     for x in dataObject["Neo4j"][0]:
         for key in x['nodes']:
             key['label'] = key['label'][0]
-            # if key['label'][0] == 'IP':
-            #     key['label'] = '\uf542'
+            if key['label'] == 'IP':
+                key['label'] = '\uf287'
 
 
     return dataObject
