@@ -27,9 +27,9 @@ def full_load(graph):
         
                 try:
                         host = socket.gethostbyaddr(node)
-                        a = Node("Hostname", data = host[0])
+                        a = Node("Host", data = host[0])
                         ip_node = graph.nodes.match("IP", data=node).first()
-                        h_node = graph.nodes.match("Hostname", data=host[0]).first()
+                        h_node = graph.nodes.match("Host", data=host[0]).first()
 
                         if(h_node):
                                 rel = Relationship(ip_node, "IS_RELATED_TO", h_node)
@@ -114,9 +114,9 @@ def insertHostname(node, graph):
 
         try:
                 host = socket.gethostbyaddr(node)
-                a = Node("Hostname", data = host[0])
+                a = Node("Host", data = host[0])
                 ip_node = graph.nodes.match("IP", data=node).first()
-                h_node = graph.nodes.match("Hostname", data=host[0]).first()
+                h_node = graph.nodes.match("Host", data=host[0]).first()
 
                 if(h_node):
                         rel = Relationship(ip_node, "IS_RELATED_TO", h_node)

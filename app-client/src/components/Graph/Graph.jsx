@@ -13,9 +13,6 @@ function InitializeGraph(data) {
     return null;
   }
   const { nodes } = data.Neo4j[0][0];
-  // const nodes = [{
-  //    id: 3, font: {multi: 'html', face: 'FontAwesome'}, label:'\uf287', x: 40, y: 40
-  // }];
   const { edges } = data.Neo4j[1][0];
   const dataObject = { nodes, edges };
 
@@ -25,7 +22,6 @@ function InitializeGraph(data) {
     nodes: {
       shape: 'circle',
       widthConstraint: 100,
-      font: {multi: 'html', face: 'FontAwesome'}
     },
     edges: {
       length: 200
