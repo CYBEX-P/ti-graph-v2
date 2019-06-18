@@ -65,11 +65,8 @@ def register():
 		'password' : form.password.data	
 	    }
 
-        print("I made it!")
         c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
-        print("I made a client")
         r = c.add_database()
-        print("I made it 2!")
 
         if(r and r["status"]):
             print("Created Database: " + r["data"]["id"])

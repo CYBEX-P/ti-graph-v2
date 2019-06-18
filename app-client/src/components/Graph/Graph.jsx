@@ -21,7 +21,7 @@ function InitializeGraph(data) {
     height: '99vh',
     nodes: {
       shape: 'circle',
-      widthConstraint: 100
+      widthConstraint: 100,
     },
     edges: {
       length: 200
@@ -33,7 +33,6 @@ function InitializeGraph(data) {
   };
   const container = document.getElementById('mynetwork');
   const nw = new Network(container, dataObject, options);
-  nw.redraw()
   return nw;
 }
 
