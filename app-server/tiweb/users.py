@@ -38,4 +38,4 @@ class LoginForm(FlaskForm):
     #first_name = StringField('first_name', validators = [InputRequired()])
     #last_name = StringField('last_name', validators = [InputRequired()])
     username = StringField('username', validators = [InputRequired(), length(min = 4, max = 15)])
-    password = PasswordField('password', validators = [InputRequired(), length(min = 8,max = 80)])
+    password = PasswordField('password', validators = [InputRequired(), length(min = 4,max = 80)])

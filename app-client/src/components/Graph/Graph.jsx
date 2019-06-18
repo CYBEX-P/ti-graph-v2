@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Network } from 'vis';
 import PropTypes from 'prop-types';
 import { CircleLoader } from 'react-spinners';
+import { Card, CardText, CardBody, CardTitle } from 'reactstrap';
 
 import NetworkContext from '../App/DataContext';
 import RadialMenu from '../radialMenu/radialMenu';
@@ -20,7 +21,7 @@ function InitializeGraph(data) {
     height: '99vh',
     nodes: {
       shape: 'circle',
-      widthConstraint: 100
+      widthConstraint: 100,
     },
     edges: {
       length: 200
@@ -204,16 +205,20 @@ const Graph = ({ isLoading }) => {
       {hoverText && (
         <div
           style={{
-            position: 'absolute',
-            zIndex: 1000,
-            top: hoverText.y,
-            left: hoverText.x,
-            backgroundColor: '#111',
-            color: '#fff',
-            pointerEvents: 'none'
-          }}
-        >
-          {hoverText.text}
+                position: 'absolute',
+                zIndex: 1000,
+                top: hoverText.y,
+                left: hoverText.x,
+                backgroundColor: '#111',
+                pointerEvents: 'none'
+              }}>
+          <Card>
+            <CardBody>
+              <CardTitle style={{textAlign:"center"}}><b>Node Data</b></CardTitle>
+              <hr/>
+              <CardText>{hoverText.text}</CardText>
+            </CardBody>
+          </Card>
         </div>
       )}
     </div>

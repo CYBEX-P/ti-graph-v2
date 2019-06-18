@@ -5,17 +5,18 @@ whoisData:
 IOC:
   types:
     - IP
-    - SourcePort
-    - DestinationPort
-    - EmailAddress
-    - Hostname
+    - SPort
+    - DPort
+    - Email
+    - Host
     - URL
-    - FileHash
+    - Hash
     - BTC
-    - AS
+    - ASN
     - MAC
     - BGPath
     - SSID
+    - Country
 
 
   enrichments:
@@ -26,19 +27,19 @@ IOC:
       - whois
       - cybex
 
-    SourcePort:
+    SPort:
       - na
       - none
 
-    DestinationPort:
+    DPort:
       - na
       - none
 
-    EmailAddress:
+    Email:
       - na
       - none
 
-    Hostname:
+    Host:
       - na
       - none
 
@@ -46,7 +47,7 @@ IOC:
       - na
       - none
 
-    FileHash:
+    Hash:
       - na
       - none
 
@@ -54,7 +55,7 @@ IOC:
       - na
       - none
 
-    AS:
+    ASN:
       - na
       - none
 
@@ -67,5 +68,9 @@ IOC:
       - none
 
     SSID:
+      - na
+      - none
+    
+    Country:
       - na
       - none

@@ -8,6 +8,33 @@ def processExport(dataObject):
     for x in dataObject["Neo4j"][0]:
         for key in x['nodes']:
             key['label'] = key['label'][0]
+            if key['label'] == 'IP':
+                key['color'] = '#97C2FC'
+            if key['label'] == 'Host':
+                key['color'] = '#FB7E81'
+            if key['label'] == 'URL':
+                key['color'] = '#D496A7'
+            if key['label'] == 'SPort':
+                key['color'] = '#8C99CE'
+            if key['label'] == 'DPort':
+                key['color'] = '#5B8E7D'
+            if key['label'] == 'Email':
+                key['color'] = '#34E5FF'
+            if key['label'] == 'Hash':
+                key['color'] = '#FDF5BF'
+            if key['label'] == 'ASN':
+                key['color'] = '#8CB369'
+            if key['label'] == 'Country':
+                key['color'] = '#F4A259'
+            if key['label'] == 'BTC':
+                key['color'] = '#3185FC'
+            if key['label'] == 'MAC':
+                key['color'] = '#DDF8E8'
+            if key['label'] == 'BGPath':
+                key['color'] = '#28AFB0'
+            if key['label'] == 'SSID':
+                key['color'] = '#E8E8E8'
+
 
     return dataObject
 

@@ -22,9 +22,13 @@ export const login = user => {
     })
     .then(res => {
       console.log(res.data);
+<<<<<<< HEAD
       localStorage.setItem('usertoken', res.data);
       //alert(`${user.username} is logged in`);
       //post('/tiweb/graph');
+=======
+      localStorage.setItem('token', JSON.stringify(res.data));
+>>>>>>> master
       return res.data;
     })
     .catch(err => {

@@ -27,7 +27,12 @@ from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport
 from cybex import insertCybex
+<<<<<<< HEAD
 from connect import graph
+=======
+
+from connect import connectDev, connectProd
+>>>>>>> master
 from containerlib import client
 from users import db, User, RegistrationForm, LoginForm
 
@@ -38,6 +43,10 @@ CORS(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# If in development, connect to local container right away
+if app.config['ENV'] == 'development':
+    graph = connectDev()
 
 #db.create_all()
     
@@ -56,11 +65,8 @@ def register():
 		'password' : form.password.data	
 	    }
 
-        print("I made it!")
         c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
-        print("I made a client")
         r = c.add_database()
-        print("I made it 2!")
 
         if(r and r["status"]):
             print("Created Database: " + r["data"]["id"])
@@ -103,6 +109,7 @@ def login():
             if check_password_hash(user.password, form.password.data):
                 access_token = create_access_token(identity = {'username': form.username.data})
                 result = access_token
+<<<<<<< HEAD
                 if(user.db_ip is None or user.db_port is None):
                     c = client(bearer, urlBase, projectid, clusterid, None, ClusterIP)
                     r = c.add_database()
@@ -118,17 +125,39 @@ def login():
                             user.db_port = r['data']['port']
                             db.session.commit() 
                     return result
+=======
+                # if(user.db_ip is None or user.db_port is None):
+                #     c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
+                #     r = c.add_database()
+                #     if(r and r["status"]):
+                #         print("Created Database: " + r["data"]["id"])
+                #     else:
+                #         print("Error: " + r["error"])
+                #         r = c.get_database_info()
+                #         if(r and r["status"]):
+                #             user = User.query.filter_by(username=form.username.data).first()
+                #             user.db_ip = r['data']['ip']
+                #             user.db_port = r['data']['port']
+                #             db.session.commit() 
+                #     return result
+>>>>>>> master
                             
-                else:
-                    access_token = create_access_token(identity = {'username': form.username.data})
-                    result = access_token
-                    return result
+                # else:
+                access_token = create_access_token(identity = {'username': form.username.data})
+                result = access_token
+                global graph
+                graph = connectProd(user.db_username, user.db_password, user.db_ip, user.db_port)
+                return result
+                
+            else:
+                result = jsonify({"Error":"Invalid username and password"})
+                return result
 
         else:
             result = jsonify({"Error":"Invalid username and password"})
             return result
     else:
-        return jsonify({"Error" : "Invalid form"})
+        return jsonify({"Error" : "Invalid form", "Data" : form.validate_on_submit()})
 	
 @app.route('/remove', methods = ['POST'])
 def delete():
