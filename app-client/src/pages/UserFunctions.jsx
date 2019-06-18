@@ -10,7 +10,7 @@ export const register =  newUser => {
       password: newUser.password
       
     }).then(({data}) => {console.log(data)})
-    alert(`${newUser.username} is logged in`);
+    alert(`${newUser.username} is Registered `);
   return "submitted"
 };
 
@@ -40,6 +40,7 @@ export const remove = user => {
     })
     .then(() => {
       console.log('deleted');
+      alert(`${user.username} is Deleted`);
     });
 };
 
@@ -53,6 +54,7 @@ export const update = user => {
     })
     .then(() => {
       console.log('updated');
+      alert(`${user.username} is Updated `);
     })
     .catch(err => {
       console.log(err);
@@ -78,5 +80,6 @@ export const change_password = newPassword => {
   })
   .then(res =>{
     console.log(res.data);
+    alert(`Password changed for ${newPassword.username}  `);
   });
 };

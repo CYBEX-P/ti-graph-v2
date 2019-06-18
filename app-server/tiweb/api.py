@@ -1,19 +1,15 @@
 from flask import Flask, render_template, request, jsonify, flash, make_response, session
-from flask_change_password import ChangePassword, ChangePasswordForm, SetPasswordForm
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
 from py2neo import Graph, Node
 import requests
 import json
 import os
 import pandas as pd
-
 from flask_jwt_extended import JWTManager
-
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import jwt
 import datetime
-
 from flask_jwt_extended import (JWTManager, jwt_required, create_access_token,get_jwt_identity, verify_jwt_in_request)
 from flask_mail import Message, Mail
 import sys
@@ -24,7 +20,6 @@ from flask_cors import CORS
 from werkzeug.datastructures import Headers
 import uuid
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
-
 from tiweb import app, YAMLConfig
 from gip import geoip, ASN, geoip_insert, asn_insert
 from wipe_db import wipeDB
@@ -32,7 +27,6 @@ from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport
 from cybex import insertCybex
-
 from connect import graph
 from containerlib import client
 from users import db, User, RegistrationForm, LoginForm
@@ -78,10 +72,16 @@ def register():
         #sys.stdout.flush()
 
         if(r and r["status"]):
-           #print(json.dumps(r['data']))
+           print(json.dumps(r['data']))
            user = User.query.filter_by(username=form.username.data).first()
            user.db_ip = r['data']['ip']
            user.db_port = r['data']['port']
+           us = r['data']['auth']
+           a = us.split('/')
+           user.db_username = a[0]
+           hashed_password1 = generate_password_hash(a[1], method = 'sha256')
+           user.db_password = hashed_password1
+        
            db.session.commit() 
            
         return jsonify({'result' : result})
@@ -112,6 +112,7 @@ def login():
                         print("Error: " + r["error"])
                         r = c.get_database_info()
                         if(r and r["status"]):
+                            print(json.dumps(r['data']))
                             user = User.query.filter_by(username=form.username.data).first()
                             user.db_ip = r['data']['ip']
                             user.db_port = r['data']['port']
@@ -313,10 +314,6 @@ def sess_init():
     session['neoPort'] = None
 
     return "User {} has initialized a session.".format(session['username'])
-
-app.secret_key = os.urandom(20)
-flask_change_password = ChangePassword(min_password_length=10, rules=dict(long_password_override=2))
-flask_change_password.init_app(app)
 
 @app.route('/change_password', methods=['GET', 'POST'])
 def page_change_password():

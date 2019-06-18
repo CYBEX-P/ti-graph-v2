@@ -10,8 +10,8 @@ import Found from './pages/Found';
 import Remove from './pages/Remove';
 import Update from './pages/Update';
 import Landing from './pages/Landing';
-import NavBar from './components/navBar/navBar';
-import MenuContext from './components/App/MenuContext';
+
+
 import Change_password from './pages/Change_password'
 import User_page from './pages/User_page'
 

@@ -2,8 +2,8 @@ import React, { useReducer, useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Container } from 'reactstrap';
-import { Link, withRouter } from 'react-router-dom';
-import NavBar from '../navBar/navBar';
+
+
 import MenuBar from '../menuBar/menuBar';
 import { AppContainer, ContentContainerStyle } from '../__styles__/styles';
 import MenuContext from './MenuContext';
