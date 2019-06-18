@@ -2,7 +2,7 @@ import React, { useReducer, useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Container } from 'reactstrap';
-
+import { Link, withRouter } from 'react-router-dom';
 import NavBar from '../navBar/navBar';
 import MenuBar from '../menuBar/menuBar';
 import { AppContainer, ContentContainerStyle } from '../__styles__/styles';
@@ -68,7 +68,11 @@ const App = props => {
   }, []);
 
   return (
+    
+   
+        
     <MenuContext.Provider value={{ isExpanded, dispatchExpand, setLoading }}>
+      
       <ModalContext.Provider value={{ isShowingModal, dispatchModal, setError }}>
         <DataContext.Provider value={{ config: props.config, neo4jData, setNeo4jData }}>
           {/* Keep modals here */}
@@ -114,7 +118,8 @@ const App = props => {
             <ContentContainerStyle>
               <Graph isLoading={isLoading} />
             </ContentContainerStyle>
-            <NavBar eName={eventName} />
+            {/*<NavBar eName={eventName} />*/}
+              
             <MenuBar side="left" icon="search">
               <button
                 type="button"

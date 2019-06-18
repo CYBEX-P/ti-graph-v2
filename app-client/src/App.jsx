@@ -12,6 +12,9 @@ import Update from './pages/Update';
 import Landing from './pages/Landing';
 import NavBar from './components/navBar/navBar';
 import MenuContext from './components/App/MenuContext';
+import Change_password from './pages/Change_password'
+import User_page from './pages/User_page'
+
 
 const App = ({ config }) => {
   const [isExpanded, dispatchExpand] = useReducer((_, action) => {
@@ -42,14 +45,15 @@ const App = ({ config }) => {
     <Router basename='/tiweb'>
       <div style={{ minHeight: '100vh', backgroundColor: '#efefef' }} className="App">
         <Route path="/graph" component={() => <MainApp config={config} />} />
-
-        <MenuContext.Provider value={{ dispatchExpand, isExpanded }}>
+        
+        {/*<MenuContext.Provider value={{ dispatchExpand, isExpanded }}>
           <NavBar />
-        </MenuContext.Provider>
+  </MenuContext.Provider>*/}
 
         <div style={{ backgroundColor: '#ffffff', paddingTop: '56px', paddingBottom: '32px' }} className="container">
           <Route exact path="/" component={() => <Redirect to="/home" />} />
           <Route path="/home" component={() => <Landing isSignedIn={isSignedIn} />} />
+          <Route path="/change_password" component = {Change_password} />
           <Route path="/register" component={Register} />
           <Route path="/login" component={Login} />
           <Route path="/profile" component={Profile} />
@@ -57,6 +61,9 @@ const App = ({ config }) => {
           <Route path="/update" component={Update} />
           <Route path="/find" component={Find} />
           <Route path="/found" component={Found} />
+          <Route path = "/User" component={User_page} />
+          
+         
         </div>
       </div>
     </Router>

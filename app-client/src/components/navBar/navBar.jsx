@@ -21,11 +21,11 @@ const NavBar = (props) => {
         <a style={{ flexGrow: 2, textAlign: 'center', color: '#e3e3e3' }} href="/ti-graph">
           <div>ti-graph --- Event: {props.eName||"Temp Event"}</div>
         </a>
-        <UnstyledButton onClick={() => {}}>
+        {/*<UnstyledButton onClick={() => {}}>
           <a style={{ flexGrow: 2, textAlign: 'center', color: '#e3e3e3' }} href="/login">
             <FontAwesomeIcon size="lg" icon="user" color="#e0e0e0" />
           </a>
-        </UnstyledButton>
+        </UnstyledButton>*/}
       </NavBarStyle>
       {isExpanded === 'top' && (
         <div
@@ -45,16 +45,16 @@ const NavBar = (props) => {
                 <span style={{ paddingLeft: '12px' }}>Home</span>
               </Link>
             </li>
-            <li className="nav-item">
+            {/*<li className="nav-item">
               <Link onClick={() => dispatchExpand('none')} className="nav-link text-light" to="/login">
                 <FontAwesomeIcon fixedWidth size="lg" icon="user" color="#e0e0e0" />
                 <span style={{ paddingLeft: '12px' }}>Login</span>
-              </Link>
-            </li>
+        </Link>
+        </li>*/}
             <li className="nav-item">
               <Link onClick={() => dispatchExpand('none')} className="nav-link text-light" to="/register">
                 <FontAwesomeIcon fixedWidth size="lg" icon="user-plus" color="#e0e0e0" />
-                <span style={{ paddingLeft: '12px' }}>Register</span>
+                <span style={{ paddingLeft: '12px' }}>Create new user</span>
               </Link>
             </li>
             <li className="nav-item">

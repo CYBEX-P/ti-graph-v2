@@ -14,7 +14,7 @@ const MenuBar = props => {
   const { icon, side, children } = props;
   const { isExpanded, dispatchExpand } = useContext(MenuContext);
 
-  const iconToUse = `chevron-circle-${(s => (s === 'left' || s === 'right' ? s : 'down'))(side)}`;
+  const iconToUse = `chevron-circle-${(s => (s === 'left' || s === 'right' || s === 'top'? s : 'down'))(side)}`;
 
   return (
     <>

@@ -8,7 +8,9 @@ export const register =  newUser => {
       email: newUser.email,
       username: newUser.username,
       password: newUser.password
+      
     }).then(({data}) => {console.log(data)})
+    alert(`${newUser.username} is logged in`);
   return "submitted"
 };
 
@@ -21,7 +23,8 @@ export const login = user => {
     .then(res => {
       console.log(res.data);
       localStorage.setItem('usertoken', res.data);
-      alert(`${user.username} is logged in`);
+      //alert(`${user.username} is logged in`);
+      //post('/tiweb/graph');
       return res.data;
     })
     .catch(err => {
@@ -64,4 +67,16 @@ export const find = user => {
     .then(res => {
       console.log(res.data);
     });
+};
+
+export const change_password = newPassword => {
+  return axios
+  .post('/change_password',{
+    username: newPassword.username,
+    old_password: newPassword.old_password,
+    new_password: newPassword.new_password
+  })
+  .then(res =>{
+    console.log(res.data);
+  });
 };

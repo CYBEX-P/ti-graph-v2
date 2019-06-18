@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, flash, make_response, session
+from flask_change_password import ChangePassword, ChangePasswordForm, SetPasswordForm
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
 from py2neo import Graph, Node
 import requests
@@ -313,6 +314,16 @@ def sess_init():
 
     return "User {} has initialized a session.".format(session['username'])
 
-@app.route('/', methods=['GET'])
-def index_root():
-    return app.send_static_file('index.html')
+app.secret_key = os.urandom(20)
+flask_change_password = ChangePassword(min_password_length=10, rules=dict(long_password_override=2))
+flask_change_password.init_app(app)
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def page_change_password():
+    change_this = User.query.filter_by(username = request.get_json()['username']).first()
+    if check_password_hash(change_this.password,  request.get_json()['old_password']):
+        hashed_password = generate_password_hash(request.get_json()['new_password'], method = 'sha256')
+        change_this.password = hashed_password
+        db.session.commit()
+        result = jsonify({'message':'Password updated'})
+        return result
