@@ -32,7 +32,7 @@ from whoisXML import whois, insertWhois
 from exportDB import export, processExport
 from cybex import insertCybex
 
-from connect import graph
+from connect import connectDev, connectProd
 from containerlib import client
 from users import db, User, RegistrationForm, LoginForm
 
@@ -43,6 +43,10 @@ CORS(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# If in development, connect to local container right away
+if app.config['ENV'] == 'development':
+    graph = connectDev()
 
 #db.create_all()
     
@@ -120,6 +124,8 @@ def login():
                 # else:
                 access_token = create_access_token(identity = {'username': form.username.data})
                 result = access_token
+                global graph
+                graph = connectProd(user.db_username, user.db_password, user.db_ip, user.db_port)
                 return result
                 
             else:
