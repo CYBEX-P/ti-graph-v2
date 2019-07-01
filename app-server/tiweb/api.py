@@ -49,7 +49,16 @@ if app.config['ENV'] == 'development':
     graph = connectDev()
 
 #db.create_all()
-    
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'cybexp123@gmail.com'
+app.config['MAIL_PASSWORD'] = 'cybexpadmin'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False  
+app.config['SECURITY_PASSWORD_SALT'] = 'my_precious_two'
+
+mail = Mail(app)
+   
 @app.route('/users/register', methods = ['POST'])
 def register():
     form = RegistrationForm()
@@ -62,7 +71,8 @@ def register():
 		'first_name' : form.first_name.data,
 		'last_name' : form.last_name.data,
 		'email' : form.email.data,
-		'password' : form.password.data	
+		'password' : form.password.data,
+        'admin': form.admin.data
 	    }
 
         c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
@@ -82,8 +92,18 @@ def register():
            user = User.query.filter_by(username=form.username.data).first()
            user.db_ip = r['data']['ip']
            user.db_port = r['data']['port']
+           us = r['data']['auth']
+           print(us)
+           a = us.split('/')
+           user.db_username = a[0]
+           hashed_password1 = generate_password_hash(a[1], method = 'sha256')
+           user.db_password = hashed_password1
            db.session.commit() 
            
+           msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
+           msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
+           mail.send(msg)
+           return "Sent"
         return jsonify({'result' : result})
         
     else:
@@ -158,12 +178,26 @@ def update():
 @app.route('/find', methods = ['POST'])
 def found():
     found_user= User.query.filter_by(username = request.get_json()['username']).first_or_404()
-    found_f = found_user.first_name
-    found_l = found_user.last_name
+    result = {
+        'found_f': found_user.first_name,
+        'found_l': found_user.last_name,
+        'email':found_user.email,
+        'admin':found_user.admin
+    }
     #found_id = found_user.id
     db.session.commit()
-    
-    return str(found_f+ " "+ found_l)
+    #return found_f, found_l
+    return jsonify({'result':result})
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def page_change_password():
+    change_this = User.query.filter_by(username = request.get_json()['username']).first()
+    if check_password_hash(change_this.password,  request.get_json()['old_password']):
+        hashed_password = generate_password_hash(request.get_json()['new_password'], method = 'sha256')
+        change_this.password = hashed_password
+        db.session.commit()
+        result = jsonify({'message':'Password updated'})
+        return result
 
 
 

@@ -19,6 +19,8 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(15), unique = True)
     password = db.Column(db.String(80))
     admin = db.Column(db.Boolean)
+    db_username=db.Column(db.String(15))
+    db_password = db.Column(db.String(80))
 
 class RegistrationForm(FlaskForm):
     first_name = StringField('first_name', validators = [InputRequired()])
