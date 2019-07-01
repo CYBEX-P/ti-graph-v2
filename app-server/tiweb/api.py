@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, flash, make_response, session
+from flask import Flask, render_template, request, jsonify, flash, make_response, session, redirect
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
 from py2neo import Graph, Node
 import requests
@@ -139,10 +139,10 @@ def login():
                 #     return result
                             
                 # else:
-                access_token = create_access_token(identity = {'username': form.username.data})
+                access_token = create_access_token(identity = {'username': form.username.data, expiresInMinutes:30})
                 result = access_token
-                global graph
-                graph = connectProd(user.db_username, user.db_password, user.db_ip, user.db_port)
+                #global graph
+                #graph = connectProd(user.db_username, user.db_password, user.db_ip, user.db_port)
                 return result
                 
             else:
@@ -203,7 +203,7 @@ def page_change_password():
 @app.route('/user/logout', methods = ['GET', 'POST'])
 def logout():
     logout_user()
-    
+    return redirect('/login')
 
 
 @app.route('/secure')

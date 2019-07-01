@@ -6,7 +6,7 @@ import {logout} from './UserFunctions';
 
 logout().then(res => {
   if (!res.exit) {
-    this.props.history.push('/home');
+    //this.props.history.push('/login');
   }
 });
 
