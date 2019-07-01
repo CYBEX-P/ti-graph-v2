@@ -31,6 +31,7 @@ from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport
 from cybex import insertCybex
+from enrichments import insert_domain_and_user, insert_domain, insert_netblock
 
 from connect import connectDev, connectProd
 from containerlib import client
@@ -194,6 +195,18 @@ def wipe_function():
     wipeDB(graph)
     return jsonify({"Status":"Neo4j DB full wipe complete!"})
 
+@app.route('/api/v1/neo4j/insertURL', methods = ['POST'])
+def insert2():
+    req = request.get_json()
+    Ntype = req['Ntype']
+    data = req['value']
+
+    status = insertNode(Ntype, data, graph)
+    if status == 1:
+        return jsonify({"Status" : "Success"})
+    else:
+        return jsonify({"Status" : "Failed"})
+
 
 @app.route('/api/v1/neo4j/insert/<Ntype>/<data>')
 def insert(Ntype, data):
@@ -204,46 +217,61 @@ def insert(Ntype, data):
         return jsonify({"Status" : "Failed"})
 
 
-@app.route('/api/v1/enrich/<enrich_type>/<ip>')
-def enrich(enrich_type, ip):
+@app.route('/api/v1/enrich/<enrich_type>/<value>')
+def enrich(enrich_type, value):
     if(enrich_type == "asn"):
-            a_results = ASN(ip)
+            a_results = ASN(value)
             status = asn_insert(a_results, graph)
             return jsonify({"insert status" : status})
 
     elif enrich_type == "gip":
-            g_results = geoip(ip)
+            g_results = geoip(value)
             status = geoip_insert(g_results, graph)
             return jsonify({"insert status" : status})
 
     elif enrich_type == "hostname":
-            status = insertHostname(ip, graph)
+            status = insertHostname(value, graph)
             return jsonify({"insert status" : status})
     
     elif enrich_type == "whois":
-            w_results = whois(ip)
+            w_results = whois(value)
             status = insertWhois(w_results, graph)
             return jsonify({"insert status" : status})
 
     elif enrich_type == "cybex":
             url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/related/"
             headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
-            data = { 'ipv4-addr' : ip }
+            data = { 'ipv4-addr' : value }
             data = json.dumps(data)
 
             r = requests.post(url, headers=headers, data=data)
             res = json.loads(r.text)
             try:
                 numOccur = len(res['objects'])
-                status = insertCybex(numOccur, graph, ip)
+                status = insertCybex(numOccur, graph, value)
                 return jsonify({"insert status" : status})
 
             except:
                 return jsonify({"insert status" : 0})
+
+    elif enrich_type == "deconstructEmail":
+            status = insert_domain_and_user(value, graph)
+            return jsonify({"insert status" : status})
+
+    elif enrich_type == "netblock":
+            status = insert_netblock(value, graph)
+            return jsonify({"insert status" : status})
                     
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
 
+@app.route('/api/v1/enrichURL', methods=['POST'])
+def enrichURL():
+    req = request.get_json()
+    value = req['value']
+
+    status = insert_domain(value, graph)
+    return jsonify({"insert status" : status})
 
 @app.route('/api/v1/enrich/all')
 def enrich_all():

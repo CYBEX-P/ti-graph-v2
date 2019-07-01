@@ -1,5 +1,8 @@
 whoisData:
   apikey: at_dE3c8tVnBieCdGwtzUiOFFGfuCQoz
+
+shodanData:
+  apikey: jLcUwcGmyoMnyRW5f8SyrB5U85ztyD0i
   
   
 IOC:
