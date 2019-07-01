@@ -200,6 +200,10 @@ def page_change_password():
         result = jsonify({'message':'Password updated'})
         return result
 
+@app.route('/user/logout', methods = ['GET', 'POST'])
+def logout():
+    logout_user()
+    
 
 
 @app.route('/secure')

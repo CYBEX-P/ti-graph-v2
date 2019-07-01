@@ -1,12 +1,19 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../components/Button/Button';
+import {logout} from './UserFunctions';
 // import axios from 'axios';
+
+logout().then(res => {
+  if (!res.exit) {
+    this.props.history.push('/home');
+  }
+});
 
 const Landing = ({ isSignedIn }) => (
   <>
     <h1 className="text-center">Threat Intelligence Graph</h1>
-    <p>NSF funded project at the University of Nevada, Reno</p>
+    <center><p>NSF funded project at the University of Nevada, Reno</p></center>
     {!isSignedIn && (
       <>
         <a href="/tiweb/login">
@@ -26,11 +33,12 @@ const Landing = ({ isSignedIn }) => (
     )}
     {isSignedIn && (
       <>
-        <a href="/tiweb/logout">Logout</a>
+        
         <a href="/tiweb/graph">
           <Button width="100%" onClickFunction={() => {}}>
             <div style={{ width: '100%', textAlign: 'center' }}>Graph</div>
           </Button>
+          <center><a href="/tiweb/logout">Logout</a></center>
         </a>
       </>
     )}
