@@ -171,6 +171,7 @@ def update():
         update_this.first_name = request.get_json()['first_name']
         update_this.last_name = request.get_json()['last_name']
         update_this.email = request.get_json()['email']
+        update_this.admin = request.get_json()['admin']
         db.session.commit()
         result = jsonify({'message': 'DB updated'})
         return result 

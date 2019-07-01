@@ -48,7 +48,8 @@ export const update = user => {
       last_name: user.last_name,
       email: user.email,
       username: user.username,
-      admin:user.admin
+      admin:user.admin,
+      
     })
     .then(() => {
       console.log('updated');

@@ -11,8 +11,9 @@ class Register extends Component {
       email: '',
       username: '',
       password: '',
-      admin:true,
-      selectedvalue:'',
+      admin:false,
+      user:false,
+      
       first_nameError: '',
       last_nameError: '',
       emailError: '',
@@ -21,6 +22,7 @@ class Register extends Component {
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   onChange(e) {
@@ -28,14 +30,10 @@ class Register extends Component {
       
       });
   }
-  handleInputChange(event) {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-
+  handleInputChange(e) {
     this.setState({
-      [name]: value
-    });
+      [e.target.name]: e.target.checked
+    })
   }
 
   validate = () => {
@@ -77,7 +75,8 @@ class Register extends Component {
       email: this.state.email,
       username: this.state.username,
       password: this.state.password,
-      admin:true
+      admin:this.state.admin,
+      user:this.state.user
       //selectedValue: this.state.selectedValue
     };
 

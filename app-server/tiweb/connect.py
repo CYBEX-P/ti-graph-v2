@@ -5,7 +5,7 @@ from py2neo import Graph
 #     graph = Graph("bolt://127.0.0.1:7687", auth=("neo4j", "wolfpack"))
 #     return graph
 def connectDev():
-    graph = Graph("bolt://127.0.0.1:7687", auth=("neo4j", "wolfpack"))
+    graph = Graph("bolt://moose.soc.unr.edu:31413", auth=("neo4j", "dfKrTJN7"))
     return graph
 # connect to user's individual container 
 def connectProd(user, passw, addr, port):
