@@ -47,7 +47,8 @@ export const update = user => {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
-      username: user.username
+      username: user.username,
+      admin:user.admin
     })
     .then(() => {
       console.log('updated');
@@ -81,9 +82,5 @@ export const change_password = newPassword => {
     alert(`Password changed for ${newPassword.username}  `);
   });
 };
-export const user_permission = user => {
-  return axios
-  .get('/find',{
-    admin: user.admin
-  });
-};
+
+

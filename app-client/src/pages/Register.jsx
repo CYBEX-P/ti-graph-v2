@@ -171,7 +171,7 @@ class Register extends Component {
                 <div style={{ fontSize: 12, color: 'red' }}>{this.state.passwordError}</div>
               ) : null}
               <label> Admin
-              <input type="checkbox" name ="admin" checked={this.state.admin} onChange ={this.handleInputChange}/></label>
+              <input type="checkbox" name ="admin" checked={this.state.admin} onChange ={this.handleInputChange}/></label><br></br>
               <label> User
               <input type="checkbox" name ="user" checked={this.state.user} onChange ={this.handleInputChange}/></label>
               <button type="submit" className="btn btn-lg btn-primary btn-block">

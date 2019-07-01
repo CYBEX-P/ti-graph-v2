@@ -21,6 +21,15 @@ class Update extends Component {
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
+  }
   validate = () => {
     let first_nameError = '';
     let last_nameError = '';
@@ -54,7 +63,8 @@ class Update extends Component {
       username: this.state.username,
       first_name: this.state.first_name,
       last_name: this.state.last_name,
-      email: this.state.email
+      email: this.state.email,
+      adin:true
     };
     const isValid = this.validate();
     if (isValid) {
@@ -129,7 +139,10 @@ class Update extends Component {
                 />
               </div>
               {this.state.emailError ? <div style={{ fontSize: 12, color: 'red' }}>{this.state.emailError}</div> : null}
-
+              <label> Admin
+              <input type="checkbox" name ="admin" checked={this.state.admin} onChange ={this.handleInputChange}/></label><br></br>
+              <label> User
+              <input type="checkbox" name ="user" checked={this.state.user} onChange ={this.handleInputChange}/></label>
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Update
               </button>
