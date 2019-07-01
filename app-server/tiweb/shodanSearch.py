@@ -1,6 +1,6 @@
 import shodan
 import yaml
-
+from py2neo import Graph, Node, Relationship
 
 
 def shodan_lookup(ip):
@@ -18,11 +18,28 @@ def shodan_lookup(ip):
     # return list of ports detected
     return results['ports']
 
+def insert_ports(values, graph, ip):
+    c = Node("Ports", data=values)
+    ip_node = graph.nodes.match("IP", data=ip).first()
+    c_node = graph.nodes.match("Ports", data = values).first()
+
+    if(c_node):
+            rel = Relationship(ip_node, "FROM_IP", c_node)
+            graph.create(rel)
+            print("Existing port node linked")
+    else:
+            graph.create(c)
+            rel = Relationship(ip_node, "FROM_IP", c)
+            graph.create(rel)
+            print("New port node created and linked")
+
+    return 1
 
 
-if __name__ == "__main__":
 
-    value = str(input("Enter an IP: "))
-    results = shodan_lookup(value)
-    print("Ports open: " + str(results['ports']))
+# if __name__ == "__main__":
+
+#     value = str(input("Enter an IP: "))
+#     results = shodan_lookup(value)
+#     print("Ports open: " + str(results['ports']))
 

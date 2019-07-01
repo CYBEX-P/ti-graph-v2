@@ -36,6 +36,7 @@ from enrichments import insert_domain_and_user, insert_domain, insert_netblock
 from connect import connectDev, connectProd
 from containerlib import client
 from users import db, User, RegistrationForm, LoginForm
+from shodanSearch import shodan_lookup, insert_ports
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -260,6 +261,11 @@ def enrich(enrich_type, value):
 
     elif enrich_type == "netblock":
             status = insert_netblock(value, graph)
+            return jsonify({"insert status" : status})
+    
+    elif enrich_type == "ports":
+            results = shodan_lookup(value)
+            status = insert_ports(results, graph, value)
             return jsonify({"insert status" : status})
                     
     else:
