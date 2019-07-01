@@ -139,7 +139,7 @@ def login():
                 #     return result
                             
                 # else:
-                access_token = create_access_token(identity = {'username': form.username.data, expiresInMinutes:30})
+                access_token = create_access_token(identity = {'username': form.username.data})
                 result = access_token
                 #global graph
                 #graph = connectProd(user.db_username, user.db_password, user.db_ip, user.db_port)
