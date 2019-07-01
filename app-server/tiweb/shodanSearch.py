@@ -12,10 +12,11 @@ def shodan_lookup(ip):
 
     api = shodan.Shodan(API_KEY)
 
-    results = api.host(ip)
+    results = api.host(ip, minify=True)
     # results = api.scan(ip)
 
-    return results
+    # return list of ports detected
+    return results['ports']
 
 
 
@@ -23,5 +24,5 @@ if __name__ == "__main__":
 
     value = str(input("Enter an IP: "))
     results = shodan_lookup(value)
-    print(results)
+    print("Ports open: " + str(results['ports']))
 
