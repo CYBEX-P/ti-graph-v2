@@ -65,6 +65,7 @@ class Login extends Component {
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Sign in
               </button>
+              <a href = '/tiweb/Change_Password'>Forgot Password</a>
             </form>
           </div>
         </div>

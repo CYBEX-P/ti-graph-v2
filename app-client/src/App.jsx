@@ -12,6 +12,7 @@ import Update from './pages/Update';
 import Landing from './pages/Landing';
 import NavBar from './components/navBar/navBar';
 import MenuContext from './components/App/MenuContext';
+import Change_password from './pages/Change_Password';
 
 const App = ({ config }) => {
   const [isExpanded, dispatchExpand] = useReducer((_, action) => {
@@ -57,6 +58,7 @@ const App = ({ config }) => {
           <Route path="/update" component={Update} />
           <Route path="/find" component={Find} />
           <Route path="/found" component={Found} />
+          <Route path="/Change_Password" component={Change_password} />
         </div>
       </div>
     </Router>

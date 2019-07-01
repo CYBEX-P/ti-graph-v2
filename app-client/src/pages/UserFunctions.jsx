@@ -7,9 +7,10 @@ export const register =  newUser => {
       last_name: newUser.last_name,
       email: newUser.email,
       username: newUser.username,
-      password: newUser.password
+      password: newUser.password,
+     admin:newUser.admin
     }).then(({data}) => {console.log(data)})
-  return "submitted"
+  //return "submitted"
 };
 
 export const login = user => {
@@ -36,6 +37,7 @@ export const remove = user => {
     })
     .then(() => {
       console.log('deleted');
+      alert(` ${user.username} is deleted  `);
     });
 };
 
@@ -49,6 +51,7 @@ export const update = user => {
     })
     .then(() => {
       console.log('updated');
+      alert(` ${user.username} is updated  `);
     })
     .catch(err => {
       console.log(err);
@@ -58,9 +61,29 @@ export const update = user => {
 export const find = user => {
   return axios
     .post('/find', {
-      username: user.username
+      username: user.username, 
     })
     .then(res => {
       console.log(res.data);
+      return(res.data)
     });
+};
+
+export const change_password = newPassword => {
+  return axios
+  .post('/change_password',{
+    username: newPassword.username,
+    old_password: newPassword.old_password,
+    new_password: newPassword.new_password
+  })
+  .then(res =>{
+    console.log(res.data);
+    alert(`Password changed for ${newPassword.username}  `);
+  });
+};
+export const user_permission = user => {
+  return axios
+  .get('/find',{
+    admin: user.admin
+  });
 };

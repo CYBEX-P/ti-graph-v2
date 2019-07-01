@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { register } from './UserFunctions';
+//import Checkbox from './Checkbox';
 
 class Register extends Component {
   constructor(props) {
@@ -10,6 +11,8 @@ class Register extends Component {
       email: '',
       username: '',
       password: '',
+      admin:true,
+      selectedvalue:'',
       first_nameError: '',
       last_nameError: '',
       emailError: '',
@@ -21,7 +24,18 @@ class Register extends Component {
   }
 
   onChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
+    this.setState({ [e.target.name]: e.target.value,
+      
+      });
+  }
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
   }
 
   validate = () => {
@@ -62,7 +76,9 @@ class Register extends Component {
       last_name: this.state.last_name,
       email: this.state.email,
       username: this.state.username,
-      password: this.state.password
+      password: this.state.password,
+      admin:true
+      //selectedValue: this.state.selectedValue
     };
 
     const isValid = this.validate();
@@ -154,9 +170,14 @@ class Register extends Component {
               {this.state.passwordError ? (
                 <div style={{ fontSize: 12, color: 'red' }}>{this.state.passwordError}</div>
               ) : null}
+              <label> Admin
+              <input type="checkbox" name ="admin" checked={this.state.admin} onChange ={this.handleInputChange}/></label>
+              <label> User
+              <input type="checkbox" name ="user" checked={this.state.user} onChange ={this.handleInputChange}/></label>
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Register
               </button>
+              
             </form>
           </div>
         </div>

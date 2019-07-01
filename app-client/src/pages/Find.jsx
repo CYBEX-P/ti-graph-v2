@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import { find } from './UserFunctions';
 
+
+
 class Find extends Component {
   constructor() {
     super();
     this.state = {
-      username: ''
+      username: '',
+      first_name:'',
+      last_name:'',
+      email:''
+      
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -19,11 +25,23 @@ class Find extends Component {
     e.preventDefault();
 
     const user = {
-      username: this.state.username
+      username: this.state.username,
+      first_name:this.state.first_name,
+      last_name:this.state.last_name,
+      email:this.state.email
+      
     };
 
     find(user).then(res => {
       console.log('found');
+      this.setState({
+        first_name:res.result['found_f'],
+        last_name:res.result['found_l'],
+        email:res.result['email']
+        
+      })
+      
+     
     });
   }
 
@@ -50,10 +68,42 @@ class Find extends Component {
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Find
               </button>
+              
             </form>
+            <div className="container">
+        <div className="jumbotron mt-5">
+        <h1><center>Details</center></h1>
+          <div className="col-sm-8 mt-5">
+            {/* <h1 className="text-center" /> */}
+            
+          </div>
+          
+          <table className="table col-md-6 mx-auto">
+            <tbody>
+              <tr>
+                <td>Username</td>
+                <td>{this.state.username}</td>
+              </tr>
+              <tr>
+                <td>First Name</td>
+                <td>{this.state.first_name}</td>
+              </tr>
+              <tr>
+                <td>Last Name</td>
+                <td>{this.state.last_name}</td>
+              </tr>
+              <tr>
+                <td>Email</td>
+                <td>{this.state.email}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
           </div>
         </div>
       </div>
+      
     );
   }
 }

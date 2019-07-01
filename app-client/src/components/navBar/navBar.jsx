@@ -3,11 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import { NavBarStyle, UnstyledButton } from '../__styles__/styles';
 import MenuContext from '../App/MenuContext';
+import axios from 'axios';
 
-const NavBar = (props) => {
+
+const NavBar = (props,permissions) => {
   const { isExpanded, dispatchExpand } = useContext(MenuContext);
   
-
+  
   return (
     <>
       <NavBarStyle>
@@ -21,11 +23,11 @@ const NavBar = (props) => {
         <a style={{ flexGrow: 2, textAlign: 'center', color: '#e3e3e3' }} href="/ti-graph">
           <div>ti-graph --- Event: {props.eName||"Temp Event"}</div>
         </a>
-        <UnstyledButton onClick={() => {}}>
+        {/*<UnstyledButton onClick={() => {}}>
           <a style={{ flexGrow: 2, textAlign: 'center', color: '#e3e3e3' }} href="/login">
             <FontAwesomeIcon size="lg" icon="user" color="#e0e0e0" />
           </a>
-        </UnstyledButton>
+      </UnstyledButton>*/}
       </NavBarStyle>
       {isExpanded === 'top' && (
         <div
@@ -38,7 +40,7 @@ const NavBar = (props) => {
             zIndex: 7
           }}
         >
-          <ul style={{ marginLeft: '12px' }} className="navbar-nav">
+        <ul style={{ marginLeft: '12px' }} className="navbar-nav">
             <li className="nav-item">
               <Link onClick={() => dispatchExpand('none')} className="nav-link text-light" to="/">
                 <FontAwesomeIcon fixedWidth size="lg" icon="home" color="#e0e0e0" />
@@ -51,6 +53,9 @@ const NavBar = (props) => {
                 <span style={{ paddingLeft: '12px' }}>Login</span>
               </Link>
             </li>
+            
+           {permissions === 'admin' && (
+            <>
             <li className="nav-item">
               <Link onClick={() => dispatchExpand('none')} className="nav-link text-light" to="/register">
                 <FontAwesomeIcon fixedWidth size="lg" icon="user-plus" color="#e0e0e0" />
@@ -75,7 +80,10 @@ const NavBar = (props) => {
                 <span style={{ paddingLeft: '12px' }}>Update</span>
               </Link>
             </li>
-          </ul>
+            </>
+            )}
+           
+        </ul>
         </div>
       )}
     </>
