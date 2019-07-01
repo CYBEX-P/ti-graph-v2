@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import { NavBarStyle, UnstyledButton } from '../__styles__/styles';
 import MenuContext from '../App/MenuContext';
-import axios from 'axios';
+
 
 
 const NavBar = (props,permissions) => {
