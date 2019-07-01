@@ -27,7 +27,7 @@ class Login extends Component {
 
     login(user).then(res => {
       if (!res.exit) {
-        this.props.history.push('/');
+        this.props.history.push('/graph');
       }
     });
   }
