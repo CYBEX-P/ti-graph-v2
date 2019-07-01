@@ -11,8 +11,3 @@ def connectProd(user, passw, addr, port):
     URI = "bolt://" + addr + ":" + port
     graph = Graph(URI, auth=(user, passw))
     return graph
-    
-# dev prod connection for demo
-# def connectDev():
-#     graph = Graph("bolt://moose.soc.unr.edu:31413", auth=("neo4j", "dfKrTJN7"))
-#     return graph
