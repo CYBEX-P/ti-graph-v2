@@ -1,4 +1,5 @@
 from py2neo import Graph, Node, Relationship
+import socket
 
 def insert_domain_and_user(emailString, graph):
     user, domain = emailString.split("@")
@@ -74,6 +75,59 @@ def insert_netblock(value, graph):
 
         return 1
         
+def resolveHost(node, graph):
+        try:
+                host = socket.gethostbyname(node)
+
+                i = Node("IP", data = host)
+                host_node = graph.nodes.match("Host", data=node).first()
+                i_node = graph.nodes.match("IP", data=host).first()
+
+                if(i_node):
+                        rel = Relationship(host_node, "IS_RELATED_TO", i_node)
+                        graph.create(rel)
+                        print("Existing IP node linked")
+
+                else:
+                        graph.create(i)
+                        rel = Relationship(host_node, "IS_RELATED_TO", i)
+                        graph.create(rel)
+                        print("New IP node created and linked", host)
+                
+                return 1
+
+        except:
+                print("No IP Entry for {}".format(node))
+                return 0
+
+
+def getNameservers(data, graph, value):
+        if(data != 0):
+                values = data["WhoisRecord"]["nameServers"]["hostNames"]
+                for i in values:
+                        print(i)
+                #         # try:
+                #                 c = Node("Nameserver", data = i)
+                #                 host_node = graph.nodes.match("Host", data=value).first()
+                #                 c_node = graph.nodes.match("Nameserver", data = i).first()
+
+                #                 if(c_node):
+                #                         rel = Relationship(host_node, "HAS", c_node)
+                #                         graph.create(rel)
+                #                         print("Existing Nameserver node linked")
+
+                #                 else:
+                #                         graph.create(c)
+                #                         rel = Relationship(host_node, "HAS", c)
+                #                         graph.create(rel)
+                #                         print("New Nameserver node created and linked")
+                #                 return 1
+                        # except:
+                        #         print("Error with cycling through nameservers")
+                        #         return 0
+        else:
+                print("No Whois for this Host")
+                return 0
 # if __name__ == "__main__":
 #         value = input("Enter Full URL: ")
 #         print(insert_domain(value, 1))

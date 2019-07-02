@@ -31,7 +31,7 @@ from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport
 from cybex import insertCybex
-from enrichments import insert_domain_and_user, insert_domain, insert_netblock
+from enrichments import insert_domain_and_user, insert_domain, insert_netblock, resolveHost, getNameservers
 
 from connect import connectDev, connectProd
 from containerlib import client
@@ -236,7 +236,7 @@ def enrich(enrich_type, value):
     
     elif enrich_type == "whois":
             w_results = whois(value)
-            status = insertWhois(w_results, graph)
+            status = insertWhois(w_results, graph, value)
             return jsonify({"insert status" : status})
 
     elif enrich_type == "cybex":
@@ -267,7 +267,15 @@ def enrich(enrich_type, value):
             results = shodan_lookup(value)
             status = insert_ports(results, graph, value)
             return jsonify({"insert status" : status})
-                    
+
+    elif enrich_type == "resolveHost":
+            status = resolveHost(value, graph)
+            return jsonify({"insert status" : status})
+    
+    elif enrich_type == "nameservers":
+            w_results = whois(value)
+            status = getNameservers(w_results, graph, value)
+            return jsonify({"insert status" : status})
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
 

@@ -43,7 +43,7 @@ IOC:
       - none
 
     Host:
-      - na
+      - whois
       - none
 
     URL:
