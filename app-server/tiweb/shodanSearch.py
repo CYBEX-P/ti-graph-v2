@@ -11,7 +11,7 @@ def shodan_lookup(ip):
     API_KEY = conf['shodanData']['apikey']
 
     api = shodan.Shodan(API_KEY)
-
+        
     results = api.host(ip, minify=True)
     # results = api.scan(ip)
 
@@ -20,16 +20,20 @@ def shodan_lookup(ip):
 
 def insert_ports(values, graph, ip):
     c = Node("Ports", data=values)
-    ip_node = graph.nodes.match("IP", data=ip).first()
+    try:
+            ip_node = graph.nodes.match("IP", data=ip).first()
+    except:
+            ip_node = graph.nodes.match("Subnet", data=ip).first()
+
     c_node = graph.nodes.match("Ports", data = values).first()
 
     if(c_node):
-            rel = Relationship(ip_node, "FROM_IP", c_node)
+            rel = Relationship(ip_node, "FROM", c_node)
             graph.create(rel)
             print("Existing port node linked")
     else:
             graph.create(c)
-            rel = Relationship(ip_node, "FROM_IP", c)
+            rel = Relationship(ip_node, "FROM", c)
             graph.create(rel)
             print("New port node created and linked")
 

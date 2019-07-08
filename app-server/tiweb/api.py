@@ -37,6 +37,7 @@ from connect import connectDev, connectProd
 from containerlib import client
 from users import db, User, RegistrationForm, LoginForm
 from shodanSearch import shodan_lookup, insert_ports
+from pdns import pdns_handler, insert_pdns
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -295,6 +296,28 @@ def enrich_all():
         enrich('whois', node['data'])
         enrich('hostname', node['data'])
     return jsonify({"Status" : "Success"})
+
+@app.route('/api/v1/enrichPDNS', methods=['POST'])
+def enrich_pdns():
+    req = request.get_json()
+    value = req['value']
+
+    data = pdns_handler(value)
+    print(data)
+    status = insert_pdns(data, graph, value)
+
+    return jsonify({"Insert Status" : status})
+
+# @app.route('/api/v1/enrichBlock', methods=['POST'])
+# def enrichBlock():
+#         req = request.get_json()
+#         print(str(req))
+#         value = req['value']
+#         print(str(value))
+#         results = shodan_lookup(value)
+#         status = insert_ports(results, graph, value)
+#         return jsonify({"insert status" : status})
+
 
 # @app.route('/details/<id>')
 # def show_details(id):

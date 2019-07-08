@@ -103,28 +103,33 @@ def resolveHost(node, graph):
 
 def getNameservers(data, graph, value):
         if(data != 0):
-                values = data["WhoisRecord"]["nameServers"]["hostNames"]
+                try:
+                        values = data["WhoisRecord"]["nameServers"]["hostNames"]
+                except:
+                        print("No nameservers for this host")
+                        return 0
+                        
                 for i in values:
-                        print(i)
-                #         # try:
-                #                 c = Node("Nameserver", data = i)
-                #                 host_node = graph.nodes.match("Host", data=value).first()
-                #                 c_node = graph.nodes.match("Nameserver", data = i).first()
+                        # print(i)
+                        try:
+                                c = Node("Nameserver", data = i)
+                                host_node = graph.nodes.match("Host", data=value).first()
+                                c_node = graph.nodes.match("Nameserver", data = i).first()
 
-                #                 if(c_node):
-                #                         rel = Relationship(host_node, "HAS", c_node)
-                #                         graph.create(rel)
-                #                         print("Existing Nameserver node linked")
+                                if(c_node):
+                                        rel = Relationship(host_node, "HAS", c_node)
+                                        graph.create(rel)
+                                        print("Existing Nameserver node linked")
 
-                #                 else:
-                #                         graph.create(c)
-                #                         rel = Relationship(host_node, "HAS", c)
-                #                         graph.create(rel)
-                #                         print("New Nameserver node created and linked")
-                #                 return 1
-                        # except:
-                        #         print("Error with cycling through nameservers")
-                        #         return 0
+                                else:
+                                        graph.create(c)
+                                        rel = Relationship(host_node, "HAS", c)
+                                        graph.create(rel)
+                                        print("New Nameserver node created and linked")
+                                
+                        except:
+                                print("Error with cycling through nameservers")
+                return 1
         else:
                 print("No Whois for this Host")
                 return 0
