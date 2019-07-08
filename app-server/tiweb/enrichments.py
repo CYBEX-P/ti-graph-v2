@@ -104,7 +104,12 @@ def resolveHost(node, graph):
 
 def getNameservers(data, graph, value):
         if(data != 0):
-                values = data["WhoisRecord"]["nameServers"]["hostNames"]
+                try:
+                        values = data["WhoisRecord"]["nameServers"]["hostNames"]
+                except:
+                        print("No nameservers for this host")
+                        return 0
+                        
                 for i in values:
                         try:
                                 c = Node("Nameserver", data = i)
