@@ -1,7 +1,7 @@
 class DefaultConfig(object):
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://cybexpadmin:O4LZcK9pIMF3x0PFGqeKvdH3krhknwpF@134.197.21.10:3306/cybexpui"
+    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://cybexpadmin:cybexp19sekret@134.197.21.10:3306/cybexpui"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PROPOGATE_EXCCEPTIONS = True
     WTF_CSRF_ENABLED = False

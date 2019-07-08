@@ -1,5 +1,11 @@
 whoisData:
   apikey: at_dE3c8tVnBieCdGwtzUiOFFGfuCQoz
+
+shodanData:
+  apikey: jLcUwcGmyoMnyRW5f8SyrB5U85ztyD0i
+
+farsightData:
+  apikey: 55bccaf382c8e595b6ce05e779c9b61165cb70391cc9e9d930871596ee39fd75
   
   
 IOC:
@@ -40,7 +46,7 @@ IOC:
       - none
 
     Host:
-      - na
+      - whois
       - none
 
     URL:

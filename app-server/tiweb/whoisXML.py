@@ -26,23 +26,42 @@ def whois(data):
     return jsonResponse
 
 
-def insertWhois(data, graph):
+def insertWhois(data, graph, value):
 
     if(data != 0):
+        try:
             c = Node("Whois", data = data["WhoisRecord"]["registryData"]["registrant"]["organization"])
-            ip_node = graph.nodes.match("IP", data=data["WhoisRecord"]["domainName"]).first()
+            ip_node = graph.nodes.match( data=value).first()
             c_node = graph.nodes.match("Whois", data = data["WhoisRecord"]["registryData"]["registrant"]["organization"]).first()
 
             if(c_node):
-                    rel = Relationship(ip_node, "HAS_WHOIS", c_node)
-                    graph.create(rel)
-                    print("Existing whois node linked")
+                rel = Relationship(ip_node, "HAS_WHOIS", c_node)
+                graph.create(rel)
+                print("Existing whois node linked")
             else:
-                    graph.create(c)
-                    rel = Relationship(ip_node, "HAS_WHOIS", c)
-                    graph.create(rel)
-                    print("New whois node created and linked")
+                graph.create(c)
+                rel = Relationship(ip_node, "HAS_WHOIS", c)
+                graph.create(rel)
+                print("New whois node created and linked")
             return 1
+
+        except:
+            c = Node("Whois", data = data["WhoisRecord"]["registrant"])
+            ip_node = graph.nodes.match( data=value).first()
+            c_node = graph.nodes.match("Whois", data = data["WhoisRecord"]["registrant"]["organization"]).first()
+
+            if(c_node):
+                rel = Relationship(ip_node, "HAS_WHOIS", c_node)
+                graph.create(rel)
+                print("Existing whois node linked")
+            else:
+                graph.create(c)
+                rel = Relationship(ip_node, "HAS_WHOIS", c)
+                graph.create(rel)
+                print("New whois node created and linked")
+            return 1
+
+        
     else:
             print("No whois Entry")
             return 0
