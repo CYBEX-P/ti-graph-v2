@@ -1,5 +1,6 @@
 from py2neo import Graph, Node, Relationship
 import socket
+import dns.resolver
 
 def insert_domain_and_user(emailString, graph):
     user, domain = emailString.split("@")
@@ -110,7 +111,6 @@ def getNameservers(data, graph, value):
                         return 0
                         
                 for i in values:
-                        # print(i)
                         try:
                                 c = Node("Nameserver", data = i)
                                 host_node = graph.nodes.match("Host", data=value).first()
@@ -133,6 +133,63 @@ def getNameservers(data, graph, value):
         else:
                 print("No Whois for this Host")
                 return 0
+
+
+def getRegistrar(data, graph, value):
+        if(data != 0):
+                values = data["WhoisRecord"]["registrarName"]
+                try:
+                        c = Node("Registrar", data = values)
+                        host_node = graph.nodes.match("Host", data=value).first()
+                        c_node = graph.nodes.match("Registrar", data = values).first()
+
+                        if(c_node):
+                                rel = Relationship(host_node, "HAS", c_node)
+                                graph.create(rel)
+                                print("Existing Registrar node linked")
+
+                        else:
+                                graph.create(c)
+                                rel = Relationship(host_node, "HAS", c)
+                                graph.create(rel)
+                                print("New Registrar node created and linked")
+                        
+                except:
+                        print("Error with Registrar")
+                        return 0
+                return 1
+        else:
+                print("No Registrar for this Host")
+                return 0
+
+def getMailServer(data, graph):
+    answers = []
+    for x in dns.resolver.query(data, 'MX'):
+        answers.append(x.to_text())
+
+    for values in answers:
+        try:
+            c = Node("MailServer", data = values)
+            host_node = graph.nodes.match("Host", data=data).first()
+            c_node = graph.nodes.match("MailServer", data = values).first()
+
+            if(c_node):
+                    rel = Relationship(host_node, "HAS", c_node)
+                    graph.create(rel)
+                    print("Existing MailServer node linked")
+
+            else:
+                    graph.create(c)
+                    rel = Relationship(host_node, "HAS", c)
+                    graph.create(rel)
+                    print("New MailServer node created and linked")
+                
+        except:
+            print("Error with MailServer")
+            return 0
+
+    return 1
+
 # if __name__ == "__main__":
 #         value = input("Enter Full URL: ")
 #         print(insert_domain(value, 1))

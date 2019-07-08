@@ -31,7 +31,7 @@ from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport
 from cybex import insertCybex
-from enrichments import insert_domain_and_user, insert_domain, insert_netblock, resolveHost, getNameservers
+from enrichments import insert_domain_and_user, insert_domain, insert_netblock, resolveHost, getNameservers, getRegistrar, getMailServer
 
 from connect import connectDev, connectProd
 from containerlib import client
@@ -276,6 +276,15 @@ def enrich(enrich_type, value):
     elif enrich_type == "nameservers":
             w_results = whois(value)
             status = getNameservers(w_results, graph, value)
+            return jsonify({"insert status" : status})
+        
+    elif enrich_type == "registrar":
+            w_results = whois(value)
+            status = getRegistrar(w_results, graph, value)
+            return jsonify({"insert status" : status})
+
+    elif enrich_type == "mail":
+            status = getMailServer(value, graph)
             return jsonify({"insert status" : status})
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
