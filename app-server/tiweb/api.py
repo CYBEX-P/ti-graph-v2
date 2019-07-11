@@ -397,3 +397,55 @@ def sess_init():
 @app.route('/', methods=['GET'])
 def index_root():
     return app.send_static_file('index.html')
+
+@app.route('/api/v1/macro')
+def macro1():
+    data = processExport(export(graph))
+    nodes = data["Neo4j"][0][0]["nodes"]
+
+    for node in nodes:
+        value = node["properties"]["data"]
+        print(value)
+
+        if node["label"] == "URL": 
+            # deconstruct URL
+            status = insert_domain(value, graph)
+            print(str(status))
+
+        elif node["label"] == "Email":
+            # deconstruct Email
+            status = insert_domain_and_user(value, graph)
+            print(str(status))
+
+        elif node["label"] == "Host":
+            # resolve IP, MX, nameservers
+            try:
+                status1 = resolveHost(value, graph)
+            except:
+                print("IP resolve Error")
+            try:
+                status2 = getMailServer(value, graph)
+            except:
+                print("MX Error")
+            try:
+                w_results = whois(value)
+                status3 = getNameservers(w_results, graph, value)
+            except:
+                print("Nameserver Error")
+
+        elif node["label"] == "IP":
+            # enrich all + ports + netblock 
+            enrich('asn', value)
+            enrich('gip', value)
+            enrich('whois', value)
+            enrich('hostname', value)
+
+            results = shodan_lookup(value)
+            status1 = insert_ports(results, graph, value)
+
+
+            status2 = insert_netblock(value, graph)
+        
+        print("Done with", str(value))
+
+    return jsonify(nodes)
