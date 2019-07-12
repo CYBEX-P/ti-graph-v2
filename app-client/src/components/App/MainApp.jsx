@@ -116,13 +116,30 @@ const App = props => {
             </ContentContainerStyle>
             <NavBar eName={eventName} />
             <MenuBar side="left" icon="search">
+              <h3 style={{paddingLeft: "20%", paddingRight: "25%", marginLeft: "20%", marginTop: "5%"}}>Macros</h3>
+              <hr style={{marginLeft: "12.5%"}}/>
               <button
+                id="macro1Button"
+                style={{paddingLeft: "25%", paddingRight: "25%", marginLeft: "20%", marginTop: "5%"}}
                 type="button"
                 onClick={() => {
-                  dispatchModal('example');
-                }}
-              >
-                Press to make a modal appear
+                  setLoading(true);
+                  axios.get('/api/v1/macro')
+                  .then(() => {
+                    axios
+                      .get('/api/v1/neo4j/export')
+                      .then(({ data }) => {
+                        setNeo4jData(data);
+                        setLoading(false);
+                      })
+                      .catch(() => {
+                        dispatchModal('Error');
+                        setLoading(false);
+                      });
+                    })
+                  }}
+                >
+                Macro 1
               </button>
             </MenuBar>
             <MenuBar side="right" icon="edit">
