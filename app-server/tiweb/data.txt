@@ -1,0 +1,40 @@
+{
+	"Neo4j": [
+		[{
+			"nodes": [{
+				"color": "#97C2FC",
+				"id": 2,
+				"label": "IP",
+				"properties": {
+					"data": "104.168.138.60"
+				}
+			}, {
+				"color": "#FB7E81",
+				"id": 3,
+				"label": "Host",
+				"properties": {
+					"data": "hwsrv-483454.hostwindsdns.com"
+				}
+			}, {
+				"id": 4,
+				"label": "Whois",
+				"properties": {
+					"data": "Hostwinds LLC."
+				}
+			}]
+		}],
+		[{
+			"edges": [{
+				"from": 2,
+				"to": 3,
+				"type": "IS_RELATED_TO",
+				"id": "f7d6fad3-1171-4824-b306-340cb9c2ab95"
+			}, {
+				"from": 2,
+				"to": 4,
+				"type": "HAS_WHOIS",
+				"id": "f8f5bd10-48f7-42e1-a10e-9dad0471d8c6"
+			}]
+		}]
+	]
+}
