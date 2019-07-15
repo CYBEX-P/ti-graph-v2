@@ -81,7 +81,7 @@ def resolveHost(node, graph):
                 host = socket.gethostbyname(node)
 
                 i = Node("IP", data = host)
-                host_node = graph.nodes.match("Host", data=node).first()
+                host_node = graph.nodes.match(data=node).first()
                 i_node = graph.nodes.match("IP", data=host).first()
 
                 if(i_node):
@@ -113,7 +113,7 @@ def getNameservers(data, graph, value):
                 for i in values:
                         try:
                                 c = Node("Nameserver", data = i)
-                                host_node = graph.nodes.match("Host", data=value).first()
+                                host_node = graph.nodes.match(data=value).first()
                                 c_node = graph.nodes.match("Nameserver", data = i).first()
 
                                 if(c_node):
@@ -140,7 +140,7 @@ def getRegistrar(data, graph, value):
                 values = data["WhoisRecord"]["registrarName"]
                 try:
                         c = Node("Registrar", data = values)
-                        host_node = graph.nodes.match("Host", data=value).first()
+                        host_node = graph.nodes.match(data=value).first()
                         c_node = graph.nodes.match("Registrar", data = values).first()
 
                         if(c_node):
@@ -170,7 +170,7 @@ def getMailServer(data, graph):
     for values in answers:
         try:
             c = Node("MailServer", data = values)
-            host_node = graph.nodes.match("Host", data=data).first()
+            host_node = graph.nodes.match(data=data).first()
             c_node = graph.nodes.match("MailServer", data = values).first()
 
             if(c_node):

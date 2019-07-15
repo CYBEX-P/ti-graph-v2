@@ -283,7 +283,7 @@ def enrich(enrich_type, value):
             status = getRegistrar(w_results, graph, value)
             return jsonify({"insert status" : status})
 
-    elif enrich_type == "mail":
+    elif enrich_type == "mailservers":
             status = getMailServer(value, graph)
             return jsonify({"insert status" : status})
     else:
@@ -405,7 +405,7 @@ def macro1():
 
     for node in nodes:
         value = node["properties"]["data"]
-        print(value)
+        print("--> Enriching", value)
 
         if node["label"] == "URL": 
             # deconstruct URL
@@ -432,6 +432,32 @@ def macro1():
                 status3 = getNameservers(w_results, graph, value)
             except:
                 print("Nameserver Error")
+            try:
+                w_results = whois(value)
+                status3 = getRegistrar(w_results, graph, value)
+            except:
+                print("No registrar")
+        
+        elif node["label"] == "Domain":
+            # resolve IP, MX, nameservers
+            try:
+                status1 = resolveHost(value, graph)
+            except:
+                print("IP resolve Error")
+            try:
+                status2 = getMailServer(value, graph)
+            except:
+                print("MX Error")
+            try:
+                w_results = whois(value)
+                status3 = getNameservers(w_results, graph, value)
+            except:
+                print("Nameserver Error")
+            try:
+                w_results = whois(value)
+                status3 = getRegistrar(w_results, graph, value)
+            except:
+                print("No registrar")
 
         elif node["label"] == "IP":
             # enrich all + ports + netblock 
@@ -439,10 +465,9 @@ def macro1():
             enrich('gip', value)
             enrich('whois', value)
             enrich('hostname', value)
-
+            # enrich cybexp needed here
             results = shodan_lookup(value)
             status1 = insert_ports(results, graph, value)
-
 
             status2 = insert_netblock(value, graph)
         

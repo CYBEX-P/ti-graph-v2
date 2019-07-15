@@ -14,6 +14,7 @@ const InsertForm = props => {
   const { setLoading } = useContext(MenuContext);
 
   const [selectedIOC, setSelectedIOC] = useState('IP');
+  const [selectedIOC2, setSelectedIOC2] = useState('IP');
 
   function handleInsertIP(values, actions) {
     const { ipToInsert } = values;
@@ -66,6 +67,7 @@ const InsertForm = props => {
 
   return (
     <>
+      {/* Insert data */}
       <Formik
         onSubmit={handleInsertIP}
         initialValues={{ ipToInsert: '', IOCType: 'IP' }}
@@ -92,17 +94,38 @@ const InsertForm = props => {
             <Input placeholder="Data Value" name="ipToInsert" value={values.ipToInsert} onChange={handleChange} />
             <Button width="100%" hasIcon type="submit" onClickFunction={() => {}}>
               <FontAwesomeIcon size="lg" icon="plus-circle" />
-              <div>Insert IP</div>
+              <div>Insert IOC</div>
             </Button>
             <div style={{ color: '#ff4500' }}>{errors.ipToInsert}</div>
           </form>
         )}
       />
+
+      {/* Enrichments */}
       <Formik
         onSubmit={handleEnrichIP}
-        initialValues={{ ipToEnrich: 'none', enrichmentType: 'asn' }}
+        initialValues={{ ipToEnrich: 'none', enrichmentType: 'none' }}
         render={({ values, handleChange, handleSubmit }) => (
+
           <form onSubmit={handleSubmit}>
+            <select
+              style={{ width: '100%', height: '36px', backgroundColor: '#ffffff', color: '#222222' }}
+              name="IOCType"
+              value={values.IOCType}
+              onChange={e => {
+                handleChange(e);
+                setSelectedIOC2(e.target.value);
+              }}
+            >
+              {typeof props.config !== 'undefined' &&
+                typeof props.config.types !== 'undefined' &&
+                props.config.types.map(item => (
+                  <option value={item} label={item} key={item}>
+                    {item}
+                  </option>
+                ))}
+            </select>
+
             <select
               style={{ width: '30%', height: '36px', backgroundColor: '#ffffff', color: '#222222' }}
               name="enrichmentType"
@@ -111,12 +134,13 @@ const InsertForm = props => {
             >
               {typeof props.config !== 'undefined' &&
                 typeof props.config.enrichments !== 'undefined' &&
-                props.config.enrichments[selectedIOC].map(item => (
+                props.config.enrichments[selectedIOC2].map(item => (
                   <option value={item} label={item} key={item}>
                     {item}
                   </option>
                 ))}
             </select>
+            
             <select
               style={{ width: '70%', height: '36px', color: '#222222', backgroundColor: '#ffffff' }}
               name="ipToEnrich"
@@ -138,7 +162,7 @@ const InsertForm = props => {
                 )}
             </select>
             <Button width="100%" type="submit" onClickFunction={() => {}}>
-              Enrich IP
+              Enrich IOC
             </Button>
           </form>
         )}

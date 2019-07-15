@@ -23,6 +23,7 @@ IOC:
     - BGPath
     - SSID
     - Country
+    - Domain
 
 
   enrichments:
@@ -32,51 +33,55 @@ IOC:
       - hostname
       - whois
       - cybex
+      - netblock
+      - ports
 
     SPort:
-      - na
       - none
 
     DPort:
-      - na
       - none
 
     Email:
-      - na
+      - deconstructEmail
       - none
 
     Host:
       - whois
-      - none
+      - resolveHost
+      - nameservers
+      - registrar
+      - mailservers
 
     URL:
-      - na
-      - none
+      - enrichURL
+    
+    Domain:
+      - whois
+      - resolveHost
+      - nameservers
+      - registrar
+      - mailservers
 
     Hash:
-      - na
       - none
 
     BTC:
-      - na
       - none
 
     ASN:
-      - na
       - none
 
     MAC:
-      - na
       - none
 
     BGPath:
-      - na 
       - none
 
     SSID:
-      - na
       - none
     
     Country:
-      - na
       - none
+
+   
