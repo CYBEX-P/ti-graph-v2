@@ -34,7 +34,23 @@ def processExport(dataObject):
                 key['color'] = '#28AFB0'
             if key['label'] == 'SSID':
                 key['color'] = '#E8E8E8'
-
+            if key['label'] == 'Domain':
+                key['color'] = "#B37469"
+            if key['label'] == 'Ports':
+                key['color'] = "#ff41e2"
+            if key['label'] == 'Whois':
+                key['color'] = "#4070f4"
+            if key['label'] == 'Subnet':
+                key['color'] = "#eeee58"
+            if key['label'] == 'Registrar':
+                key['color'] = "#06de9e"
+            if key['label'] == 'Nameserver':
+                key['color'] = "#cf4cf3"
+            if key['label'] == 'MailServer':
+                key['color'] = "#835eba"
+            if key['label'] == 'User':
+                key['color'] = "#d8e5f6"
+            
 
     return dataObject
 
