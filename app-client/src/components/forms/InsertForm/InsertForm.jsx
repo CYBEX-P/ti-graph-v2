@@ -18,7 +18,18 @@ const InsertForm = props => {
 
   function handleInsertIP(values, actions) {
     const { ipToInsert } = values;
-    if (ipToInsert !== '') {
+    if (selectedIOC === 'URL' && ipToInsert !== '') {
+      axios.post('/api/v1/neo4j/insertURL', {Ntype: "URL", value: `${ipToInsert}`}).then(() => {
+        axios
+          .get('/api/v1/neo4j/export')
+          .then(({ data }) => {
+            setNeo4jData(data);
+          })
+          .catch(() => {});
+      });
+      actions.resetForm();
+    }
+    else if (ipToInsert !== '') {
       axios.get(`/api/v1/neo4j/insert/${selectedIOC}/${ipToInsert}`).then(() => {
         axios
           .get('/api/v1/neo4j/export')
@@ -33,7 +44,36 @@ const InsertForm = props => {
 
   function handleEnrichIP(values, actions) {
     const { enrichmentType, ipToEnrich } = values;
-    if (ipToEnrich !== 'none') {
+    if (ipToEnrich !== 'none' && selectedIOC2 === "URL") {
+      setLoading(true);
+      axios
+        .post(`/api/v1/enrichURL`, {value: `${ipToEnrich}`})
+        .then(({ data }) => {
+          if (data['insert status'] !== 0) {
+            axios
+              .get('/api/v1/neo4j/export')
+              .then(response => {
+                setNeo4jData(response.data);
+                setLoading(false);
+              })
+              .catch(() => {
+                setError(`${enrichmentType} returned nothing!`);
+                dispatchModal('Error');
+                setLoading(false);
+              });
+          } else {
+            setError(`${enrichmentType} lookup returned nothing!`);
+            dispatchModal('Error');
+            setLoading(false);
+          }
+        })
+        .catch(() => {
+          setError(`${enrichmentType} returned nothing!`);
+          dispatchModal('Error');
+          setLoading(false);
+        });
+    }
+    else if (ipToEnrich !== 'none') {
       setLoading(true);
       axios
         .get(`/api/v1/enrich/${enrichmentType}/${ipToEnrich}`)
