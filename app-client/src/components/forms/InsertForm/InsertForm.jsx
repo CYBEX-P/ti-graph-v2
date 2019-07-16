@@ -142,6 +142,8 @@ const InsertForm = props => {
       />
 
       {/* Enrichments */}
+
+      {/* selectedIOC2 select */}
       <Formik
         onSubmit={handleEnrichIP}
         initialValues={{ ipToEnrich: 'none', enrichmentType: 'none' }}
@@ -166,6 +168,7 @@ const InsertForm = props => {
                 ))}
             </select>
 
+            {/* Enrichment type select */}
             <select
               style={{ width: '30%', height: '36px', backgroundColor: '#ffffff', color: '#222222' }}
               name="enrichmentType"
@@ -181,6 +184,7 @@ const InsertForm = props => {
                 ))}
             </select>
             
+            {/* data select */}
             <select
               style={{ width: '70%', height: '36px', color: '#222222', backgroundColor: '#ffffff' }}
               name="ipToEnrich"
@@ -190,9 +194,10 @@ const InsertForm = props => {
               <option value="none">None</option>
               {neo4jData &&
                 neo4jData.Neo4j[0].map(({ nodes }) =>
-                  nodes.map(({ properties, id }) => {
+                  nodes.filter(node => node.label === selectedIOC2)
+                  .map(({ label, properties, id }) => {
                     return (
-                      properties.data && (
+                      properties.data && label && (
                         <option key={id} value={properties.data} label={properties.data}>
                           {properties.data}
                         </option>
