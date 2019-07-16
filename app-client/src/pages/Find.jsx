@@ -10,7 +10,10 @@ class Find extends Component {
       username: '',
       first_name:'',
       last_name:'',
-      email:''
+      email:'',
+      db_port:'',
+      db_ip:'',
+      db_username:''
       
     };
     this.onChange = this.onChange.bind(this);
@@ -28,7 +31,11 @@ class Find extends Component {
       username: this.state.username,
       first_name:this.state.first_name,
       last_name:this.state.last_name,
-      email:this.state.email
+      email:this.state.email,
+      db_port:this.state.db_port,
+      db_ip:this.state.db_ip,
+      db_username:this.state.db_username,
+      admin:this.state.admin
       
     };
 
@@ -37,7 +44,11 @@ class Find extends Component {
       this.setState({
         first_name:res.result['found_f'],
         last_name:res.result['found_l'],
-        email:res.result['email']
+        email:res.result['email'],
+        db_port:res.result['db_port'],
+        db_ip:res.result['db_ip'],
+        db_username:res.result['db_username'],
+        admin:res.result['admin']
         
       })
       
@@ -95,6 +106,22 @@ class Find extends Component {
               <tr>
                 <td>Email</td>
                 <td>{this.state.email}</td>
+              </tr>
+              <tr>
+                <td>DB IP</td>
+                <td>{this.state.db_ip}</td>
+              </tr>
+              <tr>
+                <td>DB PORT</td>
+                <td>{this.state.db_port}</td>
+              </tr>
+              <tr>
+                <td>DB Username</td>
+                <td>{this.state.db_username}</td>
+              </tr>
+              <tr>
+                <td>Admin</td>
+                <td>{this.state.admin}</td>
               </tr>
             </tbody>
           </table>

@@ -14,6 +14,8 @@ import Graph from '../Graph/Graph';
 import Button from '../Button/Button';
 import InsertForm from '../forms/InsertForm/InsertForm';
 import EventInsertForm from '../EventInsertForm/EventInsertForm';
+import Import_json from '../forms/InsertForm/Import_json'
+
 
 const App = props => {
   const [isLoading, setLoading] = useState(false);
@@ -59,6 +61,7 @@ const App = props => {
         setLoading(false);
       });
   }
+  
 
   // Get data on first render
   useEffect(() => {
@@ -155,11 +158,11 @@ const App = props => {
                   width: '100%',
                   backgroundColor: '#e0e0e0',
                   gridTemplateRows: '70px 70px auto',
-                  gridTemplateColumns: '50% 50%',
+                  gridTemplateColumns: '33.33% 33.33% 33.33%',
                   justifyContent: 'center'
                 }}
               >
-                <div style={{ gridColumn: '1 / span 2' }}>
+                <div style={{ gridColumn: '1 / span 3' }}>
                   <Button
                     width="100%"
                     hasIcon
@@ -191,7 +194,12 @@ const App = props => {
                     Wipe DB
                   </Button>
                 </div>
+                <div style={{ gridColumn: 3 }}>
+                  <Import_json/>
+                  
+                </div>
               </div>
+              
             </MenuBar>
           </AppContainer>
         </DataContext.Provider>

@@ -60,6 +60,8 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False  
 app.config['SECURITY_PASSWORD_SALT'] = 'my_precious_two'
 
+#app.config['UPLOAD_FOLDER'] = '/ti-graph-v2/app-server/tiweb'
+
 mail = Mail(app)
    
 @app.route('/users/register', methods = ['POST'])
@@ -186,7 +188,10 @@ def found():
         'found_f': found_user.first_name,
         'found_l': found_user.last_name,
         'email':found_user.email,
-        'admin':found_user.admin
+        'admin':found_user.admin,
+        'db_ip':found_user.db_ip,
+        'db_port':found_user.db_port,
+        'db_username':found_user.db_username
     }
     #found_id = found_user.id
     db.session.commit()
@@ -432,6 +437,21 @@ def sess_init():
     session['neoPort'] = None
 
     return "User {} has initialized a session.".format(session['username'])
+
+app.config['UPLOAD_FOLDER'] = '/tiweb'
+
+@app.route('/import_json', methods = ['GET','POST'])
+def import_json():
+        print(request.get_data())
+        data = request.files['file']
+        if data:
+                data.save(data.filename)
+                #return 'uploaded'
+                with open(data.filename) as f:
+                        f1=json.load(f)
+                        print(json.dumps(f1, indent=4))
+                        return f1
+
 
 @app.route('/', methods=['GET'])
 def index_root():
