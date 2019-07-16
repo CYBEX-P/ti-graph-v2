@@ -27,7 +27,7 @@ def whois(data):
 
 
 def insertWhois(data, graph, value):
-
+    # print(str(data))
     if(data != 0):
         try:
             c = Node("Whois", data = data["WhoisRecord"]["registryData"]["registrant"]["organization"])
