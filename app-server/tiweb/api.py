@@ -202,7 +202,8 @@ def login():
             return result
     else:
         return jsonify({"Error" : "Invalid form", "Data" : form.validate_on_submit()})
-	
+
+@login_required	
 @app.route('/remove', methods = ['POST'])
 def delete():
     
@@ -213,6 +214,7 @@ def delete():
     result = jsonify({"message": "User deleted"})
     return result 
 
+@login_required
 @app.route('/update', methods = ['POST'])
 def update():
         
@@ -226,6 +228,7 @@ def update():
         result = jsonify({'message': 'DB updated'})
         return result 
 
+@login_required
 @app.route('/find', methods = ['POST'])
 def found():
     
@@ -244,6 +247,7 @@ def found():
     #return found_f, found_l
     return jsonify({'result':result})
 
+@login_required
 @app.route('/change_password', methods=['GET', 'POST'])
 def page_change_password():
     
@@ -260,7 +264,7 @@ def page_change_password():
 def logout():
     
     s.flush()
-    session.pop()
+    
     return redirect('/login')
 
 
@@ -285,12 +289,13 @@ def exportNeoDB():
 #     full_load()
 #     return "Neo4j DB loaded!"
 
-
+@login_required
 @app.route('/api/v1/neo4j/wipe')
 def wipe_function():
     wipeDB(graph)
     return jsonify({"Status":"Neo4j DB full wipe complete!"})
 
+@login_required
 @app.route('/api/v1/neo4j/insertURL', methods = ['POST'])
 def insert2():
     req = request.get_json()
@@ -303,7 +308,7 @@ def insert2():
     else:
         return jsonify({"Status" : "Failed"})
 
-
+@login_required
 @app.route('/api/v1/neo4j/insert/<Ntype>/<data>')
 def insert(Ntype, data):
     status = insertNode(Ntype, data, graph)
@@ -312,7 +317,7 @@ def insert(Ntype, data):
     else:
         return jsonify({"Status" : "Failed"})
 
-
+@login_required
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
 def enrich(enrich_type, value):
     if(enrich_type == "asn"):
@@ -383,6 +388,7 @@ def enrich(enrich_type, value):
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
 
+@login_required
 @app.route('/api/v1/enrichURL', methods=['POST'])
 def enrichURL():
     req = request.get_json()
@@ -391,6 +397,7 @@ def enrichURL():
     status = insert_domain(value, graph)
     return jsonify({"insert status" : status})
 
+@login_required
 @app.route('/api/v1/enrich/all')
 def enrich_all():
     for node in graph.nodes.match("IP"):
@@ -400,6 +407,7 @@ def enrich_all():
         enrich('hostname', node['data'])
     return jsonify({"Status" : "Success"})
 
+@login_required
 @app.route('/api/v1/enrichPDNS', methods=['POST'])
 def enrich_pdns():
     req = request.get_json()
@@ -433,10 +441,12 @@ def enrich_pdns():
 #     res = requests.get('https://user.whoisxmlapi.com/service/account-balance?apiKey=at_dE3c8tVnBieCdGwtzUiOFFGfuCQoz')
 #     return jsonify(res.json())
 
+@login_required
 @app.route('/api/v1/admin/config')
 def sendConfig():
     return jsonify(YAMLConfig)
 
+@login_required
 @app.route('/api/v1/event/start', methods=['POST'])
 def startEvent():
     res = request.get_json()
@@ -455,6 +465,7 @@ def startEvent():
 # def getEventName():
 #     return jsonify(os.environ['eventName'])
 
+@login_required
 @app.route('/api/v1/event/start/file', methods=['POST'])
 def startFileEvent():
     os.environ['eventName'] = request.form['eventName']
@@ -474,6 +485,7 @@ def startFileEvent():
     # return status
     return jsonify(0)
 
+@login_required
 @app.route('/api/v1/session/init', methods=['POST'])
 def sess_init():
     req = request.get_json()
