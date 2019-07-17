@@ -23,7 +23,7 @@ from flask_cors import CORS
 from werkzeug.datastructures import Headers
 import uuid
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
-
+from flask_sqlalchemy import SQLAlchemy
 from tiweb import app, YAMLConfig
 from gip import geoip, ASN, geoip_insert, asn_insert
 from wipe_db import wipeDB
@@ -35,9 +35,38 @@ from enrichments import insert_domain_and_user, insert_domain, insert_netblock, 
 
 from connect import connectDev, connectProd
 from containerlib import client
-from users import db, User, RegistrationForm, LoginForm
+from users import  RegistrationForm, LoginForm
 from shodanSearch import shodan_lookup, insert_ports
 from pdns import pdns_handler, insert_pdns
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+Base = declarative_base()
+
+
+db = SQLAlchemy(app)
+
+engine = create_engine("mysql+mysqlconnector://cybexpadmin:cybexp19sekret@134.197.21.10:3306/cybexpui")
+session1 = sessionmaker(expire_on_commit=False)
+session1.configure(bind=engine)
+
+class User(UserMixin, db.Model, Base):
+    id = db.Column(db.Integer, primary_key=True) 
+    public_id = db.Column(db.String(50), unique = True)                               
+    first_name  = db.Column(db.String(15))
+    last_name = db.Column(db.String(15))
+    email = db.Column(db.String(50), unique = True)
+    db_ip = db.Column(db.String(50))
+    db_port = db.Column(db.Integer)
+    username = db.Column(db.String(15), unique = True)
+    password = db.Column(db.String(80))
+    admin = db.Column(db.Boolean)
+    db_username=db.Column(db.String(15))
+    db_password = db.Column(db.String(80))
+
+Base.metadata.create_all(engine)
+
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -51,7 +80,9 @@ login_manager.login_view = 'login'
 if app.config['ENV'] == 'development':
     graph = connectDev()
 
-#db.create_all()
+graph= Graph()
+
+
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = 'cybexp123@gmail.com'
@@ -59,30 +90,32 @@ app.config['MAIL_PASSWORD'] = 'cybexpadmin'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False  
 app.config['SECURITY_PASSWORD_SALT'] = 'my_precious_two'
+app.config['UPLOAD_FOLDER'] = '/tiweb'
 
-#app.config['UPLOAD_FOLDER'] = '/ti-graph-v2/app-server/tiweb'
+
 
 mail = Mail(app)
+s=session1()
    
 @app.route('/users/register', methods = ['POST'])
 def register():
     form = RegistrationForm()
+    
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method = 'sha256')
         new_user = User(public_id=str(uuid.uuid4()),first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data, username = form.username.data, password = hashed_password, admin = form.admin.data)
-        db.session.add(new_user)
-        db.session.commit()
+        s.add(new_user)
         result = {
 		'first_name' : form.first_name.data,
 		'last_name' : form.last_name.data,
 		'email' : form.email.data,
 		'password' : form.password.data,
-        'admin': form.admin.data
+                'admin': form.admin.data
 	    }
 
         c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
         r = c.add_database()
-
+        
         if(r and r["status"]):
             print("Created Database: " + r["data"]["id"])
         else:
@@ -94,22 +127,25 @@ def register():
 
         if(r and r["status"]):
            #print(json.dumps(r['data']))
-           user = User.query.filter_by(username=form.username.data).first()
-           user.db_ip = r['data']['ip']
-           user.db_port = r['data']['port']
-           us = r['data']['auth']
-           print(us)
-           a = us.split('/')
-           user.db_username = a[0]
-           hashed_password1 = generate_password_hash(a[1], method = 'sha256')
-           user.db_password = hashed_password1
-           db.session.commit() 
            
-           msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
-           msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
-           mail.send(msg)
-           return "Sent"
-        return jsonify({'result' : result})
+                user = s.query(User).filter(User.username == form.username.data).first() 
+                user.db_ip= r['data']['ip']
+                user.db_port = r['data']['port']
+                us = r['data']['auth']
+                print(us)
+                a = us.split('/')
+                user.db_username = a[0]
+           
+                user.db_password = a[1]
+          
+           
+                s.commit() 
+           
+                msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
+                msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
+                mail.send(msg)
+                return "Sent"
+        return jsonify({'result' : session['result']})
         
     else:
         result = jsonify({"error":"enter all the values"})
@@ -123,11 +159,20 @@ def login():
     result = ''
     
     if form.validate_on_submit():
-        user= User.query.filter_by(username = form.username.data).first()                                
-        if user:
-            if check_password_hash(user.password, form.password.data):
-                access_token = create_access_token(identity = {'username': form.username.data})
-                result = access_token
+        session['user']= s.query(User).filter(User.username == form.username.data).first()                                
+        if session['user']:
+                if check_password_hash(session['user'].password, form.password.data):
+                         access_token = create_access_token(identity = {'username': form.username.data})
+                         session['result'] = access_token
+                         global graph
+                         session['db_username'] = session['user'].db_username
+                         session['db_password'] = session['user'].db_password
+                         session['db_ip'] = session['user'].db_ip
+                         session['db_port'] = session['user'].db_port
+                         graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
+                         print(session)
+                         return session['result']
+                         
                 # if(user.db_ip is None or user.db_port is None):
                 #     c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
                 #     r = c.add_database()
@@ -144,15 +189,13 @@ def login():
                 #     return result
                             
                 # else:
-                access_token = create_access_token(identity = {'username': form.username.data})
-                result = access_token
-                global graph
-                graph = connectProd(user.db_username, user.db_password, user.db_ip, user.db_port)
-                return result
+                #access_token = create_access_token(identity = {'username': form.username.data})
+                #result = access_token
+                        
                 
-            else:
-                result = jsonify({"Error":"Invalid username and password"})
-                return result
+                else:
+                        result = jsonify({"Error":"Invalid username and password"})
+                        return result
 
         else:
             result = jsonify({"Error":"Invalid username and password"})
@@ -162,28 +205,31 @@ def login():
 	
 @app.route('/remove', methods = ['POST'])
 def delete():
+    
     #form = DeleteForm()
     #if form.validate_on_submit():
-    User.query.filter_by(username = request.get_json()['username']).delete()
-    db.session.commit()
+    s.query(User).filter(User.username == request.get_json()['username']).delete()
+    s.commit()
     result = jsonify({"message": "User deleted"})
     return result 
 
 @app.route('/update', methods = ['POST'])
 def update():
+        
         #options = session.query(User)
-        update_this = User.query.filter_by(username = request.get_json()['username']).first()
+        update_this = s.query(User).filter(User.username == request.get_json()['username']).first()
         update_this.first_name = request.get_json()['first_name']
         update_this.last_name = request.get_json()['last_name']
         update_this.email = request.get_json()['email']
         update_this.admin = request.get_json()['admin']
-        db.session.commit()
+        s.commit()
         result = jsonify({'message': 'DB updated'})
         return result 
 
 @app.route('/find', methods = ['POST'])
 def found():
-    found_user= User.query.filter_by(username = request.get_json()['username']).first_or_404()
+    
+    found_user= s.query(User).filter(User.username == request.get_json()['username']).first()
     result = {
         'found_f': found_user.first_name,
         'found_l': found_user.last_name,
@@ -194,23 +240,27 @@ def found():
         'db_username':found_user.db_username
     }
     #found_id = found_user.id
-    db.session.commit()
+    s.commit()
     #return found_f, found_l
     return jsonify({'result':result})
 
 @app.route('/change_password', methods=['GET', 'POST'])
 def page_change_password():
-    change_this = User.query.filter_by(username = request.get_json()['username']).first()
+    
+    change_this = s.query(User).filter(User.username == request.get_json()['username']).first()
     if check_password_hash(change_this.password,  request.get_json()['old_password']):
         hashed_password = generate_password_hash(request.get_json()['new_password'], method = 'sha256')
         change_this.password = hashed_password
-        db.session.commit()
+        s.commit()
         result = jsonify({'message':'Password updated'})
         return result
 
+@login_required
 @app.route('/user/logout', methods = ['GET', 'POST'])
 def logout():
-    logout_user()
+    
+    s.flush()
+    session.pop()
     return redirect('/login')
 
 
@@ -438,8 +488,8 @@ def sess_init():
 
     return "User {} has initialized a session.".format(session['username'])
 
-app.config['UPLOAD_FOLDER'] = '/tiweb'
 
+@login_required
 @app.route('/import_json', methods = ['GET','POST'])
 def import_json():
         print(request.get_data())
@@ -449,8 +499,8 @@ def import_json():
                 #return 'uploaded'
                 with open(data.filename) as f:
                         f1=json.load(f)
-                        print(json.dumps(f1, indent=4))
-                        return f1
+                        #print(json.dumps(f1, indent=4))
+                        return jsonify(f1)
 
 
 @app.route('/', methods=['GET'])

@@ -13,7 +13,8 @@ class Find extends Component {
       email:'',
       db_port:'',
       db_ip:'',
-      db_username:''
+      db_username:'',
+      admin:''
       
     };
     this.onChange = this.onChange.bind(this);
@@ -121,7 +122,7 @@ class Find extends Component {
               </tr>
               <tr>
                 <td>Admin</td>
-                <td>{this.state.admin}</td>
+                <td>{this.state.admin.toString()}</td>
               </tr>
             </tbody>
           </table>
