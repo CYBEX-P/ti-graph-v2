@@ -39,6 +39,7 @@ const InsertForm = props => {
           .catch(() => {});
       });
     }
+    setSelectedIOC('IP');
     actions.resetForm();
   }
 

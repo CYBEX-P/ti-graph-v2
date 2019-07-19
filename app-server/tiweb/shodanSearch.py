@@ -11,14 +11,19 @@ def shodan_lookup(ip):
     API_KEY = conf['shodanData']['apikey']
 
     api = shodan.Shodan(API_KEY)
-        
-    results = api.host(ip, minify=True)
+    try:
+        results = api.host(ip, minify=True)
+    except:
+        return None
     # results = api.scan(ip)
 
     # return list of ports detected
     return results['ports']
 
 def insert_ports(values, graph, ip):
+    if values is None:
+        return 0
+        
     c = Node("Ports", data=values)
     try:
             ip_node = graph.nodes.match("IP", data=ip).first()
