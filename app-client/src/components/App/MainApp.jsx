@@ -1,7 +1,7 @@
 import React, { useReducer, useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Container } from 'reactstrap';
+import { Container, Row } from 'reactstrap';
 
 import NavBar from '../navBar/navBar';
 import MenuBar from '../menuBar/menuBar';
@@ -38,27 +38,27 @@ const App = props => {
 
   const [eventName, setEventName] = useState(null);
 
-  function handleEnrichAll() {
-    setLoading(true);
-    axios
-      .get('/api/v1/enrich/all')
-      .then(() => {
-        axios
-          .get('/api/v1/neo4j/export')
-          .then(({ data }) => {
-            setNeo4jData(data);
-            setLoading(false);
-          })
-          .catch(() => {
-            dispatchModal('Error');
-            setLoading(false);
-          });
-      })
-      .catch(() => {
-        dispatchModal('Error');
-        setLoading(false);
-      });
-  }
+  // function handleEnrichAll() {
+  //   setLoading(true);
+  //   axios
+  //     .get('/api/v1/enrich/all')
+  //     .then(() => {
+  //       axios
+  //         .get('/api/v1/neo4j/export')
+  //         .then(({ data }) => {
+  //           setNeo4jData(data);
+  //           setLoading(false);
+  //         })
+  //         .catch(() => {
+  //           dispatchModal('Error');
+  //           setLoading(false);
+  //         });
+  //     })
+  //     .catch(() => {
+  //       dispatchModal('Error');
+  //       setLoading(false);
+  //     });
+  // }
 
   // Get data on first render
   useEffect(() => {
@@ -116,13 +116,30 @@ const App = props => {
             </ContentContainerStyle>
             <NavBar eName={eventName} />
             <MenuBar side="left" icon="search">
+              <h3 style={{paddingLeft: "20%", paddingRight: "25%", marginLeft: "20%", marginTop: "5%"}}>Macros</h3>
+              <hr style={{marginLeft: "12.5%"}}/>
               <button
+                id="macro1Button"
+                style={{paddingLeft: "25%", paddingRight: "25%", marginLeft: "20%", marginTop: "5%"}}
                 type="button"
                 onClick={() => {
-                  dispatchModal('example');
-                }}
-              >
-                Press to make a modal appear
+                  setLoading(true);
+                  axios.get('/api/v1/macro')
+                  .then(() => {
+                    axios
+                      .get('/api/v1/neo4j/export')
+                      .then(({ data }) => {
+                        setNeo4jData(data);
+                        setLoading(false);
+                      })
+                      .catch(() => {
+                        dispatchModal('Error');
+                        setLoading(false);
+                      });
+                    })
+                  }}
+                >
+                Macro 1
               </button>
             </MenuBar>
             <MenuBar side="right" icon="edit">
@@ -138,9 +155,8 @@ const App = props => {
                 }}
               >
                 <InsertForm config={props.config} />
-                <Button width="100%" onClickFunction={() => handleEnrichAll()}>
-                  Enrich All
-                </Button>
+              <Row></Row>
+                
                 <Button width="100%" onClickFunction={() => dispatchModal('New Event Form')}>
                   <div>New Event</div>
                 </Button>
