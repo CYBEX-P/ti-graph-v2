@@ -38,15 +38,31 @@ function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
   let icons = [];
   let onClickFns = [];
   let titles = [];
+  // if (nodeType.label === 'IP') {
+  //   // We could probably find a way to do this by YAML instead of hardcoding it
+  //   onClickFns = config.enrichments.IP.map(enrichmentType => () => {
+  //     return EnrichIPbyType(enrichmentType);
+  //   });
+  //   // Copy arrays
+  //   titles = config.enrichments.IP.map(val => val);
+  //   titles.push('all');
+  //   icons = titles.map(val => val);
+  //   onClickFns.push(() => EnrichIPAll());
+  // }
+  // return props => {
+  //   return <RadialMenuComponent titles={titles} icons={icons} onClickFunctions={onClickFns} {...props} />;
+  // };
+    
+  onClickFns = config.enrichments[`${nodeType.label}`].map(enrichmentType => () => {
+    return EnrichIPbyType(enrichmentType);
+  });
+  // Copy arrays
+  titles = config.enrichments[`${nodeType.label}`].map(val => val);
   if (nodeType.label === 'IP') {
-    // We could probably find a way to do this by YAML instead of hardcoding it
-    onClickFns = config.enrichments.IP.map(enrichmentType => () => {
-      return EnrichIPbyType(enrichmentType);
-    });
-    // Copy arrays
-    titles = config.enrichments.IP.map(val => val);
     titles.push('all');
-    icons = titles.map(val => val);
+  }
+  icons = titles.map(val => val);
+  if (nodeType.label === 'IP') {
     onClickFns.push(() => EnrichIPAll());
   }
   return props => {

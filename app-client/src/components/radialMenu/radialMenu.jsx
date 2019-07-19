@@ -96,6 +96,17 @@ const RadialMenu = ({ position, icons, onClickFunctions, scale, titles }) => {
           return 'project-diagram';
         case 'whois':
           return 'user';
+        case 'enrichURL':
+          return 'plus-circle';
+        case 'resolveHost':
+            return 'h-square';
+        case 'nameservers':
+            return 'server';
+        case 'mailservers':
+            return 'server';
+        case 'registrar':
+            return 'passport';
+        
         default:
           return icon;
       }

@@ -44,7 +44,6 @@ IOC:
 
     Email:
       - deconstructEmail
-      - none
 
     Host:
       - whois
