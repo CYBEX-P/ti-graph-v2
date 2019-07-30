@@ -193,6 +193,9 @@ const EventInsertForm = props => {
         )}
       />
       <br />
+      <br />
+      <hr />
+      <br />
       <Formik
         onSubmit={handleInsertFile}
         initialValues={{ file: '', eventName2: '' }}

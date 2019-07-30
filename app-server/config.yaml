@@ -24,6 +24,15 @@ IOC:
     - SSID
     - Country
     - Domain
+    - User
+    - Subnet
+    - Whois
+    - Ports
+    - Registrar
+    - Nameserver
+    - MailServer
+    - CybexCount
+    - CybexRelated
 
 
   enrichments:
@@ -32,7 +41,8 @@ IOC:
       - gip
       - hostname
       - whois
-      - cybex
+      - cybexCount
+      - cybexRelated
       - netblock
       - ports
 
@@ -44,6 +54,8 @@ IOC:
 
     Email:
       - deconstructEmail
+      - cybexRelated
+      - cybexCount
 
     Host:
       - whois
@@ -51,9 +63,13 @@ IOC:
       - nameservers
       - registrar
       - mailservers
+      - cybexRelated
+      - cybexCount
+      - pdns
 
     URL:
       - enrichURL
+      - cybexRelated
     
     Domain:
       - whois
@@ -61,15 +77,19 @@ IOC:
       - nameservers
       - registrar
       - mailservers
+      - cybexRelated
 
     Hash:
-      - none
+      - cybexRelated
+      - cybexCount
 
     BTC:
-      - none
+      - cybexRelated
+      - cybexCount
 
     ASN:
-      - none
+      - cybexRelated
+      - cybexCount
 
     MAC:
       - none
@@ -83,4 +103,30 @@ IOC:
     Country:
       - none
 
+    User:
+      - none
+
+    Subnet:
+      - none
+
+    Whois:
+      - none
+
+    Ports:
+      - none
+
+    Registrar: 
+      - none
+
+    Nameserver: 
+      - none
+
+    MailServer: 
+      - none
+
+    CybexCount:
+      - none
+
+    CybexRelated:
+      - none
    
