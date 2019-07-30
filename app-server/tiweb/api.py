@@ -232,6 +232,7 @@ def cybexCount():
 
     r = requests.post(url, headers=headers, data=data)
     res = json.loads(r.text)
+    # print(res)
 
     try:
         numOccur = res["count"]
@@ -255,6 +256,8 @@ def CybexRelated():
 
     r = requests.post(url, headers=headers, data=data)
     res = json.loads(r.text)
+    # print(res)
+    
     try:
         status = insertRelated(str(res), graph, data1)
         return jsonify({"insert status" : status})
