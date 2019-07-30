@@ -30,7 +30,7 @@ from wipe_db import wipeDB
 from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport
-from cybex import insertCybex, insertRelated
+from cybex import insertCybex, insertRelated, replaceType
 from enrichments import insert_domain_and_user, insert_domain, insert_netblock, resolveHost, getNameservers, getRegistrar, getMailServer
 
 from connect import connectDev, connectProd
@@ -218,6 +218,50 @@ def insert(Ntype, data):
     else:
         return jsonify({"Status" : "Failed"})
 
+@app.route('/api/v1/enrich/cybexCount', methods = ['POST'])
+def cybexCount():
+    req = request.get_json()
+    Ntype = str(req['Ntype'])
+    Ntype1 = replaceType(Ntype)
+    data1 = req['value']
+
+    url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/count"
+    headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
+    data = { Ntype1 : data1 }
+    data = json.dumps(data)
+
+    r = requests.post(url, headers=headers, data=data)
+    res = json.loads(r.text)
+
+    try:
+        numOccur = res["count"]
+        status = insertCybex(numOccur, graph, data1)
+        return jsonify({"insert status" : status})
+
+    except:
+        return jsonify({"insert status" : 0})
+
+@app.route('/api/v1/enrich/cybexRelated', methods = ['POST'])
+def CybexRelated():
+    req = request.get_json()
+    Ntype = str(req['Ntype'])
+    Ntype1 = replaceType(Ntype)
+    data1 = req['value']
+
+    url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/related/attribute/summary"
+    headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
+    data = { Ntype1 : data1 }
+    data = json.dumps(data)
+
+    r = requests.post(url, headers=headers, data=data)
+    res = json.loads(r.text)
+    try:
+        status = insertRelated(str(res), graph, data1)
+        return jsonify({"insert status" : status})
+
+    except:
+        return jsonify({"insert status" : 0})
+
 
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
 def enrich(enrich_type, value):
@@ -239,37 +283,6 @@ def enrich(enrich_type, value):
             w_results = whois(value)
             status = insertWhois(w_results, graph, value)
             return jsonify({"insert status" : status})
-
-    elif enrich_type == "cybexCount":
-            url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/count"
-            headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
-            data = { 'ip' : value }
-            data = json.dumps(data)
-
-            r = requests.post(url, headers=headers, data=data)
-            res = json.loads(r.text)
-            try:
-                numOccur = res["count"]
-                status = insertCybex(numOccur, graph, value)
-                return jsonify({"insert status" : status})
-
-            except:
-                return jsonify({"insert status" : 0})
-
-    elif enrich_type == "cybexRelated":
-            url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/related/attribute/summary"
-            headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
-            data = { 'ip' : value }
-            data = json.dumps(data)
-
-            r = requests.post(url, headers=headers, data=data)
-            res = json.loads(r.text)
-            try:
-                status = insertRelated(str(res), graph, value)
-                return jsonify({"insert status" : status})
-
-            except:
-                return jsonify({"insert status" : 0})
 
     elif enrich_type == "deconstructEmail":
             status = insert_domain_and_user(value, graph)
