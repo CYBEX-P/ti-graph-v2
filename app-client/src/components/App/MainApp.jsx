@@ -36,7 +36,7 @@ const App = props => {
 
   const [errorToDisplay, setError] = useState(null);
 
-  const [eventName, setEventName] = useState(null);
+  const [eventName, setEventName] = useState('Unnamed Event');
 
   // function handleEnrichAll() {
   //   setLoading(true);
@@ -106,7 +106,15 @@ const App = props => {
 
           <GraphModal title="New Event Form">
             <Container>
-              <EventInsertForm config={props.config} setEvent={setEventName} />
+              <ModalContext.Consumer>
+                {dispatchModal => (
+                  <DataContext.Consumer>
+                    {setNeo4jData => (
+                      <EventInsertForm config={props.config} setEventName={setEventName} setNeo4jData={setNeo4jData} dispatchModal={dispatchModal}/>
+                    )}
+                  </DataContext.Consumer>
+                )}
+              </ModalContext.Consumer>
             </Container>
           </GraphModal>
 

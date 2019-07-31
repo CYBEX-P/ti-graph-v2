@@ -257,7 +257,7 @@ def CybexRelated():
     r = requests.post(url, headers=headers, data=data)
     res = json.loads(r.text)
     # print(res)
-    
+
     try:
         status = insertRelated(str(res), graph, data1)
         return jsonify({"insert status" : status})
@@ -377,14 +377,12 @@ def sendConfig():
 @app.route('/api/v1/event/start', methods=['POST'])
 def startEvent():
     res = request.get_json()
-    os.environ['eventName'] = res['eventName']
+    os.environ['eventName'] = res['EventName']
+    
     # insert all nodes
-    dType1 = res['IOCType1']
-    dType2 = res['IOCType2']
-    dType3 = res['IOCType3']
-    status = insert(dType1, res['dataToInsert1'])
-    status2 = insert(dType2, res['dataToInsert2'])
-    status2 = insert(dType3, res['dataToInsert3'])
+    for node in res['IOCS']:
+        status = insert(node['IOCType'], node['data'])
+
     # return status
     return status
 
@@ -505,3 +503,9 @@ def macro1():
         print("Done with", str(value))
 
     return jsonify(nodes)
+
+@app.route('/testAPI', methods=['POST'])
+def testFunction():
+    res = request.get_json()
+    print(res)
+    return '1'
