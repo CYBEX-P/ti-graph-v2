@@ -8,8 +8,8 @@ import Button from '../Button/Button';
 
 class EventInsertForm extends React.Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       EventName: "",
       IOCS: [{ data: "", IOCType: "IP" }]
@@ -17,9 +17,8 @@ class EventInsertForm extends React.Component {
   }
 
   handleInsert = (actions) => {
-    this.props.setEventName(this.state.EventName);
     axios.post(`/api/v1/event/start`, this.state);
-    // actions.resetForm();
+    //actions.resetForm();
     this.props.dispatchModal(false);
   }
 
@@ -27,7 +26,6 @@ class EventInsertForm extends React.Component {
     const formData = new FormData();
     formData.append('file', values.file);
     formData.append('eventName', values.eventName2);
-    this.props.setEventName(values.eventName2);
     axios.post(`/api/v1/event/start/file`, formData).then(({ data }) => {
       axios
         .get('/api/v1/neo4j/export')
