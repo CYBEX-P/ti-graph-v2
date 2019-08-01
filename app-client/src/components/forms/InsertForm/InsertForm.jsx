@@ -45,7 +45,65 @@ const InsertForm = props => {
 
   function handleEnrichIP(values, actions) {
     const { enrichmentType, ipToEnrich } = values;
-    if (ipToEnrich !== 'none' && selectedIOC2 === "URL") {
+    if (ipToEnrich !== 'none' && selectedIOC2 === "Host" && enrichmentType === 'pdns') {
+      setLoading(true);
+      axios
+        .post(`/api/v1/enrichPDNS`, {value: `${ipToEnrich}`})
+        .then(({ data }) => {
+          if (data['insert status'] !== 0) {
+            axios
+              .get('/api/v1/neo4j/export')
+              .then(response => {
+                setNeo4jData(response.data);
+                setLoading(false);
+              })
+              .catch(() => {
+                setError(`${enrichmentType} returned nothing!`);
+                dispatchModal('Error');
+                setLoading(false);
+              });
+          } else {
+            setError(`${enrichmentType} lookup returned nothing!`);
+            dispatchModal('Error');
+            setLoading(false);
+          }
+        })
+        .catch(() => {
+          setError(`${enrichmentType} returned nothing!`);
+          dispatchModal('Error');
+          setLoading(false);
+        });
+    }
+    else if (enrichmentType === "cybexCount" || enrichmentType === "cybexRelated") {
+      setLoading(true);
+      axios
+        .post(`/api/v1/enrich/${enrichmentType}`, {Ntype: `${selectedIOC2}`,value: `${ipToEnrich}`})
+        .then(({ data }) => {
+          if (data['insert status'] !== 0) {
+            axios
+              .get('/api/v1/neo4j/export')
+              .then(response => {
+                setNeo4jData(response.data);
+                setLoading(false);
+              })
+              .catch(() => {
+                setError(`${enrichmentType} returned nothing!`);
+                dispatchModal('Error');
+                setLoading(false);
+              });
+          } else {
+            setError(`${enrichmentType} lookup returned nothing!`);
+            dispatchModal('Error');
+            setLoading(false);
+          }
+        })
+        .catch(() => {
+          setError(`${enrichmentType} returned nothing!`);
+          dispatchModal('Error');
+          setLoading(false);
+        });
+    }
+    else if (ipToEnrich !== 'none' && selectedIOC2 === "URL") {
       setLoading(true);
       axios
         .post(`/api/v1/enrichURL`, {value: `${ipToEnrich}`})

@@ -19,7 +19,7 @@ const NavBar = (props) => {
           <FontAwesomeIcon size="lg" icon="bars" color="#e0e0e0" />
         </UnstyledButton>
         <a style={{ flexGrow: 2, textAlign: 'center', color: '#e3e3e3' }} href="/ti-graph">
-          <div>ti-graph --- Event: {props.eName||"Temp Event"}</div>
+          <div>ti-graph</div>
         </a>
         <UnstyledButton onClick={() => {}}>
           <a style={{ flexGrow: 2, textAlign: 'center', color: '#e3e3e3' }} href="/login">

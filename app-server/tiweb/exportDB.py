@@ -50,6 +50,10 @@ def processExport(dataObject):
                 key['color'] = "#835eba"
             if key['label'] == 'User':
                 key['color'] = "#d8e5f6"
+            if key['label'] == 'CybexCount':
+                key['color'] = "#29e682"
+            if key['label'] == 'CybexRelated':
+                key['color'] = "#92fd6c"
             
 
     return dataObject

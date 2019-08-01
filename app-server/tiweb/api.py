@@ -30,7 +30,7 @@ from wipe_db import wipeDB
 from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport
-from cybex import insertCybex
+from cybex import insertCybex, insertRelated, replaceType
 from enrichments import insert_domain_and_user, insert_domain, insert_netblock, resolveHost, getNameservers, getRegistrar, getMailServer
 
 from connect import connectDev, connectProd
@@ -218,6 +218,53 @@ def insert(Ntype, data):
     else:
         return jsonify({"Status" : "Failed"})
 
+@app.route('/api/v1/enrich/cybexCount', methods = ['POST'])
+def cybexCount():
+    req = request.get_json()
+    Ntype = str(req['Ntype'])
+    Ntype1 = replaceType(Ntype)
+    data1 = req['value']
+
+    url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/count"
+    headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
+    data = { Ntype1 : data1 }
+    data = json.dumps(data)
+
+    r = requests.post(url, headers=headers, data=data)
+    res = json.loads(r.text)
+    # print(res)
+
+    try:
+        numOccur = res["count"]
+        status = insertCybex(numOccur, graph, data1)
+        return jsonify({"insert status" : status})
+
+    except:
+        return jsonify({"insert status" : 0})
+
+@app.route('/api/v1/enrich/cybexRelated', methods = ['POST'])
+def CybexRelated():
+    req = request.get_json()
+    Ntype = str(req['Ntype'])
+    Ntype1 = replaceType(Ntype)
+    data1 = req['value']
+
+    url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/related/attribute/summary"
+    headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
+    data = { Ntype1 : data1 }
+    data = json.dumps(data)
+
+    r = requests.post(url, headers=headers, data=data)
+    res = json.loads(r.text)
+    # print(res)
+
+    try:
+        status = insertRelated(str(res), graph, data1)
+        return jsonify({"insert status" : status})
+
+    except:
+        return jsonify({"insert status" : 0})
+
 
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
 def enrich(enrich_type, value):
@@ -239,22 +286,6 @@ def enrich(enrich_type, value):
             w_results = whois(value)
             status = insertWhois(w_results, graph, value)
             return jsonify({"insert status" : status})
-
-    elif enrich_type == "cybex":
-            url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/related/"
-            headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
-            data = { 'ipv4-addr' : value }
-            data = json.dumps(data)
-
-            r = requests.post(url, headers=headers, data=data)
-            res = json.loads(r.text)
-            try:
-                numOccur = len(res['objects'])
-                status = insertCybex(numOccur, graph, value)
-                return jsonify({"insert status" : status})
-
-            except:
-                return jsonify({"insert status" : 0})
 
     elif enrich_type == "deconstructEmail":
             status = insert_domain_and_user(value, graph)
@@ -312,7 +343,7 @@ def enrich_pdns():
     value = req['value']
 
     data = pdns_handler(value)
-    print(data)
+    # print(data)
     status = insert_pdns(data, graph, value)
 
     return jsonify({"Insert Status" : status})
@@ -346,14 +377,12 @@ def sendConfig():
 @app.route('/api/v1/event/start', methods=['POST'])
 def startEvent():
     res = request.get_json()
-    os.environ['eventName'] = res['eventName']
+    os.environ['eventName'] = res['EventName']
+    
     # insert all nodes
-    dType1 = res['IOCType1']
-    dType2 = res['IOCType2']
-    dType3 = res['IOCType3']
-    status = insert(dType1, res['dataToInsert1'])
-    status2 = insert(dType2, res['dataToInsert2'])
-    status2 = insert(dType3, res['dataToInsert3'])
+    for node in res['IOCS']:
+        status = insert(node['IOCType'], node['data'])
+
     # return status
     return status
 
@@ -474,3 +503,9 @@ def macro1():
         print("Done with", str(value))
 
     return jsonify(nodes)
+
+@app.route('/testAPI', methods=['POST'])
+def testFunction():
+    res = request.get_json()
+    print(res)
+    return '1'
