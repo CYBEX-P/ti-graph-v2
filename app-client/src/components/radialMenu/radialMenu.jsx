@@ -88,7 +88,9 @@ const RadialMenu = ({ position, icons, onClickFunctions, scale, titles }) => {
           return 'plus-circle';
         case 'asn':
           return 'server';
-        case 'cybex':
+        case 'cybexCount':
+          return 'calculator';
+        case 'cybexRelated':
           return 'passport';
         case 'gip':
           return 'globe';
@@ -96,6 +98,23 @@ const RadialMenu = ({ position, icons, onClickFunctions, scale, titles }) => {
           return 'project-diagram';
         case 'whois':
           return 'user';
+        case 'enrichURL':
+          return 'plus-circle';
+        case 'resolveHost':
+            return 'h-square';
+        case 'nameservers':
+            return 'server';
+        case 'mailservers':
+            return 'server';
+        case 'registrar':
+            return 'passport';
+        case 'ports':
+            return 'file-import';
+        case 'netblock':
+            return 'object-group';
+        case 'deconstructEmail':
+            return 'mail-bulk';
+        
         default:
           return icon;
       }

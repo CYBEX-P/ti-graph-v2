@@ -23,7 +23,12 @@ import {
   faGlobe,
   faPassport,
   faHome,
-  faPen
+  faPen,
+  faHSquare,
+  faCalculator,
+  faFileImport,
+  faObjectGroup,
+  faMailBulk
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import App from './App';
@@ -50,7 +55,12 @@ library.add(
   faGlobe,
   faPassport,
   faHome,
-  faPen
+  faPen,
+  faHSquare,
+  faCalculator,
+  faFileImport,
+  faObjectGroup,
+  faMailBulk
 );
 
 let YAMLConfig = {};

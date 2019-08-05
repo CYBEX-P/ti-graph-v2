@@ -1,5 +1,5 @@
 whoisData:
-  apikey: at_dE3c8tVnBieCdGwtzUiOFFGfuCQoz
+  apikey: at_Oj1aihFSRVU0LbyqZBLnl0PhM2Zan
 
 shodanData:
   apikey: jLcUwcGmyoMnyRW5f8SyrB5U85ztyD0i
@@ -23,6 +23,16 @@ IOC:
     - BGPath
     - SSID
     - Country
+    - Domain
+    - User
+    - Subnet
+    - Whois
+    - Ports
+    - Registrar
+    - Nameserver
+    - MailServer
+    - CybexCount
+    - CybexRelated
 
 
   enrichments:
@@ -31,52 +41,91 @@ IOC:
       - gip
       - hostname
       - whois
-      - cybex
+      - cybexCount
+      - cybexRelated
+      - netblock
+      - ports
 
     SPort:
-      - na
       - none
 
     DPort:
-      - na
       - none
 
     Email:
-      - na
-      - none
+      - deconstructEmail
+      - cybexRelated
+      - cybexCount
 
     Host:
       - whois
-      - none
+      - resolveHost
+      - nameservers
+      - registrar
+      - mailservers
+      - cybexRelated
+      - cybexCount
+      - pdns
 
     URL:
-      - na
-      - none
+      - enrichURL
+      - cybexRelated
+    
+    Domain:
+      - whois
+      - resolveHost
+      - nameservers
+      - registrar
+      - mailservers
+      - cybexRelated
 
     Hash:
-      - na
-      - none
+      - cybexRelated
+      - cybexCount
 
     BTC:
-      - na
-      - none
+      - cybexRelated
+      - cybexCount
 
     ASN:
-      - na
-      - none
+      - cybexRelated
+      - cybexCount
 
     MAC:
-      - na
       - none
 
     BGPath:
-      - na 
       - none
 
     SSID:
-      - na
       - none
     
     Country:
-      - na
+      - none
+
+    User:
+      - none
+
+    Subnet:
+      - none
+
+    Whois:
+      - none
+
+    Ports:
+      - none
+
+    Registrar: 
+      - none
+
+    Nameserver: 
+      - none
+
+    MailServer: 
+      - none
+
+    CybexCount:
+      - none
+
+    CybexRelated:
       - none
