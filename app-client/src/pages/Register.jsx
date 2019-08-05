@@ -81,6 +81,7 @@ class Register extends Component {
     };
 
     const isValid = this.validate();
+    console.log(isValid);
     if (isValid) {
       let res = register(newUser);
       console.log(res);

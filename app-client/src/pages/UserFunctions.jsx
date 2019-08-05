@@ -9,8 +9,8 @@ export const register =  newUser => {
       username: newUser.username,
       password: newUser.password,
      admin:newUser.admin
-    }).then(({data}) => {console.log(data)})
-  //return "submitted"
+    }).then(({data}) => {return data})
+  
 };
 
 export const login = user => {
