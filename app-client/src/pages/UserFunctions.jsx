@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const register =  newUser => {
-  axios
+  return axios
     .post('/users/register', {
       first_name: newUser.first_name,
       last_name: newUser.last_name,
@@ -9,8 +9,22 @@ export const register =  newUser => {
       username: newUser.username,
       password: newUser.password,
      admin:newUser.admin
-    }).then(({data}) => {return data})
-  
+    }).then(res => {
+      // console.log(res);
+      if (res.status === 200){
+        if (res.data.Error === "1"){
+          return {"Exit" : "1"}
+        }
+        else if (res.data.Error === "2"){
+          return {"Exit" : "2"}
+        }
+        return {"Exit" : "0"}
+      }
+    })
+    .catch((err) => {
+      // console.log(err);
+      return {"Exit" : "1", "Type" : "1"}
+    });
 };
 
 export const login = user => {

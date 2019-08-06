@@ -145,12 +145,14 @@ def register():
                 msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
                 mail.send(msg)
                 return "Sent"
-
-        return jsonify({'result' : "Database creation Error but user was created"})
+        
+        # DB Creation Error
+        return jsonify({"Error" : "1"})
         
     else:
-        result = jsonify({"error":"enter all the values"})
-        return result
+        # invalid form
+        return jsonify({"Error" : "2"})
+        
 
     
 
