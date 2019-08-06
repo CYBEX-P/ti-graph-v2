@@ -36,7 +36,7 @@ class EventInsertForm extends React.Component {
     });
 
     actions.resetForm();
-    this.props.dispatchModal(false);
+    // this.props.dispatchModal(false);
   }
 
   handleShareholderDataChange = idx => evt => {
