@@ -469,11 +469,11 @@ def enrich_pdns():
 #     node = graph.nodes.get(int(id))
 #     return jsonify(node)
 
-# @app.route('/admin/ratelimit')
-# def ratelimit():
-#     # needs to use YAMLConfig
-#     res = requests.get('https://user.whoisxmlapi.com/service/account-balance?apiKey=at_dE3c8tVnBieCdGwtzUiOFFGfuCQoz')
-#     return jsonify(res.json())
+@app.route('/admin/ratelimit')
+def ratelimit():
+    # needs to use YAMLConfig
+    res = requests.get('https://user.whoisxmlapi.com/service/account-balance?apiKey=at_Oj1aihFSRVU0LbyqZBLnl0PhM2Zan')
+    return jsonify(res.json())
 
 @login_required
 @app.route('/api/v1/admin/config')
@@ -508,8 +508,8 @@ def startFileEvent():
     # parse all node types and data
     # insert all nodes
     for i in range(len(fileCSVDF)):
-        Ntype = fileCSVDF.iloc[i, 0]
-        Nval = fileCSVDF.iloc[i, 1]
+        Ntype = str(fileCSVDF.iloc[i, 0])
+        Nval = str(fileCSVDF.iloc[i, 1])
         Ntime = fileCSVDF.iloc[i, 2]
 
         status = insert(Ntype, Nval)
