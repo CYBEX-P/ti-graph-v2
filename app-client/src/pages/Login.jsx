@@ -30,8 +30,32 @@ class Login extends Component {
       if (res.Exit === "0") {
         this.props.history.push('/graph');
       }
-      else {
+      else if(res.Exit === "1") {
         alert("Wrong Username/Password Combination");
+        this.setState({
+          username: '',
+          password: '',
+          errors: {}
+        }); 
+      }
+      else if(res.Exit === "2") {
+        alert("User not found");
+        this.setState({
+          username: '',
+          password: '',
+          errors: {}
+        }); 
+      }
+      else if(res.Exit === "3") {
+        alert("Invalid Form -- Min. character per field is four (4)");
+        this.setState({
+          username: '',
+          password: '',
+          errors: {}
+        }); 
+      }
+      else {
+        alert("Unknown Error -- Please try again later");
         this.setState({
           username: '',
           password: '',

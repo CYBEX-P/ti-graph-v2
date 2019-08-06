@@ -197,13 +197,14 @@ def login():
                 
                 else:
                         # Wrong password for user
-                        abort(401)
+                        return jsonify({"Error" : "1"})
 
         else:
             # No User Found
-            abort(404)
+            return jsonify({"Error" : "2"})
     else:
-        abort(422)
+        # Invalid Form
+        return jsonify({"Error" : "3"})
 
 @login_required	
 @app.route('/remove', methods = ['POST'])

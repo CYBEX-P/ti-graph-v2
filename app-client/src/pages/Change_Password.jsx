@@ -20,17 +20,24 @@ class Change_password extends Component {
 
   validate = () => {
     
-    let usernameError = '';
-    let passwordError = '';
+    const errors = {
+      usernameError: '',
+      passwordError: ''
+    }
 
     if (!this.state.username || this.state.username.length < 4) {
-      usernameError = 'username must be more than 3 characters';
+      errors.usernameError = 'username must be more than 3 characters';
     }
     if (!this.state.password || this.state.password.length < 4) {
-      passwordError = 'password must be more than 3 characters';
+      errors.passwordError = 'password must be more than 3 characters';
     }
 
-    return true;
+    if (errors.usernameError === '' && errors.passwordError === ''){
+      return true
+    }
+    else {
+      return false
+    }
   };
 
   onSubmit(e) {

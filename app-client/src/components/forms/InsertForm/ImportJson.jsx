@@ -4,7 +4,7 @@ import axios from 'axios';
 import DataContext from '../../App/DataContext';
 
 
-const Import_json = props => {
+const ImportJson = props => {
     const {  setNeo4jData } = useContext(DataContext);
    // const { dispatchModal, setError } = useContext(ModalContext);
     //const { setLoading } = useContext(MenuContext);
@@ -33,5 +33,5 @@ const Import_json = props => {
         </div> 
     )
 }
-export default Import_json;
+export default ImportJson;
   

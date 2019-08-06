@@ -14,7 +14,7 @@ import Graph from '../Graph/Graph';
 import Button from '../Button/Button';
 import InsertForm from '../forms/InsertForm/InsertForm';
 import EventInsertForm from '../EventInsertForm/EventInsertForm';
-import Import_json from '../forms/InsertForm/Import_json'
+import ImportJson from '../forms/InsertForm/ImportJson'
 
 
 const App = props => {
@@ -194,7 +194,7 @@ const App = props => {
                   </Button>
                 </div>
                 <div style={{ gridColumn: 3 }}>
-                  <Import_json/>
+                  <ImportJson/>
                   
                 </div>
               </div>
