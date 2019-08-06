@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, flash, make_response, session, redirect
+from flask import abort, Flask, render_template, request, jsonify, flash, make_response, session, redirect
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
 from py2neo import Graph, Node
 import requests
@@ -160,16 +160,17 @@ def login():
     result = ''
     
     if form.validate_on_submit():
-        session['user']= s.query(User).filter(User.username == form.username.data).first()                                
-        if session['user']:
-                if check_password_hash(session['user'].password, form.password.data):
+        user = s.query(User).filter(User.username == form.username.data).first()                                
+        if user:
+                if check_password_hash(user.password, form.password.data):
                          access_token = create_access_token(identity = {'username': form.username.data})
                          session['result'] = access_token
+                         session['username'] = user.username
                          global graph
-                         session['db_username'] = session['user'].db_username
-                         session['db_password'] = session['user'].db_password
-                         session['db_ip'] = session['user'].db_ip
-                         session['db_port'] = session['user'].db_port
+                         session['db_username'] = user.db_username
+                         session['db_password'] = user.db_password
+                         session['db_ip'] = user.db_ip
+                         session['db_port'] = user.db_port
                          graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
                          print(session)
                          return session['result']
@@ -195,14 +196,14 @@ def login():
                         
                 
                 else:
-                        result = jsonify({"Error":"Invalid username and password"})
-                        return result
+                        # Wrong password for user
+                        abort(401)
 
         else:
-            result = jsonify({"Error":"Invalid username and password"})
-            return result
+            # No User Found
+            abort(404)
     else:
-        return jsonify({"Error" : "Invalid form", "Data" : form.validate_on_submit()})
+        abort(422)
 
 @login_required	
 @app.route('/remove', methods = ['POST'])

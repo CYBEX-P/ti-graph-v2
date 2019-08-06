@@ -26,8 +26,17 @@ class Login extends Component {
     };
 
     login(user).then(res => {
-      if (!res.exit) {
+      console.log(res);
+      if (res.Exit === "0") {
         this.props.history.push('/graph');
+      }
+      else {
+        alert("Wrong Username/Password Combination");
+        this.setState({
+          username: '',
+          password: '',
+          errors: {}
+        }); 
       }
     });
   }

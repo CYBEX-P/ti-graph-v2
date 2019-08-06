@@ -20,13 +20,15 @@ export const login = user => {
       password: user.password
     })
     .then(res => {
-      console.log(res.data);
-      localStorage.setItem('token', JSON.stringify(res.data));
-      return res.data;
+      console.log(res);
+      if (res.status === 200){
+        localStorage.setItem('token', JSON.stringify(res.data));
+        return {"Exit" : "0"}
+      }
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
-      return {"Exit" : "1"}
+      return {"Exit" : "1", "Type" : "1"}
     });
 };
 
