@@ -165,8 +165,9 @@ def login():
         user = s.query(User).filter(User.username == form.username.data).first()                                
         if user:
                 if check_password_hash(user.password, form.password.data):
+                         user.is_authenticated = True;
                          access_token = create_access_token(identity = {'username': form.username.data})
-                         session['result'] = access_token
+                         session['token'] = access_token
                          session['username'] = user.username
                          global graph
                          session['db_username'] = user.db_username
@@ -175,7 +176,7 @@ def login():
                          session['db_port'] = user.db_port
                          graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
                          print(session)
-                         return session['result']
+                         return session['token']
                          
                 # if(user.db_ip is None or user.db_port is None):
                 #     c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
@@ -269,7 +270,8 @@ def page_change_password():
 def logout():
     
     s.flush()
-    
+    session = {}
+    flask.flash(str(session))
     return redirect('/login')
 
 
