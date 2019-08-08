@@ -154,8 +154,6 @@ def register():
         return jsonify({"Error" : "2"})
         
 
-    
-
 @app.route('/users/login', methods =['POST'])
 def login():
     form = LoginForm()
@@ -209,7 +207,7 @@ def login():
         # Invalid Form
         return jsonify({"Error" : "3"})
 
-@login_required	
+# Admin required
 @app.route('/remove', methods = ['POST'])
 def delete():
     
@@ -220,21 +218,28 @@ def delete():
     result = jsonify({"message": "User deleted"})
     return result 
 
-@login_required
+# Admin required
 @app.route('/update', methods = ['POST'])
 def update():
         
         #options = session.query(User)
-        update_this = s.query(User).filter(User.username == request.get_json()['username']).first()
-        update_this.first_name = request.get_json()['first_name']
-        update_this.last_name = request.get_json()['last_name']
-        update_this.email = request.get_json()['email']
-        update_this.admin = request.get_json()['admin']
-        s.commit()
-        result = jsonify({'message': 'DB updated'})
-        return result 
+        try:
+            update_this = s.query(User).filter(User.username == request.get_json()['username']).first()
+            update_this.first_name = request.get_json()['first_name']
+            update_this.last_name = request.get_json()['last_name']
+            update_this.email = request.get_json()['email']
+            update_this.admin = request.get_json()['admin']
+            s.commit()
+            result = jsonify({'message': 'DB updated'})
+            return result
+        except:
+            s.rollback()
+            print("There was an error updating your account")
+            result = jsonify({'message': 'There was an error updating your account'})
+            return result
+         
 
-@login_required
+#@login_required
 @app.route('/find', methods = ['POST'])
 def found():
     
@@ -268,9 +273,8 @@ def page_change_password():
 @login_required
 @app.route('/user/logout', methods = ['GET', 'POST'])
 def logout():
-    
-    s.flush()
-    session = {}
+    s.flush()       # flush the database
+    session = {}    # Clear the session
     flask.flash(str(session))
     return redirect('/login')
 
