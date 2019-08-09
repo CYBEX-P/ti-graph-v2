@@ -152,47 +152,33 @@ def register():
     else:
         # invalid form
         return jsonify({"Error" : "2"})
-        
 
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+        
 @app.route('/users/login', methods =['POST'])
 def login():
     form = LoginForm()
     result = ''
-    print(str(form.username.data))
+
     if form.validate_on_submit():
         user = s.query(User).filter(User.username == form.username.data).first()                                
         if user:
                 if check_password_hash(user.password, form.password.data):
-                         access_token = create_access_token(identity = {'username': form.username.data}, expires_delta=False)
-                         session['token'] = access_token
-                         session['username'] = user.username
-                         global graph
-                         session['db_username'] = user.db_username
-                         session['db_password'] = user.db_password
-                         session['db_ip'] = user.db_ip
-                         session['db_port'] = user.db_port
-                         graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
-                         print(session)
-                         return session['token']
-                         
-                # if(user.db_ip is None or user.db_port is None):
-                #     c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
-                #     r = c.add_database()
-                #     if(r and r["status"]):
-                #         print("Created Database: " + r["data"]["id"])
-                #     else:
-                #         print("Error: " + r["error"])
-                #         r = c.get_database_info()
-                #         if(r and r["status"]):
-                #             user = User.query.filter_by(username=form.username.data).first()
-                #             user.db_ip = r['data']['ip']
-                #             user.db_port = r['data']['port']
-                #             db.session.commit() 
-                #     return result
-                            
-                # else:
-                #access_token = create_access_token(identity = {'username': form.username.data})
-                #result = access_token
+                        # access_token = create_access_token(identity = {'username': form.username.data}, expires_delta=False)
+                        # session['token'] = access_token
+                        login_user(user)
+                        session['username'] = user.username
+                        global graph
+                        session['db_username'] = user.db_username
+                        session['db_password'] = user.db_password
+                        session['db_ip'] = user.db_ip
+                        session['db_port'] = user.db_port
+                        graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
+                        # print(session)
+                        return "True"
+                        # return session['token']
                         
                 
                 else:
@@ -216,6 +202,20 @@ def delete():
     s.commit()
     result = jsonify({"message": "User deleted"})
     return result 
+
+@app.route('/isSignedIn')
+def isSignedIn(): 
+    
+    try:
+        user = s.query(User).filter(User.username == session['username']).first()
+        if session['user_id']:
+            return jsonify({"value" : 1})
+        else:
+            return jsonify({"value" : 0})
+    except:
+        return jsonify({"value" : 0})
+    # return "You're NOT signed in"
+    
 
 # Admin required
 @app.route('/update', methods = ['POST'])
@@ -272,10 +272,8 @@ def page_change_password():
 @login_required
 @app.route('/user/logout', methods = ['GET', 'POST'])
 def logout():
-    s.flush()       # flush the database
-    session = {}    # Clear the session
-    #Flask.flash(str(session))
-    return redirect('/login')
+    logout_user()
+    return "True"
 
 
 @app.route('/secure')

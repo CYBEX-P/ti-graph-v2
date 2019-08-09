@@ -2,15 +2,12 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../components/Button/Button';
 import {logout} from './UserFunctions';
-// import axios from 'axios';
 
-logout().then(res => {
-  if (!res.exit) {
-    //this.props.history.push('/login');
-  }
-});
-
-const Landing = ({ isSignedIn }) => (
+const Landing = ({ isSignedIn }) => {
+  
+  const [, updateState] = React.useState({});
+  
+  return (
   <>
     <h1 className="text-center">Threat Intelligence Graph</h1>
     <center><p>NSF funded project at the University of Nevada, Reno</p></center>
@@ -38,11 +35,11 @@ const Landing = ({ isSignedIn }) => (
           <Button width="100%" onClickFunction={() => {}}>
             <div style={{ width: '100%', textAlign: 'center' }}>Graph</div>
           </Button>
-          <center><a href="/tiweb/logout">Logout</a></center>
         </a>
+          <button onClick={logout}>Logout</button>
       </>
     )}
   </>
-);
+)};
 
 export default Landing;

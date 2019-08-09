@@ -45,7 +45,7 @@ export const login = user => {
         else if (res.data.Error === "3"){
           return {"Exit" : "3"}
         }
-        localStorage.setItem('token', JSON.stringify(res.data));
+        // localStorage.setItem('token', JSON.stringify(res.data));
         return {"Exit" : "0"}
       }
     })
@@ -110,7 +110,8 @@ export const change_password = newPassword => {
 };
 
 export const logout = ()=>{
-  return axios.post('/user/logout');
+  axios.post('/user/logout');
+  return true;
 }
 
 
