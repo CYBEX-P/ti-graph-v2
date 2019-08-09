@@ -110,7 +110,7 @@ export const change_password = newPassword => {
 };
 
 export const logout = ()=>{
-  return axios.post('/user/logout')
+  return axios.post('/user/logout');
 }
 
 

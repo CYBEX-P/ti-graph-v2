@@ -72,6 +72,7 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
 
+# login_manager.set_protection is 'basic' by default
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -81,7 +82,6 @@ if app.config['ENV'] == 'development':
     graph = connectDev()
 
 graph= Graph()
-
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -158,13 +158,12 @@ def register():
 def login():
     form = LoginForm()
     result = ''
-    
+    print(str(form.username.data))
     if form.validate_on_submit():
         user = s.query(User).filter(User.username == form.username.data).first()                                
         if user:
                 if check_password_hash(user.password, form.password.data):
-                         user.is_authenticated = True;
-                         access_token = create_access_token(identity = {'username': form.username.data})
+                         access_token = create_access_token(identity = {'username': form.username.data}, expires_delta=False)
                          session['token'] = access_token
                          session['username'] = user.username
                          global graph
@@ -275,7 +274,7 @@ def page_change_password():
 def logout():
     s.flush()       # flush the database
     session = {}    # Clear the session
-    flask.flash(str(session))
+    #Flask.flash(str(session))
     return redirect('/login')
 
 
