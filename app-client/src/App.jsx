@@ -15,7 +15,7 @@ import MenuContext from './components/App/MenuContext';
 import Change_password from './pages/Change_Password';
 import Axios from 'axios';
 
-const App = ({ config }) => {
+const App = (props, { config }) => {
   const [isExpanded, dispatchExpand] = useReducer((_, action) => {
     if (action === 'left' || action === 'right' || action === 'bottom' || action === 'top') {
       return action;
@@ -59,9 +59,9 @@ const App = ({ config }) => {
         <div style={{ backgroundColor: '#ffffff', paddingTop: '56px', paddingBottom: '32px' }} className="container">
           <Route exact path="/" component={() => <Redirect to="/home" />} />
           {/* {alert(isSignedIn)} */}
-          <Route path="/home" component={() => <Landing isSignedIn={isSignedIn} setSignedIn={setSignedIn}/>} />
+          <Route path="/home" component={() => <Landing isSignedIn={isSignedIn} setSignedIn={setSignedIn} />} />
           <Route path="/register" component={Register} />
-          <Route path="/login" component={() => <Login isSignedIn={isSignedIn} setSignedIn={setSignedIn}/>} />
+          <Route path="/login" component={() => <Login isSignedIn={isSignedIn} setSignedIn={setSignedIn} />} />
           <Route path="/profile" component={Profile} />
           <Route path="/remove" component={Remove} />
           <Route path="/update" component={Update} />
