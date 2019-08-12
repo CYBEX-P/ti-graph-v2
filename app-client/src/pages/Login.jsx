@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { login } from './UserFunctions';
 
 class Login extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       username: '',
       password: '',
@@ -28,6 +28,8 @@ class Login extends Component {
     login(user).then(res => {
       console.log(res);
       if (res.Exit === "0") {
+        this.props.setSignedIn(true);
+        console.log(this.props);
         this.props.history.push('/home');
       }
       else if(res.Exit === "1") {

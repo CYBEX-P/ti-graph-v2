@@ -3,9 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../components/Button/Button';
 import {logout} from './UserFunctions';
 
-const Landing = ({ isSignedIn }) => {
-  
-  const [, updateState] = React.useState({});
+const Landing = ({ isSignedIn, setSignedIn }) => {
   
   return (
   <>
@@ -36,7 +34,12 @@ const Landing = ({ isSignedIn }) => {
             <div style={{ width: '100%', textAlign: 'center' }}>Graph</div>
           </Button>
         </a>
-          <button onClick={logout}>Logout</button>
+          <button onClick={() => {
+            setSignedIn(false);
+            return logout();}
+          }>
+              Logout
+          </button>
       </>
     )}
   </>
