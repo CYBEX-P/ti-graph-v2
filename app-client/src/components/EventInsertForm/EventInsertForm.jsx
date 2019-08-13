@@ -124,7 +124,7 @@ class EventInsertForm extends React.Component {
                     ))}
                 </select>
               </Col> 
-              <Col md={{ size: 6, offset: 0 }}>
+              <Col md={{ size: 5, offset: 0 }}>
                 <Input
                   type="text"
                   placeholder={`IOC Value ${idx + 1}`}
@@ -132,15 +132,16 @@ class EventInsertForm extends React.Component {
                   onChange={this.handleShareholderDataChange(idx)}
                 />
               </Col>
-              <Col sm={{ size: 3 }}>
-                <Button
+              <Col sm={{ size: 3 }} >
+                <button
                   type="button"
                   width="30%"
-                  onClickFunction={this.handleRemoveShareholder(idx)}
+                  onClick={this.handleRemoveShareholder(idx)}
                   className="small"
+                  style={{marginTop: "2%"}}
                 >
-                  <div>-</div>
-                </Button>
+                  <div> - Remove Row</div>
+                </button>
               </Col> 
             </Row>
         ))}
@@ -157,7 +158,7 @@ class EventInsertForm extends React.Component {
               </Button>
             </Col> 
             
-            <Col sm={{ size: 6, offset: 3 }}>
+            <Col sm={{ size: 4, offset: 3 }}>
               <Button width="60%" hasIcon type="submit" onClickFunction={() => {}}>
                 <div>Start Investigation</div>
               </Button>
