@@ -136,15 +136,15 @@ class EventInsertForm extends React.Component {
         ))}
           <Row>
             <Col sm={{ size: 3 }}>
-              <button
+              <Button
                 type="button"
                 width="58%"
-                onClick={this.handleAddShareholder}
+                onClickFunction={this.handleAddShareholder}
                 className="small"
               >
                 <FontAwesomeIcon size="lg" icon="plus-circle" />
                 <div>Add Row</div>
-              </button>
+              </Button>
             </Col> 
             <Col sm={{ size: 6, offset: 3 }}>
               <Button width="60%" hasIcon type="submit" onClickFunction={() => {}}>

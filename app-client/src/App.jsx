@@ -15,7 +15,7 @@ import MenuContext from './components/App/MenuContext';
 import Change_password from './pages/Change_Password';
 import Axios from 'axios';
 
-const App = (props, { config }) => {
+const App = ({ config }) => {
   const [isExpanded, dispatchExpand] = useReducer((_, action) => {
     if (action === 'left' || action === 'right' || action === 'bottom' || action === 'top') {
       return action;

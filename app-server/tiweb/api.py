@@ -80,8 +80,8 @@ login_manager.login_view = 'login'
 # If in development, connect to local container right away
 if app.config['ENV'] == 'development':
     graph = connectDev()
-
-graph= Graph()
+else:
+    graph= Graph()
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -193,6 +193,7 @@ def login():
         return jsonify({"Error" : "3"})
 
 # Admin required
+@login_required
 @app.route('/remove', methods = ['POST'])
 def delete():
     
@@ -218,6 +219,7 @@ def isSignedIn():
     
 
 # Admin required
+@login_required
 @app.route('/update', methods = ['POST'])
 def update():
         
@@ -238,7 +240,7 @@ def update():
             return result
          
 
-#@login_required
+@login_required
 @app.route('/find', methods = ['POST'])
 def found():
     
@@ -297,7 +299,6 @@ def exportNeoDB():
 #     full_load()
 #     return "Neo4j DB loaded!"
 
-@login_required
 @app.route('/api/v1/neo4j/wipe')
 def wipe_function():
     wipeDB(graph)
@@ -325,6 +326,7 @@ def insert(Ntype, data):
     else:
         return jsonify({"Status" : "Failed"})
 
+@login_required
 @app.route('/api/v1/enrich/cybexCount', methods = ['POST'])
 def cybexCount():
     req = request.get_json()
@@ -349,6 +351,7 @@ def cybexCount():
     except:
         return jsonify({"insert status" : 0})
 
+@login_required
 @app.route('/api/v1/enrich/cybexRelated', methods = ['POST'])
 def CybexRelated():
     req = request.get_json()
@@ -372,7 +375,7 @@ def CybexRelated():
     except:
         return jsonify({"insert status" : 0})
 
-
+@login_required
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
 def enrich(enrich_type, value):
     if(enrich_type == "asn"):
@@ -474,13 +477,13 @@ def enrich_pdns():
 #     node = graph.nodes.get(int(id))
 #     return jsonify(node)
 
+@login_required
 @app.route('/admin/ratelimit')
 def ratelimit():
     # needs to use YAMLConfig
     res = requests.get('https://user.whoisxmlapi.com/service/account-balance?apiKey=at_Oj1aihFSRVU0LbyqZBLnl0PhM2Zan')
     return jsonify(res.json())
 
-@login_required
 @app.route('/api/v1/admin/config')
 def sendConfig():
     return jsonify(YAMLConfig)
@@ -556,6 +559,7 @@ def import_json():
 def index_root():
     return app.send_static_file('index.html')
 
+@login_required
 @app.route('/api/v1/macro')
 def macro1():
     data = processExport(export(graph))
@@ -632,6 +636,7 @@ def macro1():
         print("Done with", str(value))
 
     return jsonify(nodes)
+
 
 @app.route('/testAPI', methods=['POST'])
 def testFunction():
