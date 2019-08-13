@@ -17,7 +17,7 @@ const Landing = ({ isSignedIn, setSignedIn }) => {
             <div style={{ width: '100%', textAlign: 'center' }}>Login</div>
           </Button>
         </a>
-        <br />
+        <hr/>
         <a href="/tiweb/graph">
           <Button hasIcon width="100%" onClickFunction={() => {}}>
             <FontAwesomeIcon fixedWidth size="lg" icon="user-plus" color="#e0e0e0" />
@@ -34,12 +34,15 @@ const Landing = ({ isSignedIn, setSignedIn }) => {
             <div style={{ width: '100%', textAlign: 'center' }}>Graph</div>
           </Button>
         </a>
-          <button onClick={() => {
+        <hr></hr>
+          <Button  width="100%" onClickFunction={() => {
             setSignedIn(false);
             return logout();}
           }>
-              Logout
-          </button>
+            <div style={{ width: '100%', textAlign: 'center' }}>
+            Logout
+            </div>
+          </Button>
       </>
     )}
   </>

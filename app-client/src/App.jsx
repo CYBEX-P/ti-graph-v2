@@ -50,8 +50,8 @@ const App = (props, { config }) => {
   return (
     <Router basename='/tiweb'>
       <div style={{ minHeight: '100vh', backgroundColor: '#efefef' }} className="App">
-        <Route path="/graph" component={() => <MainApp config={config} />} />
 
+        <Route path="/graph" component={() => <MainApp config={config} />} />
         <MenuContext.Provider value={{ dispatchExpand, isExpanded }}>
           <NavBar />
         </MenuContext.Provider>
