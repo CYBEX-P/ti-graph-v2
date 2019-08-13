@@ -8,6 +8,6 @@ def connectDev():
 # Production connection
 # connect to user's individual container 
 def connectProd(user, passw, addr, port):
-    URI = "bolt://" + addr + ":" + port
+    URI = "bolt://" + addr + ":" + str(port)
     graph = Graph(URI, auth=(user, passw))
     return graph

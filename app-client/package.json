@@ -14,9 +14,11 @@
     "jwt-decode": "^2.2.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.2",
+    
     "react-cookies": "^0.1.0",
     "react-dom": "^16.8.2",
     "react-modal": "^3.8.1",
+    
     "react-router-dom": "^5.0.0",
     "react-scripts": "^2.1.8",
     "react-spinners": "^0.5.3",

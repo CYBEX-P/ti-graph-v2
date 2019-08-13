@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, flash, make_response, session
+from flask import abort, Flask, render_template, request, jsonify, flash, make_response, session, redirect
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
 from py2neo import Graph, Node
 import requests
@@ -23,7 +23,7 @@ from flask_cors import CORS
 from werkzeug.datastructures import Headers
 import uuid
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
-
+from flask_sqlalchemy import SQLAlchemy
 from tiweb import app, YAMLConfig
 from gip import geoip, ASN, geoip_insert, asn_insert
 from wipe_db import wipeDB
@@ -35,14 +35,44 @@ from enrichments import insert_domain_and_user, insert_domain, insert_netblock, 
 
 from connect import connectDev, connectProd
 from containerlib import client
-from users import db, User, RegistrationForm, LoginForm
+from users import  RegistrationForm, LoginForm
 from shodanSearch import shodan_lookup, insert_ports
 from pdns import pdns_handler, insert_pdns
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+Base = declarative_base()
+
+
+db = SQLAlchemy(app)
+
+engine = create_engine("mysql+mysqlconnector://cybexpadmin:cybexp19sekret@134.197.21.10:3306/cybexpui")
+session1 = sessionmaker(expire_on_commit=False)
+session1.configure(bind=engine)
+
+class User(UserMixin, db.Model, Base):
+    id = db.Column(db.Integer, primary_key=True) 
+    public_id = db.Column(db.String(50), unique = True)                               
+    first_name  = db.Column(db.String(15))
+    last_name = db.Column(db.String(15))
+    email = db.Column(db.String(50), unique = True)
+    db_ip = db.Column(db.String(50))
+    db_port = db.Column(db.Integer)
+    username = db.Column(db.String(15), unique = True)
+    password = db.Column(db.String(80))
+    admin = db.Column(db.Boolean)
+    db_username=db.Column(db.String(15))
+    db_password = db.Column(db.String(80))
+
+Base.metadata.create_all(engine)
+
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
 
+# login_manager.set_protection is 'basic' by default
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -50,27 +80,42 @@ login_manager.login_view = 'login'
 # If in development, connect to local container right away
 if app.config['ENV'] == 'development':
     graph = connectDev()
+else:
+    graph= Graph()
 
-#db.create_all()
-    
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'cybexp123@gmail.com'
+app.config['MAIL_PASSWORD'] = 'cybexpadmin'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False  
+app.config['SECURITY_PASSWORD_SALT'] = 'my_precious_two'
+app.config['UPLOAD_FOLDER'] = '/tiweb'
+
+
+
+mail = Mail(app)
+s=session1()
+   
 @app.route('/users/register', methods = ['POST'])
 def register():
     form = RegistrationForm()
+    
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method = 'sha256')
         new_user = User(public_id=str(uuid.uuid4()),first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data, username = form.username.data, password = hashed_password, admin = form.admin.data)
-        db.session.add(new_user)
-        db.session.commit()
+        s.add(new_user)
         result = {
 		'first_name' : form.first_name.data,
 		'last_name' : form.last_name.data,
 		'email' : form.email.data,
-		'password' : form.password.data	
+		'password' : form.password.data,
+                'admin': form.admin.data
 	    }
 
         c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
         r = c.add_database()
-
+        
         if(r and r["status"]):
             print("Created Database: " + r["data"]["id"])
         else:
@@ -82,92 +127,155 @@ def register():
 
         if(r and r["status"]):
            #print(json.dumps(r['data']))
-           user = User.query.filter_by(username=form.username.data).first()
-           user.db_ip = r['data']['ip']
-           user.db_port = r['data']['port']
-           db.session.commit() 
            
-        return jsonify({'result' : result})
+                user = s.query(User).filter(User.username == form.username.data).first() 
+                user.db_ip= r['data']['ip']
+                user.db_port = r['data']['port']
+                us = r['data']['auth']
+                print(us)
+                a = us.split('/')
+                user.db_username = a[0]
+           
+                user.db_password = a[1]
+          
+           
+                s.commit() 
+           
+                msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
+                msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
+                mail.send(msg)
+                return "Sent"
+        
+        # DB Creation Error
+        return jsonify({"Error" : "1"})
         
     else:
-        result = jsonify({"error":"enter all the values"})
-        return result
+        # invalid form
+        return jsonify({"Error" : "2"})
 
-    
-
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+        
 @app.route('/users/login', methods =['POST'])
 def login():
     form = LoginForm()
     result = ''
-    
+
     if form.validate_on_submit():
-        user= User.query.filter_by(username = form.username.data).first()                                
+        user = s.query(User).filter(User.username == form.username.data).first()                                
         if user:
-            if check_password_hash(user.password, form.password.data):
-                access_token = create_access_token(identity = {'username': form.username.data})
-                result = access_token
-                # if(user.db_ip is None or user.db_port is None):
-                #     c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
-                #     r = c.add_database()
-                #     if(r and r["status"]):
-                #         print("Created Database: " + r["data"]["id"])
-                #     else:
-                #         print("Error: " + r["error"])
-                #         r = c.get_database_info()
-                #         if(r and r["status"]):
-                #             user = User.query.filter_by(username=form.username.data).first()
-                #             user.db_ip = r['data']['ip']
-                #             user.db_port = r['data']['port']
-                #             db.session.commit() 
-                #     return result
-                            
-                # else:
-                access_token = create_access_token(identity = {'username': form.username.data})
-                result = access_token
-                global graph
-                graph = connectProd(user.db_username, user.db_password, user.db_ip, user.db_port)
-                return result
+                if check_password_hash(user.password, form.password.data):
+                        # access_token = create_access_token(identity = {'username': form.username.data}, expires_delta=False)
+                        # session['token'] = access_token
+                        login_user(user)
+                        session['username'] = user.username
+                        global graph
+                        session['db_username'] = user.db_username
+                        session['db_password'] = user.db_password
+                        session['db_ip'] = user.db_ip
+                        session['db_port'] = user.db_port
+                        graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
+                        # print(session)
+                        return "True"
+                        # return session['token']
+                        
                 
-            else:
-                result = jsonify({"Error":"Invalid username and password"})
-                return result
+                else:
+                        # Wrong password for user
+                        return jsonify({"Error" : "1"})
 
         else:
-            result = jsonify({"Error":"Invalid username and password"})
-            return result
+            # No User Found
+            return jsonify({"Error" : "2"})
     else:
-        return jsonify({"Error" : "Invalid form", "Data" : form.validate_on_submit()})
-	
+        # Invalid Form
+        return jsonify({"Error" : "3"})
+
+# Admin required
+@login_required
 @app.route('/remove', methods = ['POST'])
 def delete():
+    
     #form = DeleteForm()
     #if form.validate_on_submit():
-    User.query.filter_by(username = request.get_json()['username']).delete()
-    db.session.commit()
+    s.query(User).filter(User.username == request.get_json()['username']).delete()
+    s.commit()
     result = jsonify({"message": "User deleted"})
     return result 
 
+@app.route('/isSignedIn')
+def isSignedIn(): 
+    
+    try:
+        user = s.query(User).filter(User.username == session['username']).first()
+        if session['user_id']:
+            return jsonify({"value" : 1})
+        else:
+            return jsonify({"value" : 0})
+    except:
+        return jsonify({"value" : 0})
+    # return "You're NOT signed in"
+    
+
+# Admin required
+@login_required
 @app.route('/update', methods = ['POST'])
 def update():
+        
         #options = session.query(User)
-        update_this = User.query.filter_by(username = request.get_json()['username']).first()
-        update_this.first_name = request.get_json()['first_name']
-        update_this.last_name = request.get_json()['last_name']
-        update_this.email = request.get_json()['email']
-        db.session.commit()
-        result = jsonify({'message': 'DB updated'})
-        return result 
+        try:
+            update_this = s.query(User).filter(User.username == request.get_json()['username']).first()
+            update_this.first_name = request.get_json()['first_name']
+            update_this.last_name = request.get_json()['last_name']
+            update_this.email = request.get_json()['email']
+            update_this.admin = request.get_json()['admin']
+            s.commit()
+            result = jsonify({'message': 'DB updated'})
+            return result
+        except:
+            s.rollback()
+            print("There was an error updating your account")
+            result = jsonify({'message': 'There was an error updating your account'})
+            return result
+         
 
+@login_required
 @app.route('/find', methods = ['POST'])
 def found():
-    found_user= User.query.filter_by(username = request.get_json()['username']).first_or_404()
-    found_f = found_user.first_name
-    found_l = found_user.last_name
-    #found_id = found_user.id
-    db.session.commit()
     
-    return str(found_f+ " "+ found_l)
+    found_user= s.query(User).filter(User.username == request.get_json()['username']).first()
+    result = {
+        'found_f': found_user.first_name,
+        'found_l': found_user.last_name,
+        'email':found_user.email,
+        'admin':found_user.admin,
+        'db_ip':found_user.db_ip,
+        'db_port':found_user.db_port,
+        'db_username':found_user.db_username
+    }
+    #found_id = found_user.id
+    s.commit()
+    #return found_f, found_l
+    return jsonify({'result':result})
 
+@login_required
+@app.route('/change_password', methods=['GET', 'POST'])
+def page_change_password():
+    
+    change_this = s.query(User).filter(User.username == request.get_json()['username']).first()
+    if check_password_hash(change_this.password,  request.get_json()['old_password']):
+        hashed_password = generate_password_hash(request.get_json()['new_password'], method = 'sha256')
+        change_this.password = hashed_password
+        s.commit()
+        result = jsonify({'message':'Password updated'})
+        return result
+
+@login_required
+@app.route('/user/logout', methods = ['GET', 'POST'])
+def logout():
+    logout_user()
+    return "True"
 
 
 @app.route('/secure')
@@ -191,12 +299,12 @@ def exportNeoDB():
 #     full_load()
 #     return "Neo4j DB loaded!"
 
-
 @app.route('/api/v1/neo4j/wipe')
 def wipe_function():
     wipeDB(graph)
     return jsonify({"Status":"Neo4j DB full wipe complete!"})
 
+@login_required
 @app.route('/api/v1/neo4j/insertURL', methods = ['POST'])
 def insert2():
     req = request.get_json()
@@ -209,7 +317,7 @@ def insert2():
     else:
         return jsonify({"Status" : "Failed"})
 
-
+@login_required
 @app.route('/api/v1/neo4j/insert/<Ntype>/<data>')
 def insert(Ntype, data):
     status = insertNode(Ntype, data, graph)
@@ -218,6 +326,7 @@ def insert(Ntype, data):
     else:
         return jsonify({"Status" : "Failed"})
 
+@login_required
 @app.route('/api/v1/enrich/cybexCount', methods = ['POST'])
 def cybexCount():
     req = request.get_json()
@@ -242,6 +351,7 @@ def cybexCount():
     except:
         return jsonify({"insert status" : 0})
 
+@login_required
 @app.route('/api/v1/enrich/cybexRelated', methods = ['POST'])
 def CybexRelated():
     req = request.get_json()
@@ -265,7 +375,7 @@ def CybexRelated():
     except:
         return jsonify({"insert status" : 0})
 
-
+@login_required
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
 def enrich(enrich_type, value):
     if(enrich_type == "asn"):
@@ -320,6 +430,7 @@ def enrich(enrich_type, value):
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
 
+@login_required
 @app.route('/api/v1/enrichURL', methods=['POST'])
 def enrichURL():
     req = request.get_json()
@@ -328,6 +439,7 @@ def enrichURL():
     status = insert_domain(value, graph)
     return jsonify({"insert status" : status})
 
+@login_required
 @app.route('/api/v1/enrich/all')
 def enrich_all():
     for node in graph.nodes.match("IP"):
@@ -337,6 +449,7 @@ def enrich_all():
         enrich('hostname', node['data'])
     return jsonify({"Status" : "Success"})
 
+@login_required
 @app.route('/api/v1/enrichPDNS', methods=['POST'])
 def enrich_pdns():
     req = request.get_json()
@@ -364,6 +477,7 @@ def enrich_pdns():
 #     node = graph.nodes.get(int(id))
 #     return jsonify(node)
 
+@login_required
 @app.route('/admin/ratelimit')
 def ratelimit():
     # needs to use YAMLConfig
@@ -374,6 +488,7 @@ def ratelimit():
 def sendConfig():
     return jsonify(YAMLConfig)
 
+@login_required
 @app.route('/api/v1/event/start', methods=['POST'])
 def startEvent():
     res = request.get_json()
@@ -390,6 +505,7 @@ def startEvent():
 # def getEventName():
 #     return jsonify(os.environ['eventName'])
 
+@login_required
 @app.route('/api/v1/event/start/file', methods=['POST'])
 def startFileEvent():
     os.environ['eventName'] = request.form['eventName']
@@ -409,6 +525,7 @@ def startFileEvent():
     # return status
     return jsonify(0)
 
+@login_required
 @app.route('/api/v1/session/init', methods=['POST'])
 def sess_init():
     req = request.get_json()
@@ -423,10 +540,26 @@ def sess_init():
 
     return "User {} has initialized a session.".format(session['username'])
 
+
+@login_required
+@app.route('/import_json', methods = ['GET','POST'])
+def import_json():
+        print(request.get_data())
+        data = request.files['file']
+        if data:
+                data.save(data.filename)
+                #return 'uploaded'
+                with open(data.filename) as f:
+                        f1=json.load(f)
+                        #print(json.dumps(f1, indent=4))
+                        return jsonify(f1)
+
+
 @app.route('/', methods=['GET'])
 def index_root():
     return app.send_static_file('index.html')
 
+@login_required
 @app.route('/api/v1/macro')
 def macro1():
     data = processExport(export(graph))
@@ -503,6 +636,7 @@ def macro1():
         print("Done with", str(value))
 
     return jsonify(nodes)
+
 
 @app.route('/testAPI', methods=['POST'])
 def testFunction():

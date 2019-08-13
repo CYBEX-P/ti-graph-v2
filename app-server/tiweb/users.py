@@ -6,19 +6,6 @@ from flask_security import UserMixin, RoleMixin
 
 from tiweb import app
 
-db = SQLAlchemy(app)
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True) 
-    public_id = db.Column(db.String(50), unique = True)                               
-    first_name  = db.Column(db.String(15))
-    last_name = db.Column(db.String(15))
-    email = db.Column(db.String(50), unique = True)
-    db_ip = db.Column(db.String(50))
-    db_port = db.Column(db.Integer)
-    username = db.Column(db.String(15), unique = True)
-    password = db.Column(db.String(80))
-    admin = db.Column(db.Boolean)
 
 class RegistrationForm(FlaskForm):
     first_name = StringField('first_name', validators = [InputRequired()])
@@ -36,3 +23,4 @@ class LoginForm(FlaskForm):
     #last_name = StringField('last_name', validators = [InputRequired()])
     username = StringField('username', validators = [InputRequired(), length(min = 4, max = 15)])
     password = PasswordField('password', validators = [InputRequired(), length(min = 4,max = 80)])
+

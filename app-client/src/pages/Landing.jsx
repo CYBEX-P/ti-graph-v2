@@ -1,12 +1,14 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../components/Button/Button';
-// import axios from 'axios';
+import {logout} from './UserFunctions';
 
-const Landing = ({ isSignedIn }) => (
+const Landing = ({ isSignedIn, setSignedIn }) => {
+  
+  return (
   <>
     <h1 className="text-center">Threat Intelligence Graph</h1>
-    <p>NSF funded project at the University of Nevada, Reno</p>
+    <center><p>NSF funded project at the University of Nevada, Reno</p></center>
     {!isSignedIn && (
       <>
         <a href="/tiweb/login">
@@ -15,7 +17,7 @@ const Landing = ({ isSignedIn }) => (
             <div style={{ width: '100%', textAlign: 'center' }}>Login</div>
           </Button>
         </a>
-        <br />
+        <hr/>
         <a href="/tiweb/graph">
           <Button hasIcon width="100%" onClickFunction={() => {}}>
             <FontAwesomeIcon fixedWidth size="lg" icon="user-plus" color="#e0e0e0" />
@@ -26,15 +28,24 @@ const Landing = ({ isSignedIn }) => (
     )}
     {isSignedIn && (
       <>
-        <a href="/tiweb/logout">Logout</a>
+        
         <a href="/tiweb/graph">
           <Button width="100%" onClickFunction={() => {}}>
             <div style={{ width: '100%', textAlign: 'center' }}>Graph</div>
           </Button>
         </a>
+        <hr></hr>
+          <Button  width="100%" onClickFunction={() => {
+            setSignedIn(false);
+            return logout();}
+          }>
+            <div style={{ width: '100%', textAlign: 'center' }}>
+            Logout
+            </div>
+          </Button>
       </>
     )}
   </>
-);
+)};
 
 export default Landing;

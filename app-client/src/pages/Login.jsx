@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { login } from './UserFunctions';
+import { withRouter } from 'react-router-dom';
 
 class Login extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       username: '',
       password: '',
@@ -26,8 +27,43 @@ class Login extends Component {
     };
 
     login(user).then(res => {
-      if (!res.exit) {
-        this.props.history.push('/');
+      console.log(res);
+      if (res.Exit === "0") {
+        this.props.setSignedIn(true);
+        console.log(this.props);
+        this.props.history.push('/home');
+      }
+      else if(res.Exit === "1") {
+        alert("Wrong Username/Password Combination");
+        this.setState({
+          username: '',
+          password: '',
+          errors: {}
+        }); 
+      }
+      else if(res.Exit === "2") {
+        alert("User not found");
+        this.setState({
+          username: '',
+          password: '',
+          errors: {}
+        }); 
+      }
+      else if(res.Exit === "3") {
+        alert("Invalid Form -- Min. character per field is four (4)");
+        this.setState({
+          username: '',
+          password: '',
+          errors: {}
+        }); 
+      }
+      else {
+        alert("Unknown Error -- Please try again later");
+        this.setState({
+          username: '',
+          password: '',
+          errors: {}
+        }); 
       }
     });
   }
@@ -65,6 +101,7 @@ class Login extends Component {
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Sign in
               </button>
+              <a href = '/tiweb/Change_Password'>Forgot Password</a>
             </form>
           </div>
         </div>
@@ -73,4 +110,4 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default withRouter(Login);

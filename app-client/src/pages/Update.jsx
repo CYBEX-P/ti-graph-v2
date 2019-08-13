@@ -9,6 +9,8 @@ class Update extends Component {
       first_name: '',
       last_name: '',
       email: '',
+      admin:false,
+      user:false,
       usernameError: '',
       first_nameError: '',
       last_nameError: '',
@@ -16,10 +18,16 @@ class Update extends Component {
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
+  }
+  handleInputChange(e) {
+    this.setState({
+      [e.target.name]: e.target.checked
+    })
   }
   validate = () => {
     let first_nameError = '';
@@ -54,7 +62,9 @@ class Update extends Component {
       username: this.state.username,
       first_name: this.state.first_name,
       last_name: this.state.last_name,
-      email: this.state.email
+      email: this.state.email,
+      admin:this.state.admin,
+      user:this.state.user
     };
     const isValid = this.validate();
     if (isValid) {
@@ -129,7 +139,10 @@ class Update extends Component {
                 />
               </div>
               {this.state.emailError ? <div style={{ fontSize: 12, color: 'red' }}>{this.state.emailError}</div> : null}
-
+              <label> Admin
+              <input type="checkbox" name ="admin" checked={this.state.admin} onChange ={this.handleInputChange}/></label><br></br>
+              <label> User
+              <input type="checkbox" name ="user" checked={this.state.user} onChange ={this.handleInputChange}/></label>
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Update
               </button>

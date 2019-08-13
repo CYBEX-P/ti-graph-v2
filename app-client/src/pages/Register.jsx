@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { register } from './UserFunctions';
+// import { CircleLoader } from 'react-spinners';
+//import Checkbox from './Checkbox';
 
 class Register extends Component {
   constructor(props) {
@@ -10,18 +12,32 @@ class Register extends Component {
       email: '',
       username: '',
       password: '',
+      admin:false,
+      user:false,
+      
       first_nameError: '',
       last_nameError: '',
       emailError: '',
       usernameError: '',
-      passwordError: ''
+      passwordError: '',
+      roleError: ''
+
+      // isLoading:false
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   onChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
+    this.setState({ [e.target.name]: e.target.value,
+      
+      });
+  }
+  handleInputChange(e) {
+    this.setState({
+      [e.target.name]: e.target.checked
+    })
   }
 
   validate = () => {
@@ -30,25 +46,29 @@ class Register extends Component {
     let emailError = '';
     let usernameError = '';
     let passwordError = '';
+    let roleError = '';
 
     if (!this.state.first_name) {
-      first_nameError = 'first name cannot be blank';
+      first_nameError = 'First name cannot be blank';
     }
     if (!this.state.last_name) {
-      last_nameError = 'last name cannot be blank';
+      last_nameError = 'Last name cannot be blank';
     }
     if (!this.state.username || this.state.username.length < 4) {
-      usernameError = 'username must be more than 3 characters';
+      usernameError = 'Username must be more than 3 characters';
     }
     if (!this.state.password || this.state.password.length < 4) {
-      passwordError = 'password must be more than 3 characters';
+      passwordError = 'Password must be more than 3 characters';
     }
 
     if (!this.state.email.includes('@')) {
       emailError = 'Invalid Email id';
     }
-    if (emailError || first_nameError || last_nameError || usernameError || passwordError) {
-      this.setState({ emailError, first_nameError, last_nameError, usernameError, passwordError });
+    if (!this.state.admin && !this.state.user) {
+      roleError = "Check either User or Admin";
+    }
+    if (emailError || first_nameError || last_nameError || usernameError || passwordError || roleError) {
+      this.setState({ emailError, first_nameError, last_nameError, usernameError, passwordError, roleError });
       return false;
     }
     return true;
@@ -62,14 +82,33 @@ class Register extends Component {
       last_name: this.state.last_name,
       email: this.state.email,
       username: this.state.username,
-      password: this.state.password
+      password: this.state.password,
+      admin:this.state.admin,
+      user:this.state.user
+      //selectedValue: this.state.selectedValue
     };
 
     const isValid = this.validate();
+    
     if (isValid) {
-      let res = register(newUser);
+      // const newState = {...this.state, isLoading: true};
+      // this.setState(newState);
+      const res = register(newUser).then((res) => {
+        if (res.Exit === "0") {
+          alert("Successful Registration");
+          this.props.history.push('/login');
+        }
+        else if(res.Exit === "1") {
+          alert("DB Creation Error");
+        }
+        else if(res.Exit === "2") {
+          alert("Invalid Form");
+        }
+      })
       console.log(res);
-      this.props.history.push('/login');
+        // const newState = {...this.state, isLoading: false};
+        // this.setState(newState);
+      
     }
   }
 
@@ -111,6 +150,28 @@ class Register extends Component {
               {this.state.last_nameError ? (
                 <div style={{ fontSize: 12, color: 'red' }}>{this.state.last_nameError}</div>
               ) : null}
+
+              {/* {this.state.isLoading &&
+                <div
+                style={{
+                  gridRow: '2',
+                  gridColumn: 1,
+                  backgroundColor: '#e0e0e0dd',
+                  zIndex: 10,
+                  display: 'grid'
+                }}
+              >
+                <div style={{ justifySelf: 'center', alignSelf: 'end', fontSize: '24px', width: '80px' }}>Loading</div>
+                <div
+                  style={{
+                    alignSelf: 'start',
+                    justifySelf: 'center'
+                  }}
+                >
+                  <CircleLoader color="#00cbcc" />
+                </div>
+              </div>
+              } */}
 
               <div className="form-group">
                 <label htmlFor="email"> Email Address </label>
@@ -154,9 +215,18 @@ class Register extends Component {
               {this.state.passwordError ? (
                 <div style={{ fontSize: 12, color: 'red' }}>{this.state.passwordError}</div>
               ) : null}
+              <label> Admin
+              <input type="checkbox" name ="admin" checked={this.state.admin} onChange ={this.handleInputChange}/></label><br></br>
+              <label> User
+              <input type="checkbox" name ="user" checked={this.state.user} onChange ={this.handleInputChange}/></label>
+
+              {this.state.roleError ? (
+                <div style={{ fontSize: 12, color: 'red' }}>{this.state.roleError}</div>
+              ) : null}
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Register
               </button>
+              
             </form>
           </div>
         </div>
