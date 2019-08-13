@@ -132,6 +132,16 @@ class EventInsertForm extends React.Component {
                   onChange={this.handleShareholderDataChange(idx)}
                 />
               </Col>
+              <Col sm={{ size: 3 }}>
+                <Button
+                  type="button"
+                  width="30%"
+                  onClickFunction={this.handleRemoveShareholder(idx)}
+                  className="small"
+                >
+                  <div>-</div>
+                </Button>
+              </Col> 
             </Row>
         ))}
           <Row>
@@ -146,6 +156,7 @@ class EventInsertForm extends React.Component {
                 <div>Add Row</div>
               </Button>
             </Col> 
+            
             <Col sm={{ size: 6, offset: 3 }}>
               <Button width="60%" hasIcon type="submit" onClickFunction={() => {}}>
                 <div>Start Investigation</div>
