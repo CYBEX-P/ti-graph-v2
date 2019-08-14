@@ -47,7 +47,7 @@ Base = declarative_base()
 
 db = SQLAlchemy(app)
 
-engine = create_engine("mysql+mysqlconnector://cybexpadmin:cybexp19sekret@134.197.21.10:3306/cybexpui")
+engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 session1 = sessionmaker(expire_on_commit=False)
 session1.configure(bind=engine)
 
@@ -77,12 +77,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# If in development, connect to local container right away
-if app.config['ENV'] == 'development':
-    graph = connectDev()
-else:
-    graph= Graph()
-
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = 'cybexp123@gmail.com'
@@ -96,6 +90,14 @@ app.config['UPLOAD_FOLDER'] = '/tiweb'
 
 mail = Mail(app)
 s=session1()
+
+
+# If in development, connect to local container right away
+if app.config['ENV'] == 'development':
+    graph = connectDev()
+else:
+    graph= Graph()
+
    
 @app.route('/users/register', methods = ['POST'])
 def register():
@@ -166,8 +168,6 @@ def login():
         user = s.query(User).filter(User.username == form.username.data).first()                                
         if user:
                 if check_password_hash(user.password, form.password.data):
-                        # access_token = create_access_token(identity = {'username': form.username.data}, expires_delta=False)
-                        # session['token'] = access_token
                         login_user(user)
                         session['username'] = user.username
                         global graph
@@ -176,11 +176,8 @@ def login():
                         session['db_ip'] = user.db_ip
                         session['db_port'] = user.db_port
                         graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
-                        # print(session)
                         return "True"
-                        # return session['token']
                         
-                
                 else:
                         # Wrong password for user
                         return jsonify({"Error" : "1"})
