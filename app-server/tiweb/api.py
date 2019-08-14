@@ -91,10 +91,6 @@ app.config['UPLOAD_FOLDER'] = '/tiweb'
 mail = Mail(app)
 s=session1()
 
-<<<<<<< HEAD
-@app.route('/users/register', methods = ['POST'])   
-@roles_required('admin')
-=======
 
 # If in development, connect to local container right away
 # if app.config['ENV'] == 'development':
@@ -105,7 +101,7 @@ s=session1()
 # Admin required
 @app.route('/users/register', methods = ['POST'])
 @login_required
->>>>>>> master
+@roles_required('admin')
 def register():
     form = RegistrationForm()
     
@@ -198,10 +194,7 @@ def login():
 # Admin required
 @app.route('/remove', methods = ['POST'])
 @login_required
-<<<<<<< HEAD
 @roles_required('admin')
-=======
->>>>>>> master
 def delete():
     
     #form = DeleteForm()
@@ -228,10 +221,7 @@ def isSignedIn():
 # Admin required
 @app.route('/update', methods = ['POST'])
 @login_required
-<<<<<<< HEAD
 @roles_required('admin')
-=======
->>>>>>> master
 def update():
         
         #options = session.query(User)
@@ -250,17 +240,11 @@ def update():
             result = jsonify({'message': 'There was an error updating your account'})
             return result
          
-<<<<<<< HEAD
 
 
 @app.route('/find', methods = ['POST'])
 @login_required
 @roles_required('admin')
-=======
-# Admin required
-@app.route('/find', methods = ['POST'])
-@login_required
->>>>>>> master
 def found():
     
     found_user= s.query(User).filter(User.username == request.get_json()['username']).first()
@@ -278,10 +262,6 @@ def found():
     #return found_f, found_l
     return jsonify({'result':result})
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/change_password', methods=['GET', 'POST'])
 @login_required
 def page_change_password():
@@ -294,10 +274,6 @@ def page_change_password():
         result = jsonify({'message':'Password updated'})
         return result
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/user/logout', methods = ['GET', 'POST'])
 @login_required
 def logout():
@@ -332,10 +308,6 @@ def wipe_function():
     wipeDB(graph)
     return jsonify({"Status":"Neo4j DB full wipe complete!"})
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/neo4j/insertURL', methods = ['POST'])
 @login_required
 def insert2():
@@ -349,10 +321,6 @@ def insert2():
     else:
         return jsonify({"Status" : "Failed"})
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/neo4j/insert/<Ntype>/<data>')
 @login_required
 def insert(Ntype, data):
@@ -362,10 +330,6 @@ def insert(Ntype, data):
     else:
         return jsonify({"Status" : "Failed"})
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/enrich/cybexCount', methods = ['POST'])
 @login_required
 def cybexCount():
@@ -391,10 +355,6 @@ def cybexCount():
     except:
         return jsonify({"insert status" : 0})
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/enrich/cybexRelated', methods = ['POST'])
 @login_required
 def CybexRelated():
@@ -419,10 +379,6 @@ def CybexRelated():
     except:
         return jsonify({"insert status" : 0})
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
 @login_required
 def enrich(enrich_type, value):
@@ -478,10 +434,6 @@ def enrich(enrich_type, value):
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/enrichURL', methods=['POST'])
 @login_required
 def enrichURL():
@@ -491,10 +443,6 @@ def enrichURL():
     status = insert_domain(value, graph)
     return jsonify({"insert status" : status})
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/enrich/all')
 @login_required
 def enrich_all():
@@ -505,10 +453,6 @@ def enrich_all():
         enrich('hostname', node['data'])
     return jsonify({"Status" : "Success"})
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/enrichPDNS', methods=['POST'])
 @login_required
 def enrich_pdns():
@@ -537,13 +481,10 @@ def enrich_pdns():
 #     node = graph.nodes.get(int(id))
 #     return jsonify(node)
 
-<<<<<<< HEAD
-
-=======
 # Admin required
->>>>>>> master
 @app.route('/admin/ratelimit')
 @login_required
+@roles_required('admin')
 def ratelimit():
     # needs to use YAMLConfig
     res = requests.get('https://user.whoisxmlapi.com/service/account-balance?apiKey=at_Oj1aihFSRVU0LbyqZBLnl0PhM2Zan')
@@ -553,10 +494,6 @@ def ratelimit():
 def sendConfig():
     return jsonify(YAMLConfig)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/event/start', methods=['POST'])
 @login_required
 def startEvent():
@@ -574,10 +511,6 @@ def startEvent():
 # def getEventName():
 #     return jsonify(os.environ['eventName'])
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/event/start/file', methods=['POST'])
 @login_required
 def startFileEvent():
@@ -598,20 +531,11 @@ def startFileEvent():
     # return status
     return jsonify(0)
 
-<<<<<<< HEAD
-
-@app.route('/api/v1/session/init', methods=['POST'])
-@login_required
-def sess_init():
-    req = request.get_json()
-    username = req['user']
-=======
 # @login_required
 # @app.route('/api/v1/session/init', methods=['POST'])
 # def sess_init():
 #     req = request.get_json()
 #     username = req['user']
->>>>>>> master
 
 #     session['username'] = username
 #     # get the following from sql db (user info)
@@ -623,10 +547,6 @@ def sess_init():
 #     return "User {} has initialized a session.".format(session['username'])
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/import_json', methods = ['GET','POST'])
 @login_required
 def import_json():
@@ -645,10 +565,6 @@ def import_json():
 def index_root():
     return app.send_static_file('index.html')
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @app.route('/api/v1/macro')
 @login_required
 def macro1():
