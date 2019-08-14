@@ -93,12 +93,12 @@ s=session1()
 
 
 # If in development, connect to local container right away
-if app.config['ENV'] == 'development':
-    graph = connectDev()
-else:
-    graph= Graph()
-
-
+# if app.config['ENV'] == 'development':
+#     graph = connectDev()
+# else:
+#     graph= Graph()
+ 
+# Admin required
 @app.route('/users/register', methods = ['POST'])
 @login_required
 def register():
@@ -237,7 +237,7 @@ def update():
             result = jsonify({'message': 'There was an error updating your account'})
             return result
          
-
+# Admin required
 @app.route('/find', methods = ['POST'])
 @login_required
 def found():
@@ -476,6 +476,7 @@ def enrich_pdns():
 #     node = graph.nodes.get(int(id))
 #     return jsonify(node)
 
+# Admin required
 @app.route('/admin/ratelimit')
 @login_required
 def ratelimit():
