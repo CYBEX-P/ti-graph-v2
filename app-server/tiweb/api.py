@@ -46,10 +46,18 @@ Base = declarative_base()
 
 
 db = SQLAlchemy(app)
+# Define the Role data-model
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
 
-engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-session1 = sessionmaker(expire_on_commit=False)
-session1.configure(bind=engine)
+# Define the UserRoles association table
+class UserRoles(db.Model):
+    __tablename__ = 'user_roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
 
 class User(UserMixin, db.Model, Base):
     id = db.Column(db.Integer, primary_key=True) 
@@ -64,6 +72,15 @@ class User(UserMixin, db.Model, Base):
     admin = db.Column(db.Boolean)
     db_username=db.Column(db.String(15))
     db_password = db.Column(db.String(80))
+    roles = db.relationship('Role', secondary='user_roles')
+
+admin_role = Role(name='admin')
+db.session.commit()
+db.create_all()
+
+engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+session1 = sessionmaker(expire_on_commit=False)
+session1.configure(bind=engine)
 
 Base.metadata.create_all(engine)
 
@@ -86,11 +103,8 @@ app.config['MAIL_USE_SSL'] = False
 app.config['SECURITY_PASSWORD_SALT'] = 'my_precious_two'
 app.config['UPLOAD_FOLDER'] = '/tiweb'
 
-
-
 mail = Mail(app)
 s=session1()
-
 
 # If in development, connect to local container right away
 # if app.config['ENV'] == 'development':
@@ -101,7 +115,7 @@ s=session1()
 # Admin required
 @app.route('/users/register', methods = ['POST'])
 @login_required
-@roles_required('admin')
+#@roles_required('admin')
 def register():
     form = RegistrationForm()
     
@@ -141,6 +155,10 @@ def register():
                 user.db_username = a[0]
            
                 user.db_password = a[1]
+
+                # need access to database to test this code
+                if User.query.filter(User.admin == form.admin.data).first():
+                    user.roles.append(Role(name='admin'))
           
            
                 s.commit() 
@@ -220,10 +238,10 @@ def isSignedIn():
 
 # Admin required
 @app.route('/update', methods = ['POST'])
-@login_required
+#@login_required
 @roles_required('admin')
 def update():
-        
+        print("Admin: " + str(User.admin))
         #options = session.query(User)
         try:
             update_this = s.query(User).filter(User.username == request.get_json()['username']).first()
