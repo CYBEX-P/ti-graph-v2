@@ -33,5 +33,5 @@ class DevConfig(DefaultConfig):
     BOLT_PORT = '39530'
     BOLT_AUTH_USER = 'neo4j'
     BOLT_AUTH_P = 'KLZPXA9k9uv5654'
-    
+    LOGIN_DISABLED = True
     TEST = 'test_dev_string'

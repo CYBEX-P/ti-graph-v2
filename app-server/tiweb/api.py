@@ -76,6 +76,7 @@ CORS(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+    
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -92,11 +93,13 @@ mail = Mail(app)
 s=session1()
 
 
-# If in development, connect to local container right away
-# if app.config['ENV'] == 'development':
-#     graph = connectDev()
-# else:
-#     graph= Graph()
+# Function to easily connect to the proper graph when needed
+def connect2graph():
+    if app.config['ENV'] == 'development':
+        graph = connectDev()
+    else:
+        graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
+    return graph
  
 # Admin required
 @app.route('/users/register', methods = ['POST'])
@@ -171,12 +174,10 @@ def login():
                 if check_password_hash(user.password, form.password.data):
                         login_user(user)
                         session['username'] = user.username
-                        global graph
                         session['db_username'] = user.db_username
                         session['db_password'] = user.db_password
                         session['db_ip'] = user.db_ip
                         session['db_port'] = user.db_port
-                        graph = connectProd(session['db_username'], session['db_password'], session['db_ip'], session['db_port'])
                         return "True"
                         
                 else:
@@ -289,6 +290,7 @@ def api():
 @app.route('/api/v1/neo4j/export')
 @login_required
 def exportNeoDB():
+    graph = connect2graph()
     return jsonify(processExport(export(graph)))
 
 
@@ -300,12 +302,14 @@ def exportNeoDB():
 @app.route('/api/v1/neo4j/wipe')
 @login_required
 def wipe_function():
+    graph = connect2graph()
     wipeDB(graph)
     return jsonify({"Status":"Neo4j DB full wipe complete!"})
 
 @app.route('/api/v1/neo4j/insertURL', methods = ['POST'])
 @login_required
 def insert2():
+    graph = connect2graph()
     req = request.get_json()
     Ntype = req['Ntype']
     data = req['value']
@@ -319,6 +323,7 @@ def insert2():
 @app.route('/api/v1/neo4j/insert/<Ntype>/<data>')
 @login_required
 def insert(Ntype, data):
+    graph = connect2graph()
     status = insertNode(Ntype, data, graph)
     if status == 1:
         return jsonify({"Status" : "Success"})
@@ -328,6 +333,7 @@ def insert(Ntype, data):
 @app.route('/api/v1/enrich/cybexCount', methods = ['POST'])
 @login_required
 def cybexCount():
+    graph = connect2graph()
     req = request.get_json()
     Ntype = str(req['Ntype'])
     Ntype1 = replaceType(Ntype)
@@ -353,6 +359,7 @@ def cybexCount():
 @app.route('/api/v1/enrich/cybexRelated', methods = ['POST'])
 @login_required
 def CybexRelated():
+    graph = connect2graph()
     req = request.get_json()
     Ntype = str(req['Ntype'])
     Ntype1 = replaceType(Ntype)
@@ -377,6 +384,7 @@ def CybexRelated():
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
 @login_required
 def enrich(enrich_type, value):
+    graph = connect2graph()
     if(enrich_type == "asn"):
             a_results = ASN(value)
             status = asn_insert(a_results, graph)
@@ -432,6 +440,7 @@ def enrich(enrich_type, value):
 @app.route('/api/v1/enrichURL', methods=['POST'])
 @login_required
 def enrichURL():
+    graph = connect2graph()
     req = request.get_json()
     value = req['value']
 
@@ -441,6 +450,7 @@ def enrichURL():
 @app.route('/api/v1/enrich/all')
 @login_required
 def enrich_all():
+    graph = connect2graph()
     for node in graph.nodes.match("IP"):
         enrich('asn', node['data'])
         enrich('gip', node['data'])
@@ -451,6 +461,7 @@ def enrich_all():
 @app.route('/api/v1/enrichPDNS', methods=['POST'])
 @login_required
 def enrich_pdns():
+    graph = connect2graph()
     req = request.get_json()
     value = req['value']
 
@@ -462,6 +473,7 @@ def enrich_pdns():
 
 # @app.route('/api/v1/enrichBlock', methods=['POST'])
 # def enrichBlock():
+#         graph = connect2graph()
 #         req = request.get_json()
 #         print(str(req))
 #         value = req['value']
@@ -473,6 +485,7 @@ def enrich_pdns():
 
 # @app.route('/details/<id>')
 # def show_details(id):
+#     graph = connect2graph()
 #     node = graph.nodes.get(int(id))
 #     return jsonify(node)
 
@@ -562,6 +575,7 @@ def index_root():
 @app.route('/api/v1/macro')
 @login_required
 def macro1():
+    graph = connect2graph()
     data = processExport(export(graph))
     nodes = data["Neo4j"][0][0]["nodes"]
 
