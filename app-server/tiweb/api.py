@@ -1,5 +1,5 @@
 from flask import abort, Flask, render_template, request, jsonify, flash, make_response, session, redirect
-from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
+from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required, roles_required
 from py2neo import Graph, Node
 import requests
 import json
@@ -96,8 +96,9 @@ app.config['UPLOAD_FOLDER'] = '/tiweb'
 
 mail = Mail(app)
 s=session1()
-   
-@app.route('/users/register', methods = ['POST'])
+
+@app.route('/users/register', methods = ['POST'])   
+@roles_required('admin')
 def register():
     form = RegistrationForm()
     
@@ -193,8 +194,9 @@ def login():
         return jsonify({"Error" : "3"})
 
 # Admin required
-@login_required
 @app.route('/remove', methods = ['POST'])
+@login_required
+@roles_required('admin')
 def delete():
     
     #form = DeleteForm()
@@ -219,8 +221,9 @@ def isSignedIn():
     
 
 # Admin required
-@login_required
 @app.route('/update', methods = ['POST'])
+@login_required
+@roles_required('admin')
 def update():
         
         #options = session.query(User)
@@ -240,8 +243,10 @@ def update():
             return result
          
 
-@login_required
+
 @app.route('/find', methods = ['POST'])
+@login_required
+@roles_required('admin')
 def found():
     
     found_user= s.query(User).filter(User.username == request.get_json()['username']).first()
@@ -259,8 +264,9 @@ def found():
     #return found_f, found_l
     return jsonify({'result':result})
 
-@login_required
+
 @app.route('/change_password', methods=['GET', 'POST'])
+@login_required
 def page_change_password():
     
     change_this = s.query(User).filter(User.username == request.get_json()['username']).first()
@@ -271,8 +277,9 @@ def page_change_password():
         result = jsonify({'message':'Password updated'})
         return result
 
-@login_required
+
 @app.route('/user/logout', methods = ['GET', 'POST'])
+@login_required
 def logout():
     logout_user()
     return "True"
@@ -304,8 +311,9 @@ def wipe_function():
     wipeDB(graph)
     return jsonify({"Status":"Neo4j DB full wipe complete!"})
 
-@login_required
+
 @app.route('/api/v1/neo4j/insertURL', methods = ['POST'])
+@login_required
 def insert2():
     req = request.get_json()
     Ntype = req['Ntype']
@@ -317,8 +325,9 @@ def insert2():
     else:
         return jsonify({"Status" : "Failed"})
 
-@login_required
+
 @app.route('/api/v1/neo4j/insert/<Ntype>/<data>')
+@login_required
 def insert(Ntype, data):
     status = insertNode(Ntype, data, graph)
     if status == 1:
@@ -326,8 +335,9 @@ def insert(Ntype, data):
     else:
         return jsonify({"Status" : "Failed"})
 
-@login_required
+
 @app.route('/api/v1/enrich/cybexCount', methods = ['POST'])
+@login_required
 def cybexCount():
     req = request.get_json()
     Ntype = str(req['Ntype'])
@@ -351,8 +361,9 @@ def cybexCount():
     except:
         return jsonify({"insert status" : 0})
 
-@login_required
+
 @app.route('/api/v1/enrich/cybexRelated', methods = ['POST'])
+@login_required
 def CybexRelated():
     req = request.get_json()
     Ntype = str(req['Ntype'])
@@ -375,8 +386,9 @@ def CybexRelated():
     except:
         return jsonify({"insert status" : 0})
 
-@login_required
+
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
+@login_required
 def enrich(enrich_type, value):
     if(enrich_type == "asn"):
             a_results = ASN(value)
@@ -430,8 +442,9 @@ def enrich(enrich_type, value):
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
 
-@login_required
+
 @app.route('/api/v1/enrichURL', methods=['POST'])
+@login_required
 def enrichURL():
     req = request.get_json()
     value = req['value']
@@ -439,8 +452,9 @@ def enrichURL():
     status = insert_domain(value, graph)
     return jsonify({"insert status" : status})
 
-@login_required
+
 @app.route('/api/v1/enrich/all')
+@login_required
 def enrich_all():
     for node in graph.nodes.match("IP"):
         enrich('asn', node['data'])
@@ -449,8 +463,9 @@ def enrich_all():
         enrich('hostname', node['data'])
     return jsonify({"Status" : "Success"})
 
-@login_required
+
 @app.route('/api/v1/enrichPDNS', methods=['POST'])
+@login_required
 def enrich_pdns():
     req = request.get_json()
     value = req['value']
@@ -477,8 +492,9 @@ def enrich_pdns():
 #     node = graph.nodes.get(int(id))
 #     return jsonify(node)
 
-@login_required
+
 @app.route('/admin/ratelimit')
+@login_required
 def ratelimit():
     # needs to use YAMLConfig
     res = requests.get('https://user.whoisxmlapi.com/service/account-balance?apiKey=at_Oj1aihFSRVU0LbyqZBLnl0PhM2Zan')
@@ -488,8 +504,9 @@ def ratelimit():
 def sendConfig():
     return jsonify(YAMLConfig)
 
-@login_required
+
 @app.route('/api/v1/event/start', methods=['POST'])
+@login_required
 def startEvent():
     res = request.get_json()
     os.environ['eventName'] = res['EventName']
@@ -505,8 +522,9 @@ def startEvent():
 # def getEventName():
 #     return jsonify(os.environ['eventName'])
 
-@login_required
+
 @app.route('/api/v1/event/start/file', methods=['POST'])
+@login_required
 def startFileEvent():
     os.environ['eventName'] = request.form['eventName']
 
@@ -525,8 +543,9 @@ def startFileEvent():
     # return status
     return jsonify(0)
 
-@login_required
+
 @app.route('/api/v1/session/init', methods=['POST'])
+@login_required
 def sess_init():
     req = request.get_json()
     username = req['user']
@@ -541,8 +560,9 @@ def sess_init():
     return "User {} has initialized a session.".format(session['username'])
 
 
-@login_required
+
 @app.route('/import_json', methods = ['GET','POST'])
+@login_required
 def import_json():
         print(request.get_data())
         data = request.files['file']
@@ -559,8 +579,9 @@ def import_json():
 def index_root():
     return app.send_static_file('index.html')
 
-@login_required
+
 @app.route('/api/v1/macro')
+@login_required
 def macro1():
     data = processExport(export(graph))
     nodes = data["Neo4j"][0][0]["nodes"]
