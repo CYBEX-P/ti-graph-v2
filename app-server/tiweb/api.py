@@ -1,5 +1,6 @@
 from flask import abort, Flask, render_template, request, jsonify, flash, make_response, session, redirect
-from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required, roles_required
+from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, login_required, UserMixin
+from flask_user import current_user, login_required, roles_required, UserManager, UserMixin 
 from py2neo import Graph, Node
 import requests
 import json
@@ -10,6 +11,7 @@ from flask_jwt_extended import JWTManager
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+# from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
 import jwt
 import datetime
 
@@ -46,28 +48,21 @@ Base = declarative_base()
 
 
 db = SQLAlchemy(app)
-
-# Define the UserRoles association table to support a many-to-many relationship between Users and roles
-# class UserRoles(db.Model):
-#     __tablename__ = 'roles_users'
-#     id = db.Column(db.Integer(), primary_key=True)
-#     user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
-#     role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
-
-# Create a table that supports a many-to-many relationship between User and Role
-roles_users = db.Table(
-    'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-)
+_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
 
 # Role class
-class Role(db.Model, RoleMixin):
-    __tablename__ = 'role'
+class Role(db.Model):
+    __tablename__ = 'roles'
     # Our Role has three fields, ID, name and description
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
-    description = db.Column(db.String(255))
+
+ # Define the UserRoles association table
+class UserRoles(db.Model):
+    __tablename__ = 'user_roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
 
 
 class User(UserMixin, db.Model, Base):
@@ -84,20 +79,20 @@ class User(UserMixin, db.Model, Base):
     db_username=db.Column(db.String(15))
     db_password = db.Column(db.String(80))
     roles = db.relationship('Role', 
-                            secondary='roles_users',
-                            backref=db.backref('users', lazy='dynamic'))
+                            secondary='user_roles',
+                            backref=db.backref('user', lazy='dynamic'))
 
+# Setup Flask-Users and specify the User data-model
+user_manager = UserManager(app, db, User)
+
+# Create all database tables
 db.create_all()
 
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 session1 = sessionmaker(expire_on_commit=False)
 session1.configure(bind=engine)
-user_datastore.find_or_create_role(name='admin', description='Administrator')
 
 Base.metadata.create_all(engine)
-
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -137,6 +132,10 @@ def register():
         hashed_password = generate_password_hash(form.password.data, method = 'sha256')
         new_user = User(public_id=str(uuid.uuid4()),first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data, username = form.username.data, password = hashed_password, admin = form.admin.data)
         s.add(new_user)
+        if (form.admin.data):
+            admin = s.query(Role).filter(Role.name == 'admin').first()
+            new_user.roles.append(admin)
+
         result = {
 		'first_name' : form.first_name.data,
 		'last_name' : form.last_name.data,
@@ -169,10 +168,10 @@ def register():
         
             user.db_password = a[1]
 
-            user_datastore.create_user(email=user.db_username, password=user.db_password)
+            #user_datastore.create_user(email=user.db_username, password=user.db_password)
             
-            if (form.admin.data):
-                user_datastore.add_role_to_user(user.db_username, 'admin')
+            
+            #user_datastore.add_role_to_user(user.db_username, 'admin')
         
             s.commit() 
         
@@ -190,7 +189,7 @@ def register():
 
 @login_manager.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return User.query.get(id)
         
 @app.route('/users/login', methods =['POST'])
 def login():
@@ -250,9 +249,9 @@ def isSignedIn():
     
 
 # Admin required
-
-@app.route('/update', methods = ['POST'])
 @roles_required('admin')
+@app.route('/update', methods = ['POST'])
+
 #@login_required
 def update():
         #options = session.query(User)
