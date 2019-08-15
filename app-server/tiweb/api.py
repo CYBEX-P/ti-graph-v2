@@ -46,18 +46,29 @@ Base = declarative_base()
 
 
 db = SQLAlchemy(app)
-# Define the Role data-model
-class Role(db.Model):
-    __tablename__ = 'roles'
+
+# Define the UserRoles association table to support a many-to-many relationship between Users and roles
+# class UserRoles(db.Model):
+#     __tablename__ = 'roles_users'
+#     id = db.Column(db.Integer(), primary_key=True)
+#     user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
+#     role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
+
+# Create a table that supports a many-to-many relationship between User and Role
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
+
+# Role class
+class Role(db.Model, RoleMixin):
+    __tablename__ = 'role'
+    # Our Role has three fields, ID, name and description
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+    description = db.Column(db.String(255))
 
-# Define the UserRoles association table
-class UserRoles(db.Model):
-    __tablename__ = 'user_roles'
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
-    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
 
 class User(UserMixin, db.Model, Base):
     id = db.Column(db.Integer, primary_key=True) 
@@ -72,15 +83,18 @@ class User(UserMixin, db.Model, Base):
     admin = db.Column(db.Boolean)
     db_username=db.Column(db.String(15))
     db_password = db.Column(db.String(80))
-    roles = db.relationship('Role', secondary='user_roles')
+    roles = db.relationship('Role', 
+                            secondary='roles_users',
+                            backref=db.backref('users', lazy='dynamic'))
 
-admin_role = Role(name='admin')
-db.session.commit()
 db.create_all()
 
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore)
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 session1 = sessionmaker(expire_on_commit=False)
 session1.configure(bind=engine)
+user_datastore.find_or_create_role(name='admin', description='Administrator')
 
 Base.metadata.create_all(engine)
 
@@ -128,7 +142,7 @@ def register():
 		'last_name' : form.last_name.data,
 		'email' : form.email.data,
 		'password' : form.password.data,
-                'admin': form.admin.data
+        'admin': form.admin.data
 	    }
 
         c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
@@ -145,28 +159,27 @@ def register():
 
         if(r and r["status"]):
            #print(json.dumps(r['data']))
-           
-                user = s.query(User).filter(User.username == form.username.data).first() 
-                user.db_ip= r['data']['ip']
-                user.db_port = r['data']['port']
-                us = r['data']['auth']
-                print(us)
-                a = us.split('/')
-                user.db_username = a[0]
-           
-                user.db_password = a[1]
+            user = s.query(User).filter(User.username == form.username.data).first() 
+            user.db_ip= r['data']['ip']
+            user.db_port = r['data']['port']
+            us = r['data']['auth']
+            print(us)
+            a = us.split('/')
+            user.db_username = a[0]
+        
+            user.db_password = a[1]
 
-                # need access to database to test this code
-                if User.query.filter(User.admin == form.admin.data).first():
-                    user.roles.append(Role(name='admin'))
-          
-           
-                s.commit() 
-           
-                msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
-                msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
-                mail.send(msg)
-                return "Sent"
+            user_datastore.create_user(email=user.db_username, password=user.db_password)
+            
+            if (form.admin.data):
+                user_datastore.add_role_to_user(user.db_username, 'admin')
+        
+            s.commit() 
+        
+            msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
+            msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
+            mail.send(msg)
+            return "Sent"
         
         # DB Creation Error
         return jsonify({"Error" : "1"})
@@ -212,7 +225,7 @@ def login():
 # Admin required
 @app.route('/remove', methods = ['POST'])
 @login_required
-@roles_required('admin')
+# @roles_required('admin')
 def delete():
     
     #form = DeleteForm()
@@ -237,11 +250,11 @@ def isSignedIn():
     
 
 # Admin required
+
 @app.route('/update', methods = ['POST'])
-#@login_required
 @roles_required('admin')
+#@login_required
 def update():
-        print("Admin: " + str(User.admin))
         #options = session.query(User)
         try:
             update_this = s.query(User).filter(User.username == request.get_json()['username']).first()
@@ -262,7 +275,7 @@ def update():
 
 @app.route('/find', methods = ['POST'])
 @login_required
-@roles_required('admin')
+# @roles_required('admin')
 def found():
     
     found_user= s.query(User).filter(User.username == request.get_json()['username']).first()
