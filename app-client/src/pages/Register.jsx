@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { register } from './UserFunctions';
-// import { CircleLoader } from 'react-spinners';
+import { CircleLoader } from 'react-spinners';
 //import Checkbox from './Checkbox';
 
 class Register extends Component {
@@ -13,16 +13,16 @@ class Register extends Component {
       username: '',
       password: '',
       admin:false,
-      user:false,
       
       first_nameError: '',
       last_nameError: '',
       emailError: '',
       usernameError: '',
       passwordError: '',
-      roleError: ''
 
-      // isLoading:false
+      isLoading:false,
+      msg:'',
+      msf:''
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -30,9 +30,8 @@ class Register extends Component {
   }
 
   onChange(e) {
-    this.setState({ [e.target.name]: e.target.value,
-      
-      });
+    this.setState({ [e.target.name]: e.target.value});
+    this.setState({msg: '', msf: ''});
   }
   handleInputChange(e) {
     this.setState({
@@ -46,7 +45,6 @@ class Register extends Component {
     let emailError = '';
     let usernameError = '';
     let passwordError = '';
-    let roleError = '';
 
     if (!this.state.first_name) {
       first_nameError = 'First name cannot be blank';
@@ -64,11 +62,8 @@ class Register extends Component {
     if (!this.state.email.includes('@')) {
       emailError = 'Invalid Email id';
     }
-    if (!this.state.admin && !this.state.user) {
-      roleError = "Check either User or Admin";
-    }
-    if (emailError || first_nameError || last_nameError || usernameError || passwordError || roleError) {
-      this.setState({ emailError, first_nameError, last_nameError, usernameError, passwordError, roleError });
+    if (emailError || first_nameError || last_nameError || usernameError || passwordError) {
+      this.setState({ emailError, first_nameError, last_nameError, usernameError, passwordError });
       return false;
     }
     return true;
@@ -91,24 +86,26 @@ class Register extends Component {
     const isValid = this.validate();
     
     if (isValid) {
-      // const newState = {...this.state, isLoading: true};
-      // this.setState(newState);
-      const res = register(newUser).then((res) => {
+      this.setState({isLoading: true});
+
+      register(newUser).then((res) => {
         if (res.Exit === "0") {
-          alert("Successful Registration");
-          this.props.history.push('/login');
+          this.setState({isLoading: false});
+          const msg1 = "Successful Registration -- Redirecting to Login";
+          this.setState({msg : msg1});
+          setTimeout(() => this.props.history.push('/login'), 3000);
         }
         else if(res.Exit === "1") {
-          alert("DB Creation Error");
+          this.setState({isLoading: false});
+          const msg1 = "DB Creation Error";
+          this.setState({msf : msg1});
         }
         else if(res.Exit === "2") {
-          alert("Invalid Form");
+          this.setState({isLoading: false});
+          const msg1 = "Invalid Form";
+          this.setState({msf : msg1});
         }
       })
-      console.log(res);
-        // const newState = {...this.state, isLoading: false};
-        // this.setState(newState);
-      
     }
   }
 
@@ -151,7 +148,7 @@ class Register extends Component {
                 <div style={{ fontSize: 12, color: 'red' }}>{this.state.last_nameError}</div>
               ) : null}
 
-              {/* {this.state.isLoading &&
+              {this.state.isLoading &&
                 <div
                 style={{
                   gridRow: '2',
@@ -171,7 +168,7 @@ class Register extends Component {
                   <CircleLoader color="#00cbcc" />
                 </div>
               </div>
-              } */}
+              }
 
               <div className="form-group">
                 <label htmlFor="email"> Email Address </label>
@@ -215,17 +212,18 @@ class Register extends Component {
               {this.state.passwordError ? (
                 <div style={{ fontSize: 12, color: 'red' }}>{this.state.passwordError}</div>
               ) : null}
-              <label> Admin
-              <input type="checkbox" name ="admin" checked={this.state.admin} onChange ={this.handleInputChange}/></label><br></br>
-              <label> User
-              <input type="checkbox" name ="user" checked={this.state.user} onChange ={this.handleInputChange}/></label>
+              <label> isAdmin: </label>
+              <input type="checkbox" name ="admin" checked={this.state.admin} onChange ={this.handleInputChange}/><br></br>
 
-              {this.state.roleError ? (
-                <div style={{ fontSize: 12, color: 'red' }}>{this.state.roleError}</div>
-              ) : null}
+
+              {!this.state.msg &&
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Register
               </button>
+              }
+
+              {this.state.msg && <div style={{ fontSize: 18, color: 'green' }}>{this.state.msg}</div>}
+              {this.state.msf && <div style={{ fontSize: 18, color: 'red' }}>{this.state.msf}</div>}
               
             </form>
           </div>
