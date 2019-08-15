@@ -186,7 +186,7 @@ def login():
 
         else:
             # No User Found
-            return jsonify({"Error" : "2"})
+            return jsonify({"Error" : "1"})
     else:
         # Invalid Form
         return jsonify({"Error" : "3"})
