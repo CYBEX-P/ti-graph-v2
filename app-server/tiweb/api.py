@@ -1,5 +1,5 @@
 from flask import abort, Flask, render_template, request, jsonify, flash, make_response, session, redirect
-from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, login_required, UserMixin
+from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, login_required
 from flask_user import current_user, login_required, roles_required, UserManager, UserMixin 
 from py2neo import Graph, Node
 import requests
@@ -81,6 +81,52 @@ class User(UserMixin, db.Model, Base):
     roles = db.relationship('Role', 
                             secondary='user_roles',
                             backref=db.backref('user', lazy='dynamic'))
+    # Had to import this from UserMixin class
+    # Wasn't inheriting this method
+    def has_roles(self, *requirements):
+        """ Return True if the user has all of the specified roles. Return False otherwise.
+            has_roles() accepts a list of requirements:
+                has_role(requirement1, requirement2, requirement3).
+            Each requirement is either a role_name, or a tuple_of_role_names.
+                role_name example:   'manager'
+                tuple_of_role_names: ('funny', 'witty', 'hilarious')
+            A role_name-requirement is accepted when the user has this role.
+            A tuple_of_role_names-requirement is accepted when the user has ONE of these roles.
+            has_roles() returns true if ALL of the requirements have been accepted.
+            For example:
+                has_roles('a', ('b', 'c'), d)
+            Translates to:
+                User has role 'a' AND (role 'b' OR role 'c') AND role 'd'"""
+
+        # Translates a list of role objects to a list of role_names
+        user_manager = app.user_manager
+        role_names = user_manager.db_manager.get_user_roles(self)
+
+        # has_role() accepts a list of requirements
+        for requirement in requirements:
+            if isinstance(requirement, (list, tuple)):
+                # this is a tuple_of_role_names requirement
+                tuple_of_role_names = requirement
+                authorized = False
+                for role_name in tuple_of_role_names:
+                    if role_name in role_names:
+                        # tuple_of_role_names requirement was met: break out of loop
+                        authorized = True
+                        break
+                if not authorized:
+                    return False                    # tuple_of_role_names requirement failed: return False
+            else:
+                # this is a role_name requirement
+                role_name = requirement
+                # the user must have this role
+                if not role_name in role_names:
+                    return False                    # role_name requirement failed: return False
+
+        # All requirements have been met: return True
+        return True
+
+# user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+# security = Security(app, user_datastore)
 
 # Setup Flask-Users and specify the User data-model
 user_manager = UserManager(app, db, User)
@@ -123,8 +169,8 @@ s=session1()
  
 # Admin required
 @app.route('/users/register', methods = ['POST'])
-@login_required
-#@roles_required('admin')
+#@login_required
+@roles_required('admin')
 def register():
     form = RegistrationForm()
     
@@ -164,15 +210,9 @@ def register():
             us = r['data']['auth']
             print(us)
             a = us.split('/')
-            user.db_username = a[0]
-        
-            user.db_password = a[1]
 
-            #user_datastore.create_user(email=user.db_username, password=user.db_password)
-            
-            
-            #user_datastore.add_role_to_user(user.db_username, 'admin')
-        
+            user.db_username = a[0]        
+            user.db_password = a[1]
             s.commit() 
         
             msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
@@ -223,8 +263,7 @@ def login():
 
 # Admin required
 @app.route('/remove', methods = ['POST'])
-@login_required
-# @roles_required('admin')
+@roles_required('admin')
 def delete():
     
     #form = DeleteForm()
@@ -249,10 +288,9 @@ def isSignedIn():
     
 
 # Admin required
-@roles_required('admin')
-@app.route('/update', methods = ['POST'])
 
-#@login_required
+@app.route('/update', methods = ['POST'])
+@roles_required('admin')
 def update():
         #options = session.query(User)
         try:
@@ -261,6 +299,8 @@ def update():
             update_this.last_name = request.get_json()['last_name']
             update_this.email = request.get_json()['email']
             update_this.admin = request.get_json()['admin']
+            admin = s.query(Role).filter(Role.name == request.get_json()['admin']).first()
+            update_this.roles.append(admin)
             s.commit()
             result = jsonify({'message': 'DB updated'})
             return result
@@ -274,7 +314,7 @@ def update():
 
 @app.route('/find', methods = ['POST'])
 @login_required
-# @roles_required('admin')
+@roles_required('admin')
 def found():
     
     found_user= s.query(User).filter(User.username == request.get_json()['username']).first()
