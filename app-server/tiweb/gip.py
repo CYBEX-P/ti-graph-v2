@@ -6,7 +6,8 @@ import os
 from parser import pull_ip_src
 
 def geoip(ip):
-    reader = geoip2.database.Reader('/Users/jamesschnebly/Desktop/work/ti-graph-v2/app-server/tiweb/data/GeoLite2-City.mmdb')
+    path = str(os.path.dirname(__file__)) + '/data/GeoLite2-City.mmdb'
+    reader = geoip2.database.Reader(path)
 
     insights = {}
     try: 
@@ -48,7 +49,8 @@ def geoip_insert(data, graph):
     
 
 def ASN(ip):
-    with geoip2.database.Reader('/Users/jamesschnebly/Desktop/work/ti-graph-v2/app-server/tiweb/data/GeoLite2-ASN.mmdb') as reader:
+    path = str(os.path.dirname(__file__)) + '/data/GeoLite2-ASN.mmdb'
+    with geoip2.database.Reader(path) as reader:
         
         insights = {}
         try:
