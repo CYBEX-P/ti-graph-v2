@@ -8,7 +8,7 @@ class Login extends Component {
     this.state = {
       username: '',
       password: '',
-      errors: {}
+      errors: ''
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -16,6 +16,7 @@ class Login extends Component {
 
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
+    this.setState({ errors: ''}); 
   }
 
   onSubmit(e) {
@@ -30,39 +31,27 @@ class Login extends Component {
       console.log(res);
       if (res.Exit === "0") {
         this.props.setSignedIn(true);
-        console.log(this.props);
         this.props.history.push('/home');
       }
       else if(res.Exit === "1") {
-        alert("Wrong Username/Password Combination");
         this.setState({
           username: '',
           password: '',
-          errors: {}
-        }); 
-      }
-      else if(res.Exit === "2") {
-        alert("User not found");
-        this.setState({
-          username: '',
-          password: '',
-          errors: {}
+          errors: "Invalid Username/Password Combination"
         }); 
       }
       else if(res.Exit === "3") {
-        alert("Invalid Form -- Min. character per field is four (4)");
         this.setState({
           username: '',
           password: '',
-          errors: {}
+          errors: "Invalid Form"
         }); 
       }
       else {
-        alert("Unknown Error -- Please try again later");
         this.setState({
           username: '',
           password: '',
-          errors: {}
+          errors: "Unknown Error -- Please try again later"
         }); 
       }
     });
@@ -98,6 +87,12 @@ class Login extends Component {
                   onChange={this.onChange}
                 />
               </div>
+
+              {this.state.errors &&
+                <div>
+                  <div style={{ fontSize: 14, color: 'red', marginBottom: '5%' }}>{this.state.errors}</div>
+                </div>
+              }
               <button type="submit" className="btn btn-lg btn-primary btn-block">
                 Sign in
               </button>

@@ -4,17 +4,22 @@
  * https://reactjs.org/docs/higher-order-components.html
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import axios from 'axios';
+import MenuContext from '../App/MenuContext';
+
 
 
 
 function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
+  const { setLoading } = useContext(MenuContext);
+
   if (nodeType === null) {
     return <></>;
   }
 
   function EnrichIPbyType(type) {
+    setLoading(true);
     if (type === "cybexCount" || type === "cybexRelated"){
       axios
         .post(`/api/v1/enrich/${type}`, {Ntype: `${nodeType.label}`, value: `${nodeType.properties.data}`})
@@ -24,6 +29,7 @@ function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
               .get('/api/v1/neo4j/export')
               .then(response => {
                 setNeo4jData(response.data);
+                setLoading(false);
               })
           }
         }); 
@@ -34,6 +40,7 @@ function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
         if (data['insert status'] !== 0) {
           axios.get('/api/v1/neo4j/export').then(response => {
             setNeo4jData(response.data);
+            setLoading(false);
           });
         }
       });
@@ -47,6 +54,7 @@ function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
               .get('/api/v1/neo4j/export')
               .then(response => {
                 setNeo4jData(response.data);
+                setLoading(false);
               })
           }
         }); 
@@ -60,6 +68,7 @@ function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
               .get('/api/v1/neo4j/export')
               .then(response => {
                 setNeo4jData(response.data);
+                setLoading(false);
               });
           }
         });
