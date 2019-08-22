@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { find } from './UserFunctions';
 
-
-
 class Find extends Component {
   constructor() {
     super();

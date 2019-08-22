@@ -1,5 +1,6 @@
 from flask import abort, Flask, render_template, request, jsonify, flash, make_response, session, redirect
-from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
+from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, login_required
+from flask_user import current_user, login_required, roles_required, UserManager, UserMixin 
 from py2neo import Graph, Node
 import requests
 import json
@@ -10,6 +11,7 @@ from flask_jwt_extended import JWTManager
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+# from flask_user import current_user, login_required, roles_required, UserManager, UserMixin
 import jwt
 import datetime
 
@@ -46,10 +48,22 @@ Base = declarative_base()
 
 
 db = SQLAlchemy(app)
+_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
 
-engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-session1 = sessionmaker(expire_on_commit=False)
-session1.configure(bind=engine)
+# Role class
+class Role(db.Model):
+    __tablename__ = 'roles'
+    # Our Role has three fields, ID, name and description
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+ # Define the UserRoles association table
+class UserRoles(db.Model):
+    __tablename__ = 'user_roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+
 
 class User(UserMixin, db.Model, Base):
     id = db.Column(db.Integer, primary_key=True) 
@@ -64,9 +78,67 @@ class User(UserMixin, db.Model, Base):
     admin = db.Column(db.Boolean)
     db_username=db.Column(db.String(15))
     db_password = db.Column(db.String(80))
+    roles = db.relationship('Role', 
+                            secondary='user_roles',
+                            backref=db.backref('user', lazy='dynamic'))
+    # Had to import this from UserMixin class
+    # Wasn't inheriting this method
+    def has_roles(self, *requirements):
+        """ Return True if the user has all of the specified roles. Return False otherwise.
+            has_roles() accepts a list of requirements:
+                has_role(requirement1, requirement2, requirement3).
+            Each requirement is either a role_name, or a tuple_of_role_names.
+                role_name example:   'manager'
+                tuple_of_role_names: ('funny', 'witty', 'hilarious')
+            A role_name-requirement is accepted when the user has this role.
+            A tuple_of_role_names-requirement is accepted when the user has ONE of these roles.
+            has_roles() returns true if ALL of the requirements have been accepted.
+            For example:
+                has_roles('a', ('b', 'c'), d)
+            Translates to:
+                User has role 'a' AND (role 'b' OR role 'c') AND role 'd'"""
+
+        # Translates a list of role objects to a list of role_names
+        user_manager = app.user_manager
+        role_names = user_manager.db_manager.get_user_roles(self)
+
+        # has_role() accepts a list of requirements
+        for requirement in requirements:
+            if isinstance(requirement, (list, tuple)):
+                # this is a tuple_of_role_names requirement
+                tuple_of_role_names = requirement
+                authorized = False
+                for role_name in tuple_of_role_names:
+                    if role_name in role_names:
+                        # tuple_of_role_names requirement was met: break out of loop
+                        authorized = True
+                        break
+                if not authorized:
+                    return False                    # tuple_of_role_names requirement failed: return False
+            else:
+                # this is a role_name requirement
+                role_name = requirement
+                # the user must have this role
+                if not role_name in role_names:
+                    return False                    # role_name requirement failed: return False
+
+        # All requirements have been met: return True
+        return True
+
+# user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+# security = Security(app, user_datastore)
+
+# Setup Flask-Users and specify the User data-model
+user_manager = UserManager(app, db, User)
+
+# Create all database tables
+db.create_all()
+
+engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+session1 = sessionmaker(expire_on_commit=False)
+session1.configure(bind=engine)
 
 Base.metadata.create_all(engine)
-
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -87,8 +159,6 @@ app.config['MAIL_USE_SSL'] = False
 app.config['SECURITY_PASSWORD_SALT'] = 'my_precious_two'
 app.config['UPLOAD_FOLDER'] = '/tiweb'
 
-
-
 mail = Mail(app)
 s=session1()
 
@@ -103,7 +173,8 @@ def connect2graph():
  
 # Admin required
 @app.route('/users/register', methods = ['POST'])
-@login_required
+#@login_required
+@roles_required('admin')
 def register():
     form = RegistrationForm()
     
@@ -111,12 +182,16 @@ def register():
         hashed_password = generate_password_hash(form.password.data, method = 'sha256')
         new_user = User(public_id=str(uuid.uuid4()),first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data, username = form.username.data, password = hashed_password, admin = form.admin.data)
         s.add(new_user)
+        if (form.admin.data):
+            admin = s.query(Role).filter(Role.name == 'admin').first()
+            new_user.roles.append(admin)
+
         result = {
 		'first_name' : form.first_name.data,
 		'last_name' : form.last_name.data,
 		'email' : form.email.data,
 		'password' : form.password.data,
-                'admin': form.admin.data
+        'admin': form.admin.data
 	    }
 
         c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
@@ -133,24 +208,21 @@ def register():
 
         if(r and r["status"]):
            #print(json.dumps(r['data']))
-           
-                user = s.query(User).filter(User.username == form.username.data).first() 
-                user.db_ip= r['data']['ip']
-                user.db_port = r['data']['port']
-                us = r['data']['auth']
-                print(us)
-                a = us.split('/')
-                user.db_username = a[0]
-           
-                user.db_password = a[1]
-          
-           
-                s.commit() 
-           
-                msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
-                msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
-                mail.send(msg)
-                return "Sent"
+            user = s.query(User).filter(User.username == form.username.data).first() 
+            user.db_ip= r['data']['ip']
+            user.db_port = r['data']['port']
+            us = r['data']['auth']
+            print(us)
+            a = us.split('/')
+
+            user.db_username = a[0]        
+            user.db_password = a[1]
+            s.commit() 
+        
+            msg = Message('Account Created', sender = 'cybexp123@gmail.com', recipients = [form.email.data])
+            msg.body = "Hi  "+form.first_name.data + ",  Your account with CYBEX-P has been created !!"
+            mail.send(msg)
+            return "Sent"
         
         # DB Creation Error
         return jsonify({"Error" : "1"})
@@ -161,7 +233,7 @@ def register():
 
 @login_manager.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    return User.query.get(id)
         
 @app.route('/users/login', methods =['POST'])
 def login():
@@ -199,7 +271,7 @@ def isAdmin():
 
 # Admin required
 @app.route('/remove', methods = ['POST'])
-@login_required
+@roles_required('admin')
 def delete():
     
     #form = DeleteForm()
@@ -224,10 +296,10 @@ def isSignedIn():
     
 
 # Admin required
+
 @app.route('/update', methods = ['POST'])
-@login_required
+@roles_required('admin')
 def update():
-        
         #options = session.query(User)
         try:
             update_this = s.query(User).filter(User.username == request.get_json()['username']).first()
@@ -235,6 +307,8 @@ def update():
             update_this.last_name = request.get_json()['last_name']
             update_this.email = request.get_json()['email']
             update_this.admin = request.get_json()['admin']
+            admin = s.query(Role).filter(Role.name == request.get_json()['admin']).first()
+            update_this.roles.append(admin)
             s.commit()
             result = jsonify({'message': 'DB updated'})
             return result
@@ -244,9 +318,11 @@ def update():
             result = jsonify({'message': 'There was an error updating your account'})
             return result
          
-# Admin required
+
+
 @app.route('/find', methods = ['POST'])
 @login_required
+@roles_required('admin')
 def found():
     
     found_user= s.query(User).filter(User.username == request.get_json()['username']).first()
@@ -498,6 +574,7 @@ def enrich_pdns():
 # Admin required
 @app.route('/admin/ratelimit')
 @login_required
+@roles_required('admin')
 def ratelimit():
     # needs to use YAMLConfig
     res = requests.get('https://user.whoisxmlapi.com/service/account-balance?apiKey=at_Oj1aihFSRVU0LbyqZBLnl0PhM2Zan')

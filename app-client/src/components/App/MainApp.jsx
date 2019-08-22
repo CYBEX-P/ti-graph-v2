@@ -123,6 +123,7 @@ const App = props => {
                         setLoading(false);
                       });
                     })
+                    //setLoading(false);
                   }}
                 >
                 Macro 1
