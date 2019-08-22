@@ -23,6 +23,8 @@ const App = ({ config }) => {
     return 'none';
   }, 'none');
 
+  const [isAdmin, setAdmin] = useState(false);
+
   const [isSignedIn, setSignedIn] = useState(() => {
     Axios.get('/isSignedIn').then(({data}) => {
       if(data.value === 0){
@@ -34,19 +36,21 @@ const App = ({ config }) => {
     })
   });
 
-  // For now, set a local storage token to anything to see logged in behavior
-  // useEffect(() => localStorage.setItem('token', 'hi'));
-
   useEffect(() => {
     Axios.get('/isSignedIn').then(({data}) => {
       if(data.value === 0){
-        return setSignedIn(false)
+        setSignedIn(false);
+        setAdmin(false);
       }
       else {
-        return setSignedIn(true)
+        setSignedIn(true)
+        Axios.get('/isAdmin').then(({data}) => {
+          setAdmin(data.value);
+        })
       }
     })
   }, []);
+
   return (
     <Router basename='/tiweb'>
       <div style={{ minHeight: '100vh', backgroundColor: '#efefef' }} className="App">
@@ -58,10 +62,9 @@ const App = ({ config }) => {
 
         <div style={{ backgroundColor: '#ffffff', paddingTop: '56px', paddingBottom: '32px' }} className="container">
           <Route exact path="/" component={() => <Redirect to="/home" />} />
-          {/* {alert(isSignedIn)} */}
-          <Route path="/home" component={() => <Landing isSignedIn={isSignedIn} setSignedIn={setSignedIn} />} />
+          <Route path="/home" component={() => <Landing isSignedIn={isSignedIn} setSignedIn={setSignedIn} isAdmin={isAdmin} setAdmin={setAdmin}/>} />
           <Route path="/register" component={Register} />
-          <Route path="/login" component={() => <Login isSignedIn={isSignedIn} setSignedIn={setSignedIn} />} />
+          <Route path="/login" component={() => <Login isSignedIn={isSignedIn} setSignedIn={setSignedIn} setAdmin={setAdmin}/>} />
           <Route path="/profile" component={Profile} />
           <Route path="/remove" component={Remove} />
           <Route path="/update" component={Update} />
