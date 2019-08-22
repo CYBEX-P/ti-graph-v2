@@ -191,6 +191,12 @@ def login():
         # Invalid Form
         return jsonify({"Error" : "3"})
 
+@app.route('/isAdmin')
+@login_required
+def isAdmin():
+    user = s.query(User).filter(User.username == session['username']).first()
+    return jsonify({"value" : user.admin})
+
 # Admin required
 @app.route('/remove', methods = ['POST'])
 @login_required

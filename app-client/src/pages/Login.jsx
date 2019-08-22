@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { login } from './UserFunctions';
 import { withRouter } from 'react-router-dom';
+import Axios from 'axios';
 
 class Login extends Component {
   constructor(props) {
@@ -28,10 +29,13 @@ class Login extends Component {
     };
 
     login(user).then(res => {
-      console.log(res);
       if (res.Exit === "0") {
         this.props.setSignedIn(true);
-        this.props.history.push('/home');
+        Axios.get('/isAdmin').then(({data}) => {
+          this.props.setAdmin(data.value);
+          this.props.history.push('/home');
+        })
+        
       }
       else if(res.Exit === "1") {
         this.setState({
