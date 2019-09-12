@@ -57,7 +57,7 @@ const App = ({ config }) => {
 
         <Route path="/graph" component={() => <MainApp config={config} />} />
         <MenuContext.Provider value={{ dispatchExpand, isExpanded }}>
-          <NavBar />
+          <NavBar permissions={isAdmin} isSignedIn={isSignedIn}/>
         </MenuContext.Provider>
 
         <div style={{ backgroundColor: '#ffffff', paddingTop: '56px', paddingBottom: '32px' }} className="container">
