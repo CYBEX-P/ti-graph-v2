@@ -589,13 +589,18 @@ def sendConfig():
 def startEvent():
     res = request.get_json()
     os.environ['eventName'] = res['EventName']
-    
-    # insert all nodes
-    for node in res['IOCS']:
-        status = insert(node['IOCType'], node['data'])
 
-    # return status
-    return status
+    print(res)
+    for node in res['IOCS']:
+        dataList = node['data'].split(',')
+        dataList = list(map(str.strip, dataList))
+        print('Type:', node['IOCType'])
+        print('Data:', dataList)
+
+        for data in dataList:
+            status = insert(node['IOCType'], data)
+
+    return 'OK'
 
 # @app.route('/event/getName', methods=['GET'])
 # def getEventName():
