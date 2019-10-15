@@ -216,7 +216,7 @@ const App = props => {
                   </div>
                   }
                   {macroDetails == "macro2" &&
-                  <div style={{/*visibility: "hidden",*/position: "fixed", minHeight:"25%", width: '40%',top:'56px', left: "334px",padding: '10px',backgroundColor:"white",opacity:'0.9',borderRadius:'15px',border:'solid',borderColor:'#0277bd'}}>
+                  <div style={{position: "fixed", minHeight:"25%", width: '40%',top:'56px', left: "334px",padding: '10px',backgroundColor:"white",opacity:'0.9',borderRadius:'15px',border:'solid',borderColor:'#0277bd'}}>
                     <div onClick={() => setMacroDetails("none")}>
                       <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{float:'right'}}/>
                     </div>
