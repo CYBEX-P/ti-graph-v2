@@ -7,6 +7,8 @@ import { Card, CardText, CardBody, CardTitle } from 'reactstrap';
 import NetworkContext from '../App/DataContext';
 import RadialMenu from '../radialMenu/radialMenu';
 import withNodeType from '../radialMenu/withNodeType';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 function InitializeGraph(data) {
   if (typeof data.Neo4j === 'undefined') {
@@ -79,7 +81,10 @@ const Graph = ({ isLoading }) => {
           // Set the hover text to the properties of the data
           text: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties),
           x: e.event.clientX,
-          y: e.event.clientY
+          y: e.event.clientY,
+          data: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties.data),
+          label: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].label),
+          color: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].color),
         });
       }
       return setHoverText(null);
@@ -210,16 +215,35 @@ const Graph = ({ isLoading }) => {
                 zIndex: 1000,
                 top: hoverText.y,
                 left: hoverText.x,
-                backgroundColor: '#111',
-                pointerEvents: 'none'
+                // backgroundColor: '#111', // Used for classic Card styling only.
+                pointerEvents: 'none',
+                backgroundColor: "white",
+                opacity: "0.95",
+                borderRadius: "10px",
+                padding: "10px",
+                boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
               }}>
-          <Card>
+          {/* Classic Card style left in for reference below. To be removed. */}
+          {/* <Card>
             <CardBody>
               <CardTitle style={{textAlign:"center"}}><b>Node Data</b></CardTitle>
               <hr/>
               <CardText>{hoverText.text}</CardText>
             </CardBody>
-          </Card>
+          </Card> */}
+          <h4 style={{
+            textAlign:"center",
+            color: hoverText.color.replace(/"/g,""),
+            textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
+          }}>
+            <b>{hoverText.label.replace(/"/g,"")}</b>
+          </h4>
+          <hr/>
+          <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
+          <div style={{color:"black",fontSize:"large",textAlign:"center"}}>
+            <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
+            1 event
+          </div>
         </div>
       )}
     </div>
