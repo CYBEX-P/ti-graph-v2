@@ -126,8 +126,8 @@ class EventInsertForm extends React.Component {
               </Col> 
               <Col md={{ size: 5, offset: 0 }}>
                 <Input
-                  type="text"
-                  placeholder={`IOC Value ${idx + 1}`}
+                  type="textarea"
+                  placeholder={`IOC Values ${idx + 1} (sep = ',')`}
                   value={IOC.data}
                   onChange={this.handleShareholderDataChange(idx)}
                 />
