@@ -217,6 +217,34 @@ const Graph = ({ isLoading }) => {
           display: 'grid'
         }}
       />
+      <div style={{
+          position:"absolute",
+          width:"350px", 
+          right:"10px",
+          top:"65px",
+          zIndex: 5,
+          // backgroundColor: '#111', // Used for classic Card styling only.
+          pointerEvents: 'none',
+          backgroundColor: "white",
+          opacity: "0.95",
+          borderRadius: "10px",
+          padding: "10px",
+          paddingBottom: "20px",
+          boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
+          }}>
+            <h4 style={{
+              textAlign:"center",
+              color: "black",
+              textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
+            }}>
+              <b>Filters</b>
+            </h4>
+            <hr/>
+            <h5>Time</h5>
+            <div style={{color:"black",fontSize:"large"}}>
+              From: <input style={{width:'100px'}}></input> To: <input style={{width:'100px'}}></input>
+            </div>
+          </div>
       {isLoading && (
         <div
           style={{
