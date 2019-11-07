@@ -24,6 +24,7 @@ function InitializeGraph(data) {
     nodes: {
       shape: 'circle',
       widthConstraint: 100,
+      font:{color:'white'}
     },
     edges: {
       length: 200
@@ -93,10 +94,40 @@ const Graph = ({ isLoading }) => {
     nw.on('blurNode', () => setHoverText(null));
 
     // Change the selection state whenever a node is selected and deselected
-    nw.on('deselectNode', () => setSelection(nw.getSelection()));
-    nw.on('selectNode', () => {
-      setSelection(nw.getSelection());
+    nw.on('deselectNode', (params) => 
+    {
+      setSelection(nw.getSelection())
+      Object.keys(nw.body.nodes).forEach(function(currentId){
+        if (!currentId.includes("edgeId"))
+        {
+          var orgColorStr = nw.body.nodes[currentId].options.color.background;
+          // split color string into array with indices corresponding to r,g,b, and a
+          var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
+          var opacityNormal = 1;
+          nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')';
+        }
+      });
     });
+    nw.on('selectNode', (params) => {
+      setSelection(nw.getSelection());
+      var opacityBlurred = 0.1;
+      //console.log(nw.body.nodes)
+      Object.keys(nw.body.nodes).forEach(function(currentId){
+        var nodeId = params.nodes[0];
+        if (!currentId.includes("edgeId"))
+        {
+          if (currentId != nodeId)
+          {
+            var orgColorStr = nw.body.nodes[currentId].options.color.background;
+            // split color string into array with indices corresponding to r,g,b, and a
+            var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
+            nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
+            nw.body.nodes[currentId].options.color.border = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
+          }
+        }
+      });
+    });
+  
 
     // Set state when drag starts and ends. Used to determine whether to draw radial menu or not
     nw.on('dragStart', () => {
@@ -209,7 +240,8 @@ const Graph = ({ isLoading }) => {
       )}
       {radialPosition && <RadialToRender position={radialPosition} network={network} scale={network.getScale()} />}
       {hoverText && (
-        <div
+        <div>
+        {/* <div
           style={{
                 position: 'absolute',
                 zIndex: 1000,
@@ -223,14 +255,6 @@ const Graph = ({ isLoading }) => {
                 padding: "10px",
                 boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
               }}>
-          {/* Classic Card style left in for reference below. To be removed. */}
-          {/* <Card>
-            <CardBody>
-              <CardTitle style={{textAlign:"center"}}><b>Node Data</b></CardTitle>
-              <hr/>
-              <CardText>{hoverText.text}</CardText>
-            </CardBody>
-          </Card> */}
           <h4 style={{
             textAlign:"center",
             color: hoverText.color.replace(/"/g,""),
@@ -244,7 +268,39 @@ const Graph = ({ isLoading }) => {
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
             1 event
           </div>
-        </div>
+        </div> */}
+        <div style={{
+          position:"absolute",
+          width:"350px", 
+          right:"10px",
+          bottom:"10px",
+          zIndex: 1000,
+          // backgroundColor: '#111', // Used for classic Card styling only.
+          pointerEvents: 'none',
+          backgroundColor: "white",
+          opacity: "0.95",
+          borderRadius: "10px",
+          padding: "10px",
+          boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
+          }}>
+            <h4 style={{
+              textAlign:"center",
+              color: hoverText.color.replace(/"/g,""),
+              textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
+            }}>
+              <b>{hoverText.label.replace(/"/g,"")}</b>
+            </h4>
+            <hr/>
+            <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
+            <div style={{color:"black",fontSize:"large"}}>
+              Cybex Count:<br></br>
+              <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
+               Total = 6, Malicious = 2<br></br><br></br>
+              <button style={{marginRight:'32px'}}>Related Attributes</button>
+              <button>Related Events</button>
+            </div>
+          </div>
+          </div>
       )}
     </div>
   );

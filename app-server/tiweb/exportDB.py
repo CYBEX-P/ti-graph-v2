@@ -9,23 +9,31 @@ def processExport(dataObject):
         for key in x['nodes']:
             key['label'] = key['label'][0]
             if key['label'] == 'IP':
-                key['color'] = '#97C2FC'
+                #key['color'] = '#97C2FC',
+                key['color'] = 'rgba(151,194,252,1)'
+                key['widthConstraint'] = 120
             if key['label'] == 'Host':
-                key['color'] = '#FB7E81'
+                #key['color'] = '#FB7E81'
+                key['color'] = 'rgba(247, 151, 77, 1)'
             if key['label'] == 'URL':
-                key['color'] = '#D496A7'
+                #key['color'] = '#D496A7'
+                key['color'] = 'rgba(151,194,252,1)'
             if key['label'] == 'SPort':
                 key['color'] = '#8C99CE'
             if key['label'] == 'DPort':
                 key['color'] = '#5B8E7D'
             if key['label'] == 'Email':
-                key['color'] = '#34E5FF'
+                #key['color'] = '#34E5FF'
+                key['color'] = 'rgba(151,194,252,1)'
             if key['label'] == 'Hash':
                 key['color'] = '#FDF5BF'
             if key['label'] == 'ASN':
-                key['color'] = '#8CB369'
+                #key['color'] = '#8CB369'
+                key['color'] = 'rgba(168, 50, 50)'
             if key['label'] == 'Country':
-                key['color'] = '#F4A259'
+                #key['color'] = '#F4A259'
+                key['color'] = 'rgba(247, 151, 77, 1)'
+                key['widthConstraint'] = 200
             if key['label'] == 'BTC':
                 key['color'] = '#3185FC'
             if key['label'] == 'MAC':
@@ -35,13 +43,18 @@ def processExport(dataObject):
             if key['label'] == 'SSID':
                 key['color'] = '#E8E8E8'
             if key['label'] == 'Domain':
-                key['color'] = "#B37469"
+                #key['color'] = "#B37469"
+                key['color'] = 'rgba(151,194,252,1)'
             if key['label'] == 'Ports':
-                key['color'] = "#ff41e2"
+                #key['color'] = "#ff41e2"
+                key['color'] = 'rgba(151,194,252,1)'
             if key['label'] == 'Whois':
-                key['color'] = "#4070f4"
+                #key['color'] = "#4070f4"
+                key['color'] = 'rgba(151,194,252,1)'
             if key['label'] == 'Subnet':
-                key['color'] = "#eeee58"
+                #key['color'] = "#eeee58"
+                key['color'] = 'rgba(151,194,252,1)'
+                key['widthConstraint'] = 50
             if key['label'] == 'Registrar':
                 key['color'] = "#06de9e"
             if key['label'] == 'Nameserver':
@@ -51,9 +64,11 @@ def processExport(dataObject):
             if key['label'] == 'User':
                 key['color'] = "#d8e5f6"
             if key['label'] == 'CybexCount':
-                key['color'] = "#29e682"
+                #key['color'] = "#29e682"
+                key['color'] = 'rgba(151,194,252,1)'
             if key['label'] == 'CybexRelated':
-                key['color'] = "#92fd6c"
+                #key['color'] = "#92fd6c"
+                key['color'] = 'rgba(151,194,252,1)'
             
 
     return dataObject
