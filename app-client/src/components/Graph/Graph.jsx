@@ -24,7 +24,7 @@ function InitializeGraph(data) {
     nodes: {
       shape: 'circle',
       widthConstraint: 100,
-      font:{color:'white'}
+      font:{color:'black'}
     },
     edges: {
       length: 200
@@ -232,11 +232,7 @@ const Graph = ({ isLoading }) => {
           paddingBottom: "20px",
           boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
           }}>
-            <h4 style={{
-              textAlign:"center",
-              color: "black",
-              textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
-            }}>
+            <h4 style={{textAlign:"center"}}>
               <b>Filters</b>
             </h4>
             <hr/>
