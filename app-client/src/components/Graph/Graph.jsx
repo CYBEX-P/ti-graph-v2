@@ -24,7 +24,7 @@ function InitializeGraph(data) {
     nodes: {
       shape: 'circle',
       widthConstraint: 100,
-      font:{color:'black'}
+      font:{color:'white'}
     },
     edges: {
       length: 200
@@ -113,7 +113,7 @@ const Graph = ({ isLoading }) => {
         label: "No Node Selected",
         text: '',
         data: "Select a node to see details.",
-        color: "black",
+        color: "white",
         count: 'X',
         countMalicious: 'X'
       })
@@ -233,7 +233,8 @@ const Graph = ({ isLoading }) => {
           gridRow: '1 / span 2',
           gridColumn: 1,
           zIndex: 2,
-          display: 'grid'
+          display: 'grid',
+          backgroundColor: '#232323'
         }}
       />
       <div style={{
@@ -244,7 +245,8 @@ const Graph = ({ isLoading }) => {
           zIndex: 5,
           // backgroundColor: '#111', // Used for classic Card styling only.
           pointerEvents: 'none',
-          backgroundColor: "white",
+          backgroundColor: "black",
+          color: "white",
           opacity: "0.95",
           borderRadius: "10px",
           padding: "10px",
@@ -256,7 +258,7 @@ const Graph = ({ isLoading }) => {
             </h4>
             <hr/>
             <h5>Time</h5>
-            <div style={{color:"black",fontSize:"large"}}>
+            <div style={{color:"white",fontSize:"large"}}>
               From: <input style={{width:'70px'}}></input> To: <input style={{width:'70px'}}></input>
             </div>
           </div>
@@ -291,7 +293,8 @@ const Graph = ({ isLoading }) => {
                 left: hoverText.x,
                 // backgroundColor: '#111', // Used for classic Card styling only.
                 pointerEvents: 'none',
-                backgroundColor: "white",
+                backgroundColor: "black",
+                color: "white",
                 opacity: "0.95",
                 borderRadius: "10px",
                 padding: "10px",
@@ -306,9 +309,9 @@ const Graph = ({ isLoading }) => {
           </h4>
           <hr/>
           <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
-          <div style={{color:"black",fontSize:"large",textAlign:"center"}}>
+          <div style={{color:"white",fontSize:"large",textAlign:"center"}}>
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
-            X% Malicious
+            X% malicious
           </div>
         </div>
       )}
@@ -318,10 +321,11 @@ const Graph = ({ isLoading }) => {
           width:"300px", 
           right:"10px",
           bottom:"10px",
-          zIndex: 1000,
+          zIndex: 5,
           // backgroundColor: '#111', // Used for classic Card styling only.
           pointerEvents: 'none',
-          backgroundColor: "white",
+          backgroundColor: "black",
+          color: "white",
           opacity: "0.95",
           borderRadius: "10px",
           padding: "10px",
@@ -336,7 +340,7 @@ const Graph = ({ isLoading }) => {
           </h4>
           <h6 style={{textAlign:"center"}}>{selectText.data.replace(/"/g,"")}</h6>
           <hr/>
-          <div style={{color:"black",fontSize:"large"}}>
+          <div style={{color:"white",fontSize:"large"}}>
             <h5>Details</h5>
             <h6>Cybex Count:</h6>
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
