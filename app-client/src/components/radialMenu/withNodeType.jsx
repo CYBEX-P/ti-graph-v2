@@ -105,16 +105,28 @@ function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
   // return props => {
   //   return <RadialMenuComponent titles={titles} icons={icons} onClickFunctions={onClickFns} {...props} />;
   // };
-    
-  onClickFns = config.enrichments[`${nodeType.label}`].map(enrichmentType => () => {
+  
+  // If the selected node is a supported enrichment type (from config.yaml), then
+  // the enrichment list is derived from there. If not supported (current example is when 
+  // when querying cybexRelated attributes), default to 'Other' type.
+  var nodeLabel;
+  if (config.enrichments[`${nodeType.label}`] == undefined)
+  {
+    nodeLabel = 'Other';
+  }
+  else
+  {
+    nodeLabel = nodeType.label
+  }
+  onClickFns = config.enrichments[`${nodeLabel}`].map(enrichmentType => () => {
     return EnrichIPbyType(enrichmentType);
   });
-  // Copy arrays
-  titles = config.enrichments[`${nodeType.label}`].map(val => val);
+  titles = config.enrichments[`${nodeLabel}`].map(val => val);
   icons = titles.map(val => val);
   return props => {
     return <RadialMenuComponent titles={titles} icons={icons} onClickFunctions={onClickFns} {...props} />;
   };
+
 }
 
 export default withNodeType;

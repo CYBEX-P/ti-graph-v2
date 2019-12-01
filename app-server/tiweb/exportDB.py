@@ -10,12 +10,13 @@ def processExport(dataObject):
             key['label'] = key['label'][0]
             if key['label'] == 'IP':
                 #key['color'] = '#97C2FC',
-                key['color'] = 'rgba(151,194,252,1)'
+                #key['color'] = 'rgba(151,194,252,1)'
                 key['color'] = 'rgba(151,252,158,1)'
-                key['widthConstraint'] = 120
+                #key['widthConstraint'] = 120
             elif key['label'] == 'Host':
                 #key['color'] = '#FB7E81'
-                key['color'] = 'rgba(247, 151, 77, 1)'
+                #key['color'] = 'rgba(247, 151, 77, 1)'
+                key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'URL':
                 #key['color'] = '#D496A7'
                 key['color'] = 'rgba(151,194,252,1)'
@@ -30,11 +31,12 @@ def processExport(dataObject):
                 key['color'] = '#FDF5BF'
             elif key['label'] == 'ASN':
                 #key['color'] = '#8CB369'
-                key['color'] = 'rgba(168, 50, 50)'
+                #key['color'] = 'rgba(168, 50, 50)'
+                key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Country':
                 #key['color'] = '#F4A259'
-                key['color'] = 'rgba(247, 151, 77, 1)'
-                key['widthConstraint'] = 200
+                #key['color'] = 'rgba(247, 151, 77, 1)'
+                key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'BTC':
                 key['color'] = '#3185FC'
             elif key['label'] == 'MAC':
@@ -55,7 +57,6 @@ def processExport(dataObject):
             elif key['label'] == 'Subnet':
                 #key['color'] = "#eeee58"
                 key['color'] = 'rgba(151,194,252,1)'
-                key['widthConstraint'] = 50
             elif key['label'] == 'Registrar':
                 key['color'] = "#06de9e"
             elif key['label'] == 'Nameserver':

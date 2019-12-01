@@ -451,7 +451,7 @@ def CybexRelated():
     headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
     data = { Ntype1 : data1 }
     data = { "url-t" : "example.com", "from" : "2019/8/30 00:00", "to" : "2019/9/5 6:00am", "tzname" : "US/Pacific" }
-    data = json.dumps(data)
+    data = json.dumps(data) # data is jsonified request
 
     r = requests.post(url, headers=headers, data=data)
     res = json.loads(r.text)

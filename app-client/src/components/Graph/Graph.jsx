@@ -46,6 +46,8 @@ const Graph = ({ isLoading }) => {
   const [dragStart, setDragStart] = useState(false);
 
   const [hoverText, setHoverText] = useState(null);
+  // selctText is like hoverText, but is to be persistently shown when node is selected
+  const [selectText, setSelectText] = useState(null);
   const [selection, setSelection] = useState({ nodes: [], edges: [] });
   const [selectedNodeType, setSelectedNodeType] = useState(null);
   const [radialPosition, setRadialPosition] = useState(null);
@@ -107,13 +109,21 @@ const Graph = ({ isLoading }) => {
           nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')';
         }
       });
+      setSelectText({
+        label: "No Node Selected",
+        text: '',
+        data: "Select a node to see details.",
+        color: "black",
+        count: 'X',
+        countMalicious: 'X'
+      })
     });
     nw.on('selectNode', (params) => {
       setSelection(nw.getSelection());
       var opacityBlurred = 0.1;
       //console.log(nw.body.nodes)
+      var nodeId = params.nodes[0];
       Object.keys(nw.body.nodes).forEach(function(currentId){
-        var nodeId = params.nodes[0];
         if (!currentId.includes("edgeId"))
         {
           if (currentId != nodeId)
@@ -125,6 +135,15 @@ const Graph = ({ isLoading }) => {
             nw.body.nodes[currentId].options.color.border = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
           }
         }
+      });
+      setSelectText({
+        // Set the select text to the properties of the data
+        text: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].properties),
+        data: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].properties.data),
+        label: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].label),
+        color: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].color),
+        count: 'X',
+        countMalicious: 'X'
       });
     });
   
@@ -219,7 +238,7 @@ const Graph = ({ isLoading }) => {
       />
       <div style={{
           position:"absolute",
-          width:"350px", 
+          width:"300px", 
           right:"10px",
           top:"65px",
           zIndex: 5,
@@ -238,7 +257,7 @@ const Graph = ({ isLoading }) => {
             <hr/>
             <h5>Time</h5>
             <div style={{color:"black",fontSize:"large"}}>
-              From: <input style={{width:'100px'}}></input> To: <input style={{width:'100px'}}></input>
+              From: <input style={{width:'70px'}}></input> To: <input style={{width:'70px'}}></input>
             </div>
           </div>
       {isLoading && (
@@ -264,8 +283,7 @@ const Graph = ({ isLoading }) => {
       )}
       {radialPosition && <RadialToRender position={radialPosition} network={network} scale={network.getScale()} />}
       {hoverText && (
-        <div>
-        {/* <div
+        <div
           style={{
                 position: 'absolute',
                 zIndex: 1000,
@@ -290,12 +308,14 @@ const Graph = ({ isLoading }) => {
           <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
           <div style={{color:"black",fontSize:"large",textAlign:"center"}}>
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
-            1 event
+            X% Malicious
           </div>
-        </div> */}
+        </div>
+      )}
+      {selectText && (
         <div style={{
           position:"absolute",
-          width:"350px", 
+          width:"300px", 
           right:"10px",
           bottom:"10px",
           zIndex: 1000,
@@ -307,24 +327,27 @@ const Graph = ({ isLoading }) => {
           padding: "10px",
           boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
           }}>
-            <h4 style={{
-              textAlign:"center",
-              color: hoverText.color.replace(/"/g,""),
-              textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
-            }}>
-              <b>{hoverText.label.replace(/"/g,"")}</b>
-            </h4>
+          <h4 style={{
+            textAlign:"center",
+            color: selectText.color.replace(/"/g,""),
+            //textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
+          }}>
+            <b>{selectText.label.replace(/"/g,"")}</b>
+          </h4>
+          <h6 style={{textAlign:"center"}}>{selectText.data.replace(/"/g,"")}</h6>
+          <hr/>
+          <div style={{color:"black",fontSize:"large"}}>
+            <h5>Details</h5>
+            <h6>Cybex Count:</h6>
+            <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
+              Total = {selectText.count}, Malicious = {selectText.countMalicious}<br></br>
             <hr/>
-            <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
-            <div style={{color:"black",fontSize:"large"}}>
-              Cybex Count:<br></br>
-              <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
-               Total = 6, Malicious = 2<br></br><br></br>
-              <button style={{marginRight:'32px'}}>Related Attributes</button>
-              <button>Related Events</button>
-            </div>
+            <h5>View Options</h5>
+            <h6>Highlight Related:</h6>
+            <button style={{marginRight:'10px'}}>Attributes</button>
+            <button>Events</button>
           </div>
-          </div>
+        </div>
       )}
     </div>
   );
