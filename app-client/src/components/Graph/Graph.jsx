@@ -8,7 +8,7 @@ import NetworkContext from '../App/DataContext';
 import RadialMenu from '../radialMenu/radialMenu';
 import withNodeType from '../radialMenu/withNodeType';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faArrowRight,faTimesCircle, faFilter } from '@fortawesome/free-solid-svg-icons';
 
 function InitializeGraph(data) {
   if (typeof data.Neo4j === 'undefined') {
@@ -24,7 +24,7 @@ function InitializeGraph(data) {
     nodes: {
       shape: 'circle',
       widthConstraint: 100,
-      font:{color:'white'}
+      font:{color:'grey'}
     },
     edges: {
       length: 200
@@ -54,6 +54,8 @@ const Graph = ({ isLoading }) => {
   const [eventListenersAdded, setEventListenersAdded] = useState(false);
 
   const [network, setNetwork] = useState(null);
+
+  const [filterState,setFilterState] = useState(false);
 
   function UpdatePositions() {
     if (network === null || selection === null) {
@@ -109,14 +111,15 @@ const Graph = ({ isLoading }) => {
           nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')';
         }
       });
-      setSelectText({
-        label: "No Node Selected",
-        text: '',
-        data: "Select a node to see details.",
-        color: "white",
-        count: 'X',
-        countMalicious: 'X'
-      })
+      // setSelectText({
+      //   label: "No Node Selected",
+      //   text: '',
+      //   data: "Select a node to see details.",
+      //   color: "white",
+      //   count: 'X',
+      //   countMalicious: 'X'
+      // })
+      setSelectText(false)
     });
     nw.on('selectNode', (params) => {
       setSelection(nw.getSelection());
@@ -237,31 +240,56 @@ const Graph = ({ isLoading }) => {
           backgroundColor: '#232323'
         }}
       />
-      <div style={{
+      {!filterState && (
+        <div style={{
           position:"absolute",
-          width:"300px", 
           right:"10px",
           top:"65px",
           zIndex: 5,
           // backgroundColor: '#111', // Used for classic Card styling only.
-          pointerEvents: 'none',
           backgroundColor: "black",
           color: "white",
           opacity: "0.95",
           borderRadius: "10px",
-          padding: "10px",
-          paddingBottom: "20px",
+          padding: "13px",
+          paddingTop: "10px",
+          paddingBottom: "10px",
           boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
-          }}>
-            <h4 style={{textAlign:"center"}}>
-              <b>Filters</b>
-            </h4>
-            <hr/>
-            <h5>Time</h5>
-            <div style={{color:"white",fontSize:"large"}}>
-              From: <input style={{width:'70px'}}></input> To: <input style={{width:'70px'}}></input>
-            </div>
+        }}
+        onClick={() => setFilterState(true)}>
+          <FontAwesomeIcon size="1x" icon={faFilter}/>
+        </div>
+      )}
+      {filterState && (
+      <div style={{
+        position:"absolute",
+        width:"300px", 
+        right:"10px",
+        top:"65px",
+        zIndex: 5,
+        // backgroundColor: '#111', // Used for classic Card styling only.
+        backgroundColor: "black",
+        color: "white",
+        opacity: "0.95",
+        borderRadius: "10px",
+        padding: "20px",
+        paddingBottom: "20px",
+        boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
+        }}>
+          <div onClick={() => setFilterState(false)}>
+            <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{position:'absolute',right:'10px',top:'10px'}}/>
           </div>
+          <h4 style={{textAlign:"center"}}>
+            <b>Filters</b>
+          </h4>
+          <hr/>
+          <h5>Time</h5>
+          <div style={{color:"white",fontSize:"large"}}>
+            From: <input style={{width:'70px',backgroundColor:"#232323",border:"none",borderRadius:"5px",marginRight:"10px"}}></input>
+            To: <input style={{width:'70px',backgroundColor:"#232323",border:"none",borderRadius:"5px"}}></input>
+          </div>
+        </div>
+      )}
       {isLoading && (
         <div
           style={{
@@ -328,9 +356,10 @@ const Graph = ({ isLoading }) => {
           color: "white",
           opacity: "0.95",
           borderRadius: "10px",
-          padding: "10px",
+          padding: "20px",
           boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
           }}>
+          <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{position:'absolute',right:'10px',top:'10px'}}/>
           <h4 style={{
             textAlign:"center",
             color: selectText.color.replace(/"/g,""),
@@ -348,8 +377,8 @@ const Graph = ({ isLoading }) => {
             <hr/>
             <h5>View Options</h5>
             <h6>Highlight Related:</h6>
-            <button style={{marginRight:'10px'}}>Attributes</button>
-            <button>Events</button>
+            <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px",marginRight:'10px'}}>Attributes</button>
+            <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px"}}>Events</button>
           </div>
         </div>
       )}

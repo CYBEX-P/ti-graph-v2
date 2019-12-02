@@ -18,7 +18,7 @@ const NavBar = (props) => {
         </div>
         
         <a style={{ flexGrow: 2, textAlign: 'center', color: '#e3e3e3' }} href="/ti-graph">
-          <div>ti-graph</div>
+          <div><h4>cti-graph</h4></div>
         </a>
         {/*<UnstyledButton onClick={() => {}}>
           <a style={{ flexGrow: 2, textAlign: 'center', color: '#e3e3e3' }} href="/login">
