@@ -19,7 +19,8 @@ def processExport(dataObject):
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'URL':
                 #key['color'] = '#D496A7'
-                key['color'] = 'rgba(151,194,252,1)'
+                #key['color'] = 'rgba(151,194,252,1)'
+                key['color'] = 'rgba(151,252,158,1)'
             elif key['label'] == 'SPort':
                 key['color'] = '#8C99CE'
             elif key['label'] == 'DPort':
@@ -47,7 +48,8 @@ def processExport(dataObject):
                 key['color'] = '#E8E8E8'
             elif key['label'] == 'Domain':
                 #key['color'] = "#B37469"
-                key['color'] = 'rgba(151,194,252,1)'
+                #key['color'] = 'rgba(151,194,252,1)'
+                key['color'] = 'rgba(151,252,158,1)'
             elif key['label'] == 'Ports':
                 #key['color'] = "#ff41e2"
                 key['color'] = 'rgba(151,194,252,1)'

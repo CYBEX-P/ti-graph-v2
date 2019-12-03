@@ -204,7 +204,7 @@ const InsertForm = props => {
                 marginBottom:"10px",
                 backgroundColor:"#232323",
                 color:"white",
-                border:"none"
+                border:"none",
               }}
               placeholder="Data Value" name="ipToInsert" value={values.ipToInsert} onChange={handleChange} />
             <Button width="100%" hasIcon type="submit" onClickFunction={() => {}}>
