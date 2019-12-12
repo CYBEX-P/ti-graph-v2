@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                println(WORKSPACE)
+                sh 'echo ${WORKSPACE}'
                 sh 'jenkins/scripts/test.sh'
             }
         }
