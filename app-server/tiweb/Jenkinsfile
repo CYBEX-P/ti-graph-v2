@@ -20,11 +20,6 @@ pipeline {
             steps {
                 sh 'Temp test: Success'
             }
-            post {
-                always {
-                    junit 'test-reports/results.xml'
-                }
-            }
         }
     }
 }
