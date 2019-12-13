@@ -17,9 +17,6 @@ pipeline {
                     image 'qnib/pytest'
                 }
             }
-            steps {
-                sh 'Temp test: Success'
-            }
         }
     }
 }
