@@ -32,7 +32,7 @@ from wipe_db import wipeDB
 from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport
-from cybex import insertCybex, insertRelated, replaceType
+from cybex import insertCybex, insertRelated, replaceType, insertRelatedAttributes
 from enrichments import insert_domain_and_user, insert_domain, insert_netblock, resolveHost, getNameservers, getRegistrar, getMailServer
 
 from connect import connectDev, connectProd
@@ -450,14 +450,16 @@ def CybexRelated():
     url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/related/attribute/summary"
     headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
     data = { Ntype1 : data1 }
-    data = json.dumps(data)
+    data = { "url-t" : "example.com", "from" : "2019/8/30 00:00", "to" : "2019/9/5 6:00am", "tzname" : "US/Pacific" }
+    data = json.dumps(data) # data is jsonified request
 
     r = requests.post(url, headers=headers, data=data)
     res = json.loads(r.text)
-    # print(res)
+    #print(res)
 
     try:
-        status = insertRelated(str(res), graph, data1)
+        #status = insertRelated(str(res), graph, data1)
+        status = insertRelatedAttributes(str(res), graph, data1)
         return jsonify({"insert status" : status})
 
     except:

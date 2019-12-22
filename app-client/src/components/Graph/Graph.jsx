@@ -24,6 +24,7 @@ function InitializeGraph(data) {
     nodes: {
       shape: 'circle',
       widthConstraint: 100,
+      font:{color:'black'}
     },
     edges: {
       length: 200
@@ -45,6 +46,8 @@ const Graph = ({ isLoading }) => {
   const [dragStart, setDragStart] = useState(false);
 
   const [hoverText, setHoverText] = useState(null);
+  // selctText is like hoverText, but is to be persistently shown when node is selected
+  const [selectText, setSelectText] = useState(null);
   const [selection, setSelection] = useState({ nodes: [], edges: [] });
   const [selectedNodeType, setSelectedNodeType] = useState(null);
   const [radialPosition, setRadialPosition] = useState(null);
@@ -93,10 +96,57 @@ const Graph = ({ isLoading }) => {
     nw.on('blurNode', () => setHoverText(null));
 
     // Change the selection state whenever a node is selected and deselected
-    nw.on('deselectNode', () => setSelection(nw.getSelection()));
-    nw.on('selectNode', () => {
-      setSelection(nw.getSelection());
+    nw.on('deselectNode', (params) => 
+    {
+      setSelection(nw.getSelection())
+      Object.keys(nw.body.nodes).forEach(function(currentId){
+        if (!currentId.includes("edgeId"))
+        {
+          var orgColorStr = nw.body.nodes[currentId].options.color.background;
+          // split color string into array with indices corresponding to r,g,b, and a
+          var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
+          var opacityNormal = 1;
+          nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')';
+        }
+      });
+      setSelectText({
+        label: "No Node Selected",
+        text: '',
+        data: "Select a node to see details.",
+        color: "black",
+        count: 'X',
+        countMalicious: 'X'
+      })
     });
+    nw.on('selectNode', (params) => {
+      setSelection(nw.getSelection());
+      var opacityBlurred = 0.1;
+      //console.log(nw.body.nodes)
+      var nodeId = params.nodes[0];
+      Object.keys(nw.body.nodes).forEach(function(currentId){
+        if (!currentId.includes("edgeId"))
+        {
+          if (currentId != nodeId)
+          {
+            var orgColorStr = nw.body.nodes[currentId].options.color.background;
+            // split color string into array with indices corresponding to r,g,b, and a
+            var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
+            nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
+            nw.body.nodes[currentId].options.color.border = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
+          }
+        }
+      });
+      setSelectText({
+        // Set the select text to the properties of the data
+        text: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].properties),
+        data: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].properties.data),
+        label: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].label),
+        color: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].color),
+        count: 'X',
+        countMalicious: 'X'
+      });
+    });
+  
 
     // Set state when drag starts and ends. Used to determine whether to draw radial menu or not
     nw.on('dragStart', () => {
@@ -186,6 +236,30 @@ const Graph = ({ isLoading }) => {
           display: 'grid'
         }}
       />
+      <div style={{
+          position:"absolute",
+          width:"300px", 
+          right:"10px",
+          top:"65px",
+          zIndex: 5,
+          // backgroundColor: '#111', // Used for classic Card styling only.
+          pointerEvents: 'none',
+          backgroundColor: "white",
+          opacity: "0.95",
+          borderRadius: "10px",
+          padding: "10px",
+          paddingBottom: "20px",
+          boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
+          }}>
+            <h4 style={{textAlign:"center"}}>
+              <b>Filters</b>
+            </h4>
+            <hr/>
+            <h5>Time</h5>
+            <div style={{color:"black",fontSize:"large"}}>
+              From: <input style={{width:'70px'}}></input> To: <input style={{width:'70px'}}></input>
+            </div>
+          </div>
       {isLoading && (
         <div
           style={{
@@ -223,14 +297,6 @@ const Graph = ({ isLoading }) => {
                 padding: "10px",
                 boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
               }}>
-          {/* Classic Card style left in for reference below. To be removed. */}
-          {/* <Card>
-            <CardBody>
-              <CardTitle style={{textAlign:"center"}}><b>Node Data</b></CardTitle>
-              <hr/>
-              <CardText>{hoverText.text}</CardText>
-            </CardBody>
-          </Card> */}
           <h4 style={{
             textAlign:"center",
             color: hoverText.color.replace(/"/g,""),
@@ -242,7 +308,44 @@ const Graph = ({ isLoading }) => {
           <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
           <div style={{color:"black",fontSize:"large",textAlign:"center"}}>
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
-            1 event
+            X% Malicious
+          </div>
+        </div>
+      )}
+      {selectText && (
+        <div style={{
+          position:"absolute",
+          width:"300px", 
+          right:"10px",
+          bottom:"10px",
+          zIndex: 1000,
+          // backgroundColor: '#111', // Used for classic Card styling only.
+          pointerEvents: 'none',
+          backgroundColor: "white",
+          opacity: "0.95",
+          borderRadius: "10px",
+          padding: "10px",
+          boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
+          }}>
+          <h4 style={{
+            textAlign:"center",
+            color: selectText.color.replace(/"/g,""),
+            //textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
+          }}>
+            <b>{selectText.label.replace(/"/g,"")}</b>
+          </h4>
+          <h6 style={{textAlign:"center"}}>{selectText.data.replace(/"/g,"")}</h6>
+          <hr/>
+          <div style={{color:"black",fontSize:"large"}}>
+            <h5>Details</h5>
+            <h6>Cybex Count:</h6>
+            <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
+              Total = {selectText.count}, Malicious = {selectText.countMalicious}<br></br>
+            <hr/>
+            <h5>View Options</h5>
+            <h6>Highlight Related:</h6>
+            <button style={{marginRight:'10px'}}>Attributes</button>
+            <button>Events</button>
           </div>
         </div>
       )}
