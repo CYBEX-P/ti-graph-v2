@@ -37,13 +37,31 @@ def insertRelated(data, graph, value):
 
     return 1
 
+# Description: Adds Cybex Count and Malicious Count to node data
+# Parameters: <int>numOccur - Cybex Count query response
+#             <int>numMal - Cybex Count Malicious query response
+#             <object>graph - The current graph
+#             <string>Ntype - The type of the originating node
+#             <string>value - JSON data for the originating node
+# Returns: 1 if successful
+# Author: Adam Cassell
+def insertCybexCount(numOccur,numMal,graph,Ntype,value):
+    ip_node = graph.nodes.match(data=value).first()
+    if(ip_node):
+            ip_node["count"] = numOccur
+            ip_node["countMal"] = numMal
+            graph.push(ip_node)
+            print("CybexCount added to node")
+    else:
+            print("Error adding CybexCount")
+    return 1
+
 # Description: Attaches nodes to an object for all related attributes queried from Cybex
 # Parameters: <string>data - JSON response string from the Related Attribute Summary API call
 #             <object>graph - The current graph
-#             <string>data - JSON data for the originating node
+#             <string>value - JSON data for the originating node
 # Returns: 1 if successful
 # Author: Adam Cassell
-
 def insertRelatedAttributes(data,graph,value):
     data = data.replace("'",'"',) # Converts strin to proper JSON using "" instead of ''
     dataDict = json.loads(data) # convert json string to dict

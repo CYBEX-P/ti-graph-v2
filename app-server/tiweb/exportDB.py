@@ -4,22 +4,42 @@ import json
 
 
 def processExport(dataObject):
-
     for x in dataObject["Neo4j"][0]:
         for key in x['nodes']:
+            #print(x['nodes'])
+            # Before assigning color, referene malicious counts to assign threat level.
+            threatLevel = -1 #default to -1 for inconclusive threat level
+            if 'countMal' in str(key):
+                if (key['properties']['countMal'] != 0) and (key['properties']['count'] != 0):
+                    ratioMal = key['properties']['countMal']/(key['properties']['count'] + key['properties']['countMal'])
+                    if 0 < ratioMal < 0.5:
+                        threatLevel = 1
+                    elif 0.5 <= ratioMal <= 1:
+                        threatLevel = 2
+                    else: 
+                        threatLevel = 0
             key['label'] = key['label'][0]
             if key['label'] == 'IP':
-                #key['color'] = '#97C2FC',
-                #key['color'] = 'rgba(151,194,252,1)'
-                key['color'] = 'rgba(151,252,158,1)'
+                if threatLevel == 1:
+                    key['color'] = 'rgba(255, 222, 0)'
+                elif threatLevel == 2:
+                    key['color'] = 'rgba(168, 50, 50)'
+                else:
+                    #key['color'] = "#B37469"
+                    key['color'] = 'rgba(151,252,158,1)'
                 #key['widthConstraint'] = 120
             elif key['label'] == 'Host':
                 #key['color'] = '#FB7E81'
                 #key['color'] = 'rgba(247, 151, 77, 1)'
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'URL':
-                #key['color'] = '#D496A7'
-                key['color'] = 'rgba(151,194,252,1)'
+                if threatLevel == 1:
+                    key['color'] = 'rgba(255, 222, 0)'
+                elif threatLevel == 2:
+                    key['color'] = 'rgba(168, 50, 50)'
+                else:
+                    key['color'] = 'rgba(151,252,158,1)'
+                    #key['color'] = '#D496A7'
             elif key['label'] == 'SPort':
                 key['color'] = '#8C99CE'
             elif key['label'] == 'DPort':
@@ -46,8 +66,14 @@ def processExport(dataObject):
             elif key['label'] == 'SSID':
                 key['color'] = '#E8E8E8'
             elif key['label'] == 'Domain':
-                #key['color'] = "#B37469"
-                key['color'] = 'rgba(151,194,252,1)'
+                if threatLevel == 1:
+                    key['color'] = 'rgba(255, 222, 0)'
+                elif threatLevel == 2:
+                    key['color'] = 'rgba(168, 50, 50)'
+                else:
+                    #key['color'] = "#B37469"
+                    #key['color'] = 'rgba(151,194,252,1)'
+                    key['color'] = 'rgba(151,252,158,1)'
             elif key['label'] == 'Ports':
                 #key['color'] = "#ff41e2"
                 key['color'] = 'rgba(151,194,252,1)'
@@ -62,7 +88,7 @@ def processExport(dataObject):
             elif key['label'] == 'Nameserver':
                 key['color'] = "#cf4cf3"
             elif key['label'] == 'MailServer':
-                key['color'] = "#835eba"
+                key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'User':
                 key['color'] = "#d8e5f6"
             elif key['label'] == 'CybexCount':

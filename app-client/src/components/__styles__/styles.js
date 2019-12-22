@@ -96,7 +96,7 @@ const MenuBarStyle = styled(UnstyledButton)`
 `;
 
 const ExpandedMenuBar = styled.div`
-  background-color: ${primaryDarkBlue};
+  background-color: #171717;
   border: 3px solid ${primaryBlue};
   z-index: 6;
   ${props => {

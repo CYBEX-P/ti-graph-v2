@@ -172,8 +172,16 @@ const InsertForm = props => {
         initialValues={{ ipToInsert: '', IOCType: 'IP' }}
         render={({ handleChange, errors, values, handleSubmit }) => (
           <form onSubmit={handleSubmit}>
+            <h3>IOC Menu</h3>
             <select
-              style={{ width: '100%', height: '36px', backgroundColor: '#ffffff', color: '#222222' }}
+              style={{ 
+                width: '100%', 
+                height: '36px', 
+                backgroundColor: '#232323', 
+                color: 'white',
+                border:"none",
+                marginTop:"10px"
+              }}
               name="IOCType"
               value={values.IOCType}
               onChange={e => {
@@ -190,7 +198,15 @@ const InsertForm = props => {
                 ))}
             </select>
 
-            <Input placeholder="Data Value" name="ipToInsert" value={values.ipToInsert} onChange={handleChange} />
+            <Input 
+              style={{
+                marginTop:"10px",
+                marginBottom:"10px",
+                backgroundColor:"#232323",
+                color:"white",
+                border:"none",
+              }}
+              placeholder="Data Value" name="ipToInsert" value={values.ipToInsert} onChange={handleChange} />
             <Button width="100%" hasIcon type="submit" onClickFunction={() => {}}>
               <FontAwesomeIcon size="lg" icon="plus-circle" />
               <div>Insert IOC</div>
@@ -199,7 +215,7 @@ const InsertForm = props => {
           </form>
         )}
       />
-
+      
       {/* Enrichments */}
 
       {/* selectedIOC2 select */}
@@ -210,7 +226,7 @@ const InsertForm = props => {
 
           <form onSubmit={handleSubmit}>
             <select
-              style={{ width: '100%', height: '36px', backgroundColor: '#ffffff', color: '#222222' }}
+              style={{marginTop:"80px", width: '100%', height: '36px', backgroundColor: '#232323', color: 'white',border:"none" }}
               name="IOCType"
               value={values.IOCType}
               onChange={e => {
@@ -229,7 +245,7 @@ const InsertForm = props => {
 
             {/* Enrichment type select */}
             <select
-              style={{ width: '30%', height: '36px', backgroundColor: '#ffffff', color: '#222222' }}
+              style={{marginTop:"0px",width: '30%', height: '36px', backgroundColor: '#232323', color: 'white',border:"none" }}
               name="enrichmentType"
               value={values.enrichmentType}
               onChange={handleChange}
@@ -245,7 +261,7 @@ const InsertForm = props => {
             
             {/* data select */}
             <select
-              style={{ width: '70%', height: '36px', color: '#222222', backgroundColor: '#ffffff' }}
+              style={{ marginTop:"10px",marginBottom:"10px", width: '70%', height: '36px', color: 'white', backgroundColor: '#232323',border:"none" }}
               name="ipToEnrich"
               value={values.ipToEnrich}
               onChange={handleChange}

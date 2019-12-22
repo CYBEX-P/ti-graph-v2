@@ -167,7 +167,38 @@ const App = props => {
                 </div>
               </div> */}
                 {macroDetails == "macro1" &&
-                  <div style={{position: "fixed", minHeight:"25%", width: '40%',top:'56px', left: "334px",padding: '10px',backgroundColor:"white",opacity:'0.9',borderRadius:'15px',border:'solid',borderColor:'#0277bd'}}>
+                  <div 
+                    style={{
+                      position: "fixed",
+                      minHeight:"25%", 
+                      maxHeight:"87%",
+                      width: '25%',
+                      top:'56px', 
+                      left: "334px",
+                      padding: '10px',
+                      backgroundColor:"black",
+                      color:"white",
+                      opacity:'0.95',
+                      borderRadius:'15px',
+                      border:'solid',
+                      borderColor:'#0277bd',
+                      overflow:'auto'
+                    }}
+                    // style={{
+                    //   position: "fixed",
+                    //   minHeight:"25%", 
+                    //   width: '40%',
+                    //   top:'56px', 
+                    //   left: "334px",
+                    //   padding: '10px',
+                    //   backgroundColor:"black",
+                    //   color:"white",
+                    //   opacity:'0.95',
+                    //   borderRadius:'15px',
+                    //   border:'solid',
+                    //   borderColor:'#0277bd'
+                    // }}
+                    >
                     <div onClick={() => setMacroDetails("none")}>
                       <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{float:'right'}}/>
                     </div>
@@ -216,7 +247,7 @@ const App = props => {
                   </div>
                   }
                   {macroDetails == "macro2" &&
-                  <div style={{position: "fixed", minHeight:"25%", width: '40%',top:'56px', left: "334px",padding: '10px',backgroundColor:"white",opacity:'0.9',borderRadius:'15px',border:'solid',borderColor:'#0277bd'}}>
+                  <div style={{position: "fixed", minHeight:"25%", width: '40%',top:'56px', left: "334px",padding: '10px',backgroundColor:"black",color:"white",opacity:'0.95',borderRadius:'15px',border:'solid',borderColor:'#0277bd'}}>
                     <div onClick={() => setMacroDetails("none")}>
                       <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{float:'right'}}/>
                     </div>
@@ -232,16 +263,18 @@ const App = props => {
                 style={{
                   width: '100%',
                   height: '100%',
-                  backgroundColor: '#e0e0e0',
+                  backgroundColor: '#171717',
+                  color:'white',
                   display: 'grid',
                   gridTemplateRows: '150px 110px 70px auto',
                   justifyContent: 'center',
-                  gridTemplateColumns: '80%'
+                  gridTemplateColumns: '80%',
+                  paddingTop:"20px"
                 }}
               >
                 <InsertForm config={props.config} />
               <Row></Row>
-                
+              <Row></Row>
                 <Button width="100%" onClickFunction={() => dispatchModal('New Event Form')}>
                   <div>New Event</div>
                 </Button>
@@ -254,7 +287,8 @@ const App = props => {
                   flexWrap: 'wrap',
                   height: '100%',
                   width: '100%',
-                  backgroundColor: '#e0e0e0',
+                  backgroundColor: '#171717',
+                  color: "white",
                   gridTemplateRows: '70px 70px auto',
                   gridTemplateColumns: '33.33% 33.33% 33.33%',
                   justifyContent: 'center'
@@ -274,7 +308,7 @@ const App = props => {
                 </div>
                 <div style={{ gridColumn: 1 }}>
                   <Button width="40%" type="button" onClickFunction={() => dispatchModal('Neo4j Data')}>
-                    Export JSON Data
+                    Export JSON
                   </Button>
                 </div>
                 <div style={{ gridColumn: 2 }}>
