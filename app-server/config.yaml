@@ -70,6 +70,7 @@ IOC:
     URL:
       - enrichURL
       - cybexRelated
+      - cybexCount
     
     Domain:
       - whois
@@ -78,6 +79,7 @@ IOC:
       - registrar
       - mailservers
       - cybexRelated
+      - cybexCount
 
     Hash:
       - cybexRelated

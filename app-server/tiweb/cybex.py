@@ -42,32 +42,18 @@ def insertRelated(data, graph, value):
 #             <int>numMal - Cybex Count Malicious query response
 #             <object>graph - The current graph
 #             <string>Ntype - The type of the originating node
-#             <string>data - JSON data for the originating node
+#             <string>value - JSON data for the originating node
 # Returns: 1 if successful
 # Author: Adam Cassell
 def insertCybexCount(numOccur,numMal,graph,Ntype,value):
-    #c = Node("CybexCount", data = data)
     ip_node = graph.nodes.match(data=value).first()
-    print(ip_node)
-    #c_node = graph.nodes.match(Ntype, data = data).first()
-
     if(ip_node):
             ip_node["count"] = numOccur
             ip_node["countMal"] = numMal
-            # if (numMal/numOccur > 0):
-            #     ip_node["color"] = 'rgba(168, 50, 50)'
-            node.clear_labels()
             graph.push(ip_node)
-            # rel = Relationship(ip_node, "HAS_OCCURED", c_node)
-            # graph.create(rel)
             print("CybexCount added to node")
     else:
-            # graph.create(c)
-            # rel = Relationship(ip_node, "HAS_OCCURED", c)
-            # graph.create(rel)
-            #print("New CybexCount node created and linked")
             print("Error adding CybexCount")
-
     return 1
 
 # Description: Attaches nodes to an object for all related attributes queried from Cybex

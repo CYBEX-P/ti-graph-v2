@@ -459,7 +459,7 @@ def CybexRelated():
     Ntype = str(req['Ntype'])
     Ntype1 = replaceType(Ntype)
     data1 = req['value']
-    print(req)
+    #print(req)
 
     url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/related/attribute/summary"
     headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}

@@ -24,7 +24,7 @@ function InitializeGraph(data) {
     nodes: {
       shape: 'circle',
       widthConstraint: 100,
-      font:{color:'black'}
+      font:{color:'white',strokeWidth:3,strokeColor:"black"}
     },
     edges: {
       length: 200
@@ -85,13 +85,21 @@ const Graph = ({ isLoading }) => {
         var count = JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties.count)
         var countMal = JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties.countMal)
         var percent;
-        if (count == 0 || countMal == 0)
+        if (count == 0 /*|| countMal == 0*/)
         {
           percent = "Threat Inconclusive"
         }
         else 
         {
-          percent = (Number(countMal)/Number(count)*100) + "% Malicious";
+          percent = (Number(countMal)/(Number(countMal)+Number(count))*100).toFixed(2);
+          if (isNaN(percent))
+          {
+            percent = ""
+          }
+          else
+          {
+            percent += "% Malicious";
+          }
         }
         return setHoverText({
           // Set the hover text to the properties of the data
@@ -435,10 +443,12 @@ const Graph = ({ isLoading }) => {
           </h4>
           <hr/>
           <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
-          <div style={{color:"white",fontSize:"large",textAlign:"center"}}>
+          {hoverText.percentMal != "" && (
+            <div style={{color:"white",fontSize:"large",textAlign:"center"}}>
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
             {hoverText.percentMal}
           </div>
+          )}
         </div>
       )}
       {selectText && (
@@ -466,15 +476,13 @@ const Graph = ({ isLoading }) => {
             <b>{selectText.label.replace(/"/g,"")}</b>
           </h4>
           <h6 style={{textAlign:"center"}}>{selectText.data.replace(/"/g,"")}</h6>
-          <hr/>
           <div style={{color:"white",fontSize:"large"}}>
             <h5>Details</h5>
             <h6>Cybex Count:</h6>
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
-              Total = {selectText.count}, Malicious = {selectText.countMalicious}<br></br>
+              Benign = {selectText.count}, Malicious = {selectText.countMalicious}
             <hr/>
-            <h5>View Options</h5>
-            <h6>Highlight Related:</h6>
+            <h5>Highlight Related:</h5>
             <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px",marginRight:'10px'}}>Attributes</button>
             <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px"}}>Events</button>
           </div>
