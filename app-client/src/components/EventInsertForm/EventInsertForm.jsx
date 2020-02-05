@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Label, Row, Col, Container } from 'reactstrap';
+import { FormGroup, Input, Label, Row, Col, Container, Form } from 'reactstrap';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Formik } from 'formik';
@@ -12,7 +12,7 @@ class EventInsertForm extends React.Component {
     super(props);
     this.state = {
       EventName: "",
-      IOCS: [{ data: "", IOCType: "IP" }]
+      IOCS: [{ data: "", IOCType: "IP", submitType: "option1" }]
     };
   }
 
@@ -55,7 +55,7 @@ class EventInsertForm extends React.Component {
 
   handleAddShareholder = () => {
     this.setState({
-      IOCS: this.state.IOCS.concat([{ data: "", IOCType: "IP" }])
+      IOCS: this.state.IOCS.concat([{ data: "", IOCType: "IP", submitType: "option1" }])
     });
   };
 
@@ -69,7 +69,7 @@ class EventInsertForm extends React.Component {
     this.setState({
       EventName: evt.target.value
     });
-  }
+  };
 
   handleTypeChange = idx => evt => {
     const newIOCS = this.state.IOCS.map((IOC, sidx) => {
@@ -78,7 +78,16 @@ class EventInsertForm extends React.Component {
     });
 
     this.setState({ IOCS: newIOCS });
-  }
+  };
+
+  handleRadioChange = idx => evt => {
+    const newIOCS = this.state.IOCS.map((IOC, sidx) => {
+      if (idx !== sidx) return IOC;
+      return { ...IOC, submitType: evt.target.value };
+    });
+
+    this.setState({ IOCS: newIOCS });
+  };
 
   render() {
     return (
@@ -101,7 +110,7 @@ class EventInsertForm extends React.Component {
 
           {this.state.IOCS.map((IOC, idx) => (
             <Row>
-              <Col sm={{ size: 4 }} style={{ justifyContent: 'right' }}>
+              <Col sm={{ size: 3 }} style={{ justifyContent: 'right' }}>
                 <select
                   style={{
                     width: '50%',
@@ -124,7 +133,7 @@ class EventInsertForm extends React.Component {
                     ))}
                 </select>
               </Col> 
-              <Col md={{ size: 5, offset: 0 }}>
+              <Col md={{ size: 5 }}>
                 <Input
                   type="textarea"
                   placeholder={`IOC Values ${idx + 1} (sep = ',')`}
@@ -132,7 +141,7 @@ class EventInsertForm extends React.Component {
                   onChange={this.handleShareholderDataChange(idx)}
                 />
               </Col>
-              <Col sm={{ size: 3 }} >
+              <Col sm={{ size: 1 }} >
                 <button
                   type="button"
                   width="30%"
@@ -140,9 +149,46 @@ class EventInsertForm extends React.Component {
                   className="small"
                   style={{marginTop: "2%"}}
                 >
-                  <div> - Remove Row</div>
+                  <div> Remove Row</div>
                 </button>
               </Col> 
+              <Col sm={{ size: 1 }} >
+                <FormGroup>
+                  <label>
+                      <input
+                        type="radio"
+                        name={`Option1 ${idx + 1}`}
+                        value="option1"
+                        checked={IOC.submitType === "option1"}
+                        onChange={this.handleRadioChange(idx)}
+                        className="form-check-input"
+                      />
+                      Submit Unencrypted
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        ame={`Option2 ${idx + 1}`}
+                        value="option2"
+                        checked={IOC.submitType === "option2"}
+                        onChange={this.handleRadioChange(idx)}
+                        className="form-check-input"
+                      />
+                      Submit Encrypted
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        ame={`Option3 ${idx + 1}`}
+                        value="option3"
+                        checked={IOC.submitType === "option3"}
+                        onChange={this.handleRadioChange(idx)}
+                        className="form-check-input"
+                      />
+                      Do Not Submit
+                    </label>
+                </FormGroup>
+              </Col>
             </Row>
         ))}
           <Row>
