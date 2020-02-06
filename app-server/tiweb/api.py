@@ -605,15 +605,18 @@ def startEvent():
     res = request.get_json()
     os.environ['eventName'] = res['EventName']
 
-    print(res)
+    # print(res)
     for node in res['IOCS']:
         dataList = node['data'].split(',')
         dataList = list(map(str.strip, dataList))
-        print('Type:', node['IOCType'])
-        print('Data:', dataList)
 
         for data in dataList:
             status = insert(node['IOCType'], data)
+
+        print(type(dataList))
+        print(dataList)
+
+        # res = requests.post(cybexAPI, toSendData)
 
     return 'OK'
 
