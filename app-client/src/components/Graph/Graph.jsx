@@ -21,7 +21,7 @@ function InitializeGraph(data) {
     layout: { improvedLayout: true },
     height: '99vh',
     nodes: {
-      shape: 'circle',
+      shape: 'hexagon',
       widthConstraint: 100,
       font:{color:'white',strokeWidth:3,strokeColor:"black"}
     },
