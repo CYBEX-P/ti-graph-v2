@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Network } from 'vis';
 import PropTypes from 'prop-types';
 import { CircleLoader } from 'react-spinners';
-import { Card, CardText, CardBody, CardTitle } from 'reactstrap';
 
 import NetworkContext from '../App/DataContext';
 import RadialMenu from '../radialMenu/radialMenu';
@@ -82,19 +81,23 @@ const Graph = ({ isLoading }) => {
     // hoverNode fires whenever the mouse hovers over a node
     nw.on('hoverNode', e => {
       if (typeof data.Neo4j !== 'undefined') {
-        var count = JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties.count)
-        var countMal = JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties.countMal)
+        // nodeObj is the Neo4j object that representes the currently hovered node.
+        var nodeObj = data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node);
+        var count = JSON.stringify(nodeObj[0].properties.count);  
+        var countMal = JSON.stringify(nodeObj[0].properties.countMal)
         var percent;
-        if (count == 0 /*|| countMal == 0*/)
+        // Use non-malicious vs. malicious cybex counts to determine 'percent malicious'
+        if (count == 0 && countMal == 0) // Not enough data to determine
         {
           percent = "Threat Inconclusive"
         }
         else 
         {
+          // percent is malicious count divided by the sum of malicious count and benign count
           percent = (Number(countMal)/(Number(countMal)+Number(count))*100).toFixed(2);
           if (isNaN(percent))
           {
-            percent = ""
+            percent = "Enrich to analyze threat"
           }
           else
           {
@@ -103,14 +106,13 @@ const Graph = ({ isLoading }) => {
         }
         return setHoverText({
           // Set the hover text to the properties of the data
-          text: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties),
+          text: JSON.stringify(nodeObj[0].properties),
           x: e.event.clientX,
           y: e.event.clientY,
-          data: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties.data),
-          label: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].label),
-          color: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].color),
+          data: JSON.stringify(nodeObj[0].properties.data),
+          label: JSON.stringify(nodeObj[0].label),
+          color: JSON.stringify(nodeObj[0].color),
           percentMal: percent,
-          //countMalicious: Number(JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === e.node)[0].properties.countMal)),
         });
       }
       return setHoverText(null);
@@ -132,21 +134,14 @@ const Graph = ({ isLoading }) => {
           nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')';
         }
       });
-      // setSelectText({
-      //   label: "No Node Selected",
-      //   text: '',
-      //   data: "Select a node to see details.",
-      //   color: "white",
-      //   count: 'X',
-      //   countMalicious: 'X'
-      // })
       setSelectText(false)
     });
     nw.on('selectNode', (params) => {
       setSelection(nw.getSelection());
       var opacityBlurred = 0.1;
-      //console.log(nw.body.nodes)
       var nodeId = params.nodes[0];
+      // nodeObj is the Neo4j object that representes the currently hovered node. Note: Slightly different here than with on('hoverNode')
+      var nodeObj = data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId);
       Object.keys(nw.body.nodes).forEach(function(currentId){
         if (!currentId.includes("edgeId"))
         {
@@ -162,12 +157,12 @@ const Graph = ({ isLoading }) => {
       });
       setSelectText({
         // Set the select text to the properties of the data
-        text: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].properties),
-        data: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].properties.data),
-        label: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].label),
-        color: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].color),
-        count: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].properties.count),
-        countMalicious: JSON.stringify(data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId)[0].properties.countMal),
+        text: JSON.stringify(nodeObj[0].properties),
+        data: JSON.stringify(nodeObj[0].properties.data),
+        label: JSON.stringify(nodeObj[0].label),
+        color: JSON.stringify(nodeObj[0].color),
+        count: JSON.stringify(nodeObj[0].properties.count),
+        countMalicious: JSON.stringify(nodeObj[0].properties.countMal),
       });
     });
   
@@ -244,7 +239,6 @@ const Graph = ({ isLoading }) => {
 
   // HOC that returns the radial menu to use
   const RadialToRender = withNodeType(RadialMenu, selectedNodeType, setNeo4jData, config);
-  
 
   return (
     <div style={{ display: 'grid', gridTemplateRows: '56px auto' }}>
@@ -261,13 +255,13 @@ const Graph = ({ isLoading }) => {
           backgroundColor: '#232323'
         }}
       />
-      {!filterState && (
+      {/* TODO: Turn filter box into seperate component */}
+      {!filterState && ( 
         <div style={{
           position:"absolute",
           right:"10px",
           top:"65px",
           zIndex: 5,
-          // backgroundColor: '#111', // Used for classic Card styling only.
           backgroundColor: "black",
           color: "white",
           opacity: "0.95",
@@ -401,16 +395,18 @@ const Graph = ({ isLoading }) => {
           style={{
             gridRow: '2',
             gridColumn: 1,
-            backgroundColor: '#e0e0e0dd',
+            backgroundColor: 'black',
             zIndex: 10,
-            display: 'grid'
+            display: 'grid',
+            opacity: 0.9
           }}
         >
-          <div style={{ justifySelf: 'center', alignSelf: 'end', fontSize: '24px', width: '80px' }}>Loading</div>
+          <div style={{ justifySelf: 'center', alignSelf: 'end', fontSize: '24px', width: '80px', color: 'white',opacity: 1}}>Loading</div>
           <div
             style={{
               alignSelf: 'start',
-              justifySelf: 'center'
+              justifySelf: 'center',
+              opacity: 1
             }}
           >
             <CircleLoader color="#00cbcc" />
@@ -418,6 +414,7 @@ const Graph = ({ isLoading }) => {
         </div>
       )}
       {radialPosition && <RadialToRender position={radialPosition} network={network} scale={network.getScale()} />}
+      {/* TODO: Turn hoverText box into seperate component */}
       {hoverText && (
         <div
           style={{
@@ -451,6 +448,7 @@ const Graph = ({ isLoading }) => {
           )}
         </div>
       )}
+      {/* TODO: Turn selectText box into seperate component */}
       {selectText && (
         <div style={{
           position:"absolute",
