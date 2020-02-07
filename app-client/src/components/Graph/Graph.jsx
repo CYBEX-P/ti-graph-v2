@@ -21,7 +21,9 @@ function InitializeGraph(data) {
     layout: { improvedLayout: true },
     height: '99vh',
     nodes: {
-      shape: 'hexagon',
+      shape: 'circularImage',
+      image: '/static/svg/svg_ip.svg',
+      borderWidth: 4,
       widthConstraint: 100,
       font:{color:'white',strokeWidth:3,strokeColor:"black"}
     },
