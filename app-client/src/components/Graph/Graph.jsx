@@ -22,8 +22,9 @@ function InitializeGraph(data) {
     height: '99vh',
     nodes: {
       shape: 'circularImage',
-      image: '/static/svg/svg_ip.svg',
+      image: '/static/SVG/DataAnalytics/svg_other.svg',
       borderWidth: 4,
+      color: {border:'white'},
       widthConstraint: 100,
       font:{color:'white',strokeWidth:3,strokeColor:"black"}
     },

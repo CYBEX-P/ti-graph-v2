@@ -22,6 +22,7 @@ def processExport(dataObject):
                     #     threatLevel = 0
             key['label'] = key['label'][0]
             if key['label'] == 'IP':
+                key['image'] = '/static/SVG/DataAnalytics/svg_ip.svg'
                 if threatLevel == 0:
                     key['color'] = 'rgba(151,252,158,1)'
                 elif threatLevel == 1:
@@ -34,6 +35,7 @@ def processExport(dataObject):
                     key['color'] = 'rgba(151,194,252,1)'
                 #key['widthConstraint'] = 120
             elif key['label'] == 'Host':
+                key['image'] = '/static/SVG/DataAnalytics/svg_host.svg'
                 #key['color'] = '#FB7E81'
                 #key['color'] = 'rgba(247, 151, 77, 1)'
                 key['color'] = 'rgba(151,194,252,1)'
@@ -61,10 +63,12 @@ def processExport(dataObject):
                 #key['color'] = '#8CB369'
                 #key['color'] = 'rgba(168, 50, 50)'
                 key['color'] = 'rgba(151,194,252,1)'
+                key['image'] = '/static/SVG/DataAnalytics/svg_asn.svg'
             elif key['label'] == 'Country':
                 #key['color'] = '#F4A259'
                 #key['color'] = 'rgba(247, 151, 77, 1)'
                 key['color'] = 'rgba(151,194,252,1)'
+                key['image'] = '/static/SVG/DataAnalytics/svg_country_alt.svg'
             elif key['label'] == 'BTC':
                 key['color'] = '#3185FC'
             elif key['label'] == 'MAC':
@@ -85,12 +89,14 @@ def processExport(dataObject):
                     #key['color'] = 'rgba(151,252,158,1)'
                     key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Ports':
+                key['image'] = '/static/SVG/DataAnalytics/svg_ports.svg'
                 #key['color'] = "#ff41e2"
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Whois':
                 #key['color'] = "#4070f4"
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Subnet':
+                key['image'] = '/static/SVG/DataAnalytics/svg_subnet.svg'
                 #key['color'] = "#eeee58"
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Registrar':
@@ -109,8 +115,9 @@ def processExport(dataObject):
                 key['color'] = 'rgba(151,194,252,1)'
                 key['shape'] = 'hexagon'
             else:
-                key['color'] = 'rgba(151,194,252,1)'
-                key['shape'] = 'hexagon'
+                # key['color'] = 'rgba(151,194,252,1)'
+                #key['shape'] = 'hexagon'
+                key['color'] = 'rgba(255,255,255,1)'
                 #key['color'] = 'rgba(151,252,158,1)', 
             
 
