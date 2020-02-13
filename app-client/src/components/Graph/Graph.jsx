@@ -24,7 +24,7 @@ function InitializeGraph(data) {
       shape: 'circularImage',
       image: '/static/SVG/DataAnalytics/svg_other.svg',
       borderWidth: 4,
-      color: {border:'white'},
+      color: {border:'white',background:'white'},
       widthConstraint: 100,
       font:{color:'white',strokeWidth:3,strokeColor:"black"}
     },

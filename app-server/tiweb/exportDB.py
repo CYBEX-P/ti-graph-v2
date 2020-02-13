@@ -10,7 +10,8 @@ def processExport(dataObject):
             # Before assigning color, referene malicious counts to assign threat level.
             threatLevel = -1 #default to -1 for inconclusive threat level
             if 'countMal' in str(key):
-                if (key['properties']['countMal'] != 0) and (key['properties']['count'] != 0):
+                if (key['properties']['count'] != 0):
+                #if (key['properties']['countMal'] != 0) and (key['properties']['count'] != 0):
                     ratioMal = key['properties']['countMal']/(key['properties']['count'] + key['properties']['countMal'])
                     if ratioMal == 0:
                         threatLevel = 0
@@ -40,6 +41,7 @@ def processExport(dataObject):
                 #key['color'] = 'rgba(247, 151, 77, 1)'
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'URL':
+                key['image'] = '/static/SVG/DataAnalytics/svg_ip.svg'
                 if threatLevel == 0:
                     key['color'] = 'rgba(151,252,158,1)'
                 elif threatLevel == 1:
@@ -55,6 +57,7 @@ def processExport(dataObject):
             elif key['label'] == 'DPort':
                 key['color'] = '#5B8E7D'
             elif key['label'] == 'Email':
+                key['image'] = '/static/SVG/DataAnalytics/svg_email.svg'
                 #key['color'] = '#34E5FF'
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Hash':
@@ -64,6 +67,12 @@ def processExport(dataObject):
                 #key['color'] = 'rgba(168, 50, 50)'
                 key['color'] = 'rgba(151,194,252,1)'
                 key['image'] = '/static/SVG/DataAnalytics/svg_asn.svg'
+                if threatLevel == 0:
+                    key['color'] = 'rgba(151,252,158,1)'
+                elif threatLevel == 1:
+                    key['color'] = 'rgba(255,222,0,1)'
+                elif threatLevel == 2:
+                    key['color'] = 'rgba(168,50,50,1)'
             elif key['label'] == 'Country':
                 #key['color'] = '#F4A259'
                 #key['color'] = 'rgba(247, 151, 77, 1)'
@@ -78,6 +87,7 @@ def processExport(dataObject):
             elif key['label'] == 'SSID':
                 key['color'] = '#E8E8E8'
             elif key['label'] == 'Domain':
+                key['image'] = '/static/SVG/DataAnalytics/svg_ip.svg'
                 if threatLevel == 0:
                     key['color'] = 'rgba(151,252,158,1)'
                 elif threatLevel == 1:
@@ -100,10 +110,12 @@ def processExport(dataObject):
                 #key['color'] = "#eeee58"
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Registrar':
+                key['image'] = '/static/SVG/DataAnalytics/svg_registrar.svg'
                 key['color'] = "#06de9e"
             elif key['label'] == 'Nameserver':
                 key['color'] = "#cf4cf3"
             elif key['label'] == 'MailServer':
+                key['image'] = '/static/SVG/DataAnalytics/svg_mail.svg'
                 key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'User':
                 key['color'] = "#d8e5f6"
