@@ -108,7 +108,7 @@ const App = props => {
               <h3 style={{paddingLeft: "20%", paddingRight: "25%", marginLeft: "20%", marginTop: "5%",color:"white"}}>Macros</h3>
               <hr style={{marginLeft: "12.5%"}}/>
               <div style={{marginLeft: "20%", marginTop: "5%", backgroundColor: "white",borderRadius:'5px',padding:'5px',paddingLeft:"20%",boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"}}>
-                Macro 1
+                All Enrichments
                 <div
                   style={{display:"inline"}}
                   >
@@ -144,7 +144,7 @@ const App = props => {
                 </div>  
               </div>
               <div style={{marginLeft: "20%", marginTop: "5%", backgroundColor: "white",borderRadius:'5px',padding:'5px',paddingLeft:"20%",boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"}}>
-                Macro 2
+                CYBEX-P
                 <div style={{display:"inline"}}>
                   <FontAwesomeIcon 
                     size="lg" 

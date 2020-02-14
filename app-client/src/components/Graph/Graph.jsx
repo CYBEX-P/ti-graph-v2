@@ -24,12 +24,14 @@ function InitializeGraph(data) {
       shape: 'circularImage',
       image: '/static/SVG/DataAnalytics/svg_other.svg',
       borderWidth: 4,
-      color: {border:'white',background:'white'},
+      color: {border:'rgba(151,194,252,1)',background:'rgba(151,194,252,1)'},
       widthConstraint: 100,
       font:{color:'white',strokeWidth:3,strokeColor:"black"}
     },
     edges: {
-      length: 200
+      length: 200,
+      //color: {'inherit':false},
+      //dashes: true
     },
     interaction: {
       hover: true,
@@ -114,7 +116,7 @@ const Graph = ({ isLoading }) => {
           y: e.event.clientY,
           data: JSON.stringify(nodeObj[0].properties.data),
           label: JSON.stringify(nodeObj[0].label),
-          color: JSON.stringify(nodeObj[0].color),
+          color: JSON.stringify(nodeObj[0].color.background),
           percentMal: percent,
         });
       }
@@ -130,11 +132,15 @@ const Graph = ({ isLoading }) => {
       Object.keys(nw.body.nodes).forEach(function(currentId){
         if (!currentId.includes("edgeId"))
         {
+          // Need to store both background and border color
           var orgColorStr = nw.body.nodes[currentId].options.color.background;
+          var orgBrdColorStr = nw.body.nodes[currentId].options.color.border;
           // split color string into array with indices corresponding to r,g,b, and a
           var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
+          var orgBrdColorArr = orgBrdColorStr.split('(')[1].split(')')[0].split(',');
           var opacityNormal = 1;
           nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')';
+          nw.body.nodes[currentId].options.color.border = 'rgb('+orgBrdColorArr[0]+',' + orgBrdColorArr[1] + ',' + orgBrdColorArr[2]+','+opacityNormal+')';
         }
       });
       setSelectText(false)
@@ -150,11 +156,14 @@ const Graph = ({ isLoading }) => {
         {
           if (currentId != nodeId)
           {
+            // Need to store both background and border color
             var orgColorStr = nw.body.nodes[currentId].options.color.background;
+            var orgBrdColorStr = nw.body.nodes[currentId].options.color.border;
             // split color string into array with indices corresponding to r,g,b, and a
             var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
+            var orgBrdColorArr = orgBrdColorStr.split('(')[1].split(')')[0].split(',');
             nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
-            nw.body.nodes[currentId].options.color.border = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
+            nw.body.nodes[currentId].options.color.border = 'rgb('+orgBrdColorArr[0]+',' + orgBrdColorArr[1] + ',' + orgBrdColorArr[2]+','+opacityBlurred+')';
           }
         }
       });
@@ -163,12 +172,11 @@ const Graph = ({ isLoading }) => {
         text: JSON.stringify(nodeObj[0].properties),
         data: JSON.stringify(nodeObj[0].properties.data),
         label: JSON.stringify(nodeObj[0].label),
-        color: JSON.stringify(nodeObj[0].color),
+        color: JSON.stringify(nodeObj[0].color.background),
         count: JSON.stringify(nodeObj[0].properties.count),
         countMalicious: JSON.stringify(nodeObj[0].properties.countMal),
       });
     });
-  
 
     // Set state when drag starts and ends. Used to determine whether to draw radial menu or not
     nw.on('dragStart', () => {

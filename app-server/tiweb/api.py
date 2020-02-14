@@ -429,7 +429,7 @@ def cybexCount():
     print("Fetching cybexCount...")
     r = requests.post(url, headers=headers, data=data)
     res = json.loads(r.text)
-    print(res)
+    #print(res)
 
     # Next, query malicious count
     urlMal = "http://cybexp1.acs.unr.edu:5000/api/v1.0/count/malicious"
@@ -439,7 +439,7 @@ def cybexCount():
     print("Fetching cybexCountMalicious...")
     rMal = requests.post(urlMal, headers=headersMal, data=dataMal)
     resMal = json.loads(rMal.text)
-    print(resMal)
+    #print(resMal)
 
     try:
         numOccur = res["data"]
