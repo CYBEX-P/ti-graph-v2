@@ -15,6 +15,7 @@ const InsertForm = props => {
 
   const [selectedIOC, setSelectedIOC] = useState('IP');
   const [selectedIOC2, setSelectedIOC2] = useState('IP');
+  const [selectedIOC3, setSelectedIOC3] = useState('IP');
 
   function handleInsertIP(values, actions) {
     const { ipToInsert } = values;
@@ -164,6 +165,16 @@ const InsertForm = props => {
     actions.setSubmitting(false);
   }
 
+  function handleHighlightNode(values, actions) {
+    const { dataToHighlight ,  typeToHighlight  } = values;
+    
+    axios.get('/api/v1/neo4j/export')
+          .then(({ data }) => {
+            setNeo4jData(data);
+          })
+          .catch(() => {});
+  }
+
   return (
     <>
       {/* Insert data */}
@@ -287,7 +298,66 @@ const InsertForm = props => {
           </form>
         )}
       />
+       {/* Highlights */}
+
+      {/* selectedIOC3 select */}
+      <Formik
+        onSubmit={handleHighlightNode}
+        initialValues={{ dataToHighlight: 'none',  typeToHighlight: 'IP'}}
+        render={({ values, handleChange, handleSubmit }) => (
+
+          <form onSubmit={handleSubmit}>
+            <select
+              style={{marginTop:"150px", width: '100%', height: '36px', backgroundColor: '#232323', color: 'white',border:"none" }}
+              name="IOCType2"
+              value={values.IOCType2}
+              onChange={e => {
+                handleChange(e);
+                setSelectedIOC3(e.target.value);
+              }}
+            >
+              {typeof props.config !== 'undefined' &&
+                typeof props.config.types !== 'undefined' &&
+                props.config.types.map(item => (
+                  <option value={item} label={item} key={item}>
+                    {item}
+                  </option>
+                ))}
+            </select>
+            
+            {/* data select */}
+
+            <select
+              style={{ marginTop:"10px",marginBottom:"10px", width: '100%', height: '36px', color: 'white', backgroundColor: '#232323',border:"none" }}
+              name="dataToHighlight"
+              value={values.dataToHighlight}
+              onChange={handleChange}
+            >
+              <option value="none">None</option>
+              {neo4jData &&
+                neo4jData.Neo4j[0].map(({ nodes }) =>
+                  nodes.filter(node => node.label === selectedIOC3)
+                  .map(({ label, properties, id }) => {
+                    return (
+                      properties.data && label && (
+                        <option key={id} value={properties.data} label={properties.data}>
+                          {properties.data}
+                        </option>
+                      )
+                    );
+                  })
+                )}
+
+            </select>
+            <Button width="100%" type="submit" onClickFunction={() => {}}>
+              Highlight Node
+            </Button>
+          </form>
+        )}
+      />
     </>
+
+    
   );
 };
 
