@@ -375,7 +375,6 @@ def exportNeoDB():
     graph = connect2graph()
     return jsonify(processExport(export(graph)))
 
-
 # @app.route('/neo4j/load')
 # def load_function():
 #     full_load()
