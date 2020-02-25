@@ -169,13 +169,15 @@ const InsertForm = props => {
     const { dataToHighlight ,  typeToHighlight  } = values;
     
     setLoading(true);
-    const data = neo4jData;
-    console.log(data);
-    data['Neo4j'][0][0]['nodes'][0]['color'] = "rgba(255,252,255,1)";
-    data['Neo4j'][0][0]['nodes'][0]['highlighted'] = 1;
-    setNeo4jData(data);
-    console.log(data);
-    setLoading(false);
+    axios
+              .get('/api/v1/neo4j/export')
+              .then(response => {
+                const data = response.data;
+                data['Neo4j'][0][0]['nodes'][0]['color'] = "rgba(	204, 255, 0, 1)";
+                setNeo4jData(data);
+                setLoading(false);
+              })
+    console.log(neo4jData)
   }
 
   return (

@@ -6,12 +6,6 @@ import json
 def processExport(dataObject):
     for x in dataObject["Neo4j"][0]:
         for key in x['nodes']:
-            try:
-                if key['highlighted'] == 1:
-                    continue
-            except:
-                pass
-            
             #print(x['nodes'])
             # Before assigning color, referene malicious counts to assign threat level.
             threatLevel = -1 #default to -1 for inconclusive threat level
