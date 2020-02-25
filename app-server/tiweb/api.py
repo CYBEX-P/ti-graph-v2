@@ -603,9 +603,11 @@ def sendConfig():
 @login_required
 def startEvent():
     res = request.get_json()
+    print(res)
     os.environ['eventName'] = res['EventName']
 
-    # print(res)
+    sendDict = {}
+
     for node in res['IOCS']:
         dataList = node['data'].split(',')
         dataList = list(map(str.strip, dataList))
@@ -613,11 +615,40 @@ def startEvent():
         for data in dataList:
             status = insert(node['IOCType'], data)
 
-        print(type(dataList))
-        print(dataList)
+        if node['submitType'] == 'option1' or node['submitType'] == 'option2':
+            print("sent", str(node), "to cybex")
+            # send code CHECK WITH FARHAN IF IT WORKS
 
-        # res = requests.post(cybexAPI, toSendData)
+            # url = "http://cybexp1.acs.unr.edu:5000"
+            # token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwianRpIjoiZWFhNDUzOWEtZjE5Yy00OWFiLThjNjktZTc4MDJiYmY5MmVhIiwiaWRlbnRpdHkiOiJhZG1pbiIsImZyZXNoIjpmYWxzZSwiaWF0IjoxNTU3MzYzNjI2LCJuYmYiOjE1NTczNjM2MjZ9.PcKIqxjlPGZQGeCyOakjYeKPPaVQvPhFSbrwJzeDTWc"
 
+            # event = node
+
+            # if isinstance(event, dict):
+            #     event = json.dumps(event)
+            # data = event.encode()
+            # files = {"file": data}
+            # headers = {"Authorization": "Bearer " + token}
+
+            # with requests.post(
+            #     url,
+            #     files=files,
+            #     headers=headers,
+            #     data={
+            #         "orgid": "ac2e71cb-8e61-4144-a716-833280f54c96",
+            #         "typtag": "cici_neo4j",
+            #         "timezone": "US/Pacific",
+            #         "name": "CICI Neo4j",
+            #     },
+            # ) as r:
+            #     print(r.status_code)
+            #     if r.status_code >=200 and r.status_coe < 400:
+            #         print("no error sending to cybex")
+                    
+            #     else:
+            #         print('error sending to cybex')
+            
+            # end send code
     return 'OK'
 
 # @app.route('/event/getName', methods=['GET'])
