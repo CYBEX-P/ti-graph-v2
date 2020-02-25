@@ -173,11 +173,20 @@ const InsertForm = props => {
               .get('/api/v1/neo4j/export')
               .then(response => {
                 const data = response.data;
-                data['Neo4j'][0][0]['nodes'][0]['color'] = "rgba(	204, 255, 0, 1)";
+
+                var idx = -1;
+
+                for (var num in data['Neo4j'][0][0]['nodes']) {
+                  if (data['Neo4j'][0][0]['nodes'][num].properties.data === dataToHighlight) {
+                    idx = num;
+                    break;
+                  }
+                }
+
+                data['Neo4j'][0][0]['nodes'][idx]['color'] = "rgba(	204, 255, 0, 1)";
                 setNeo4jData(data);
                 setLoading(false);
               })
-    console.log(neo4jData)
   }
 
   return (
