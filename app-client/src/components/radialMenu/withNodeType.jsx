@@ -22,7 +22,7 @@ function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
     setLoading(true);
     if (type === "cybexCount" || type === "cybexRelated"){
       axios
-        .post(`/api/v1/enrich/${type}`, {Ntype: `${nodeType.label}`, value: `${nodeType.properties.data}`})
+        .post(`/api/v1/enrich/${type}`, {Ntype: `${nodeType.properties.type}`, value: `${nodeType.properties.data}`})
         .then(({ data }) => {
           if (data['insert status'] !== 0) {
             axios
@@ -109,14 +109,15 @@ function withNodeType(RadialMenuComponent, nodeType, setNeo4jData, config) {
   // If the selected node is a supported enrichment type (from config.yaml), then
   // the enrichment list is derived from there. If not supported (current example is when 
   // when querying cybexRelated attributes), default to 'Other' type.
+  //*MODIFIED: Changed nodeType.label to nodeType.properties.type to detach radial logic from labels */
   var nodeLabel;
-  if (config.enrichments[`${nodeType.label}`] == undefined)
+  if (config.enrichments[`${nodeType.properties.type}`] == undefined)
   {
     nodeLabel = 'Other';
   }
   else
   {
-    nodeLabel = nodeType.label
+    nodeLabel = nodeType.properties.type
   }
   onClickFns = config.enrichments[`${nodeLabel}`].map(enrichmentType => () => {
     return EnrichIPbyType(enrichmentType);

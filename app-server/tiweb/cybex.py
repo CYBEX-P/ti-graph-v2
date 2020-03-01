@@ -1,4 +1,5 @@
 from py2neo import Graph, Node, Relationship
+from exportDB import bucket
 import json
 
 def insertCybex(data, graph, value):
@@ -45,8 +46,8 @@ def insertRelated(data, graph, value):
 #             <string>value - JSON data for the originating node
 # Returns: 1 if successful
 # Author: Adam Cassell
-def insertCybexCount(numOccur,numMal,graph,Ntype,value):
-    ip_node = graph.nodes.match(data=value).first()
+def insertCybexCount(numOccur,numMal,graph,value,nType):
+    ip_node = graph.nodes.match(nType,data=value).first()
     if(ip_node):
             ip_node["count"] = numOccur
             ip_node["countMal"] = numMal
@@ -66,6 +67,7 @@ def insertRelatedAttributes(data,graph,value):
     data = data.replace("'",'"',) # Converts string to proper JSON using "" instead of ''
     dataDict = json.loads(data) # convert json string to dict
     for attr,val in dataDict["data"].items(): # iterate over all related attributes..
+        attr = bucket(attr)
         valString = ""
         for each in val:
         #     valString = valString + str(each) + ','

@@ -43,6 +43,7 @@ function InitializeGraph(data) {
   return nw;
 }
 
+
 const Graph = ({ isLoading }) => {
   const { neo4jData, setNeo4jData, config } = useContext(NetworkContext);
 
@@ -117,6 +118,7 @@ const Graph = ({ isLoading }) => {
           data: JSON.stringify(nodeObj[0].properties.data),
           label: JSON.stringify(nodeObj[0].label),
           color: JSON.stringify(nodeObj[0].color.background),
+          type: JSON.stringify(nodeObj[0].properties.type),
           percentMal: percent,
         });
       }
@@ -175,6 +177,7 @@ const Graph = ({ isLoading }) => {
         color: JSON.stringify(nodeObj[0].color.background),
         count: JSON.stringify(nodeObj[0].properties.count),
         countMalicious: JSON.stringify(nodeObj[0].properties.countMal),
+        type: JSON.stringify(nodeObj[0].properties.type)
       });
     });
 
@@ -437,7 +440,7 @@ const Graph = ({ isLoading }) => {
                 pointerEvents: 'none',
                 backgroundColor: "black",
                 color: "white",
-                opacity: "0.95",
+                opacity: "0.85",
                 borderRadius: "10px",
                 padding: "10px",
                 boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
@@ -447,7 +450,7 @@ const Graph = ({ isLoading }) => {
             color: hoverText.color.replace(/"/g,""),
             textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
           }}>
-            <b>{hoverText.label.replace(/"/g,"")}</b>
+            <b>{hoverText.type.replace(/"/g,"")}</b>
           </h4>
           <hr/>
           <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
@@ -482,18 +485,19 @@ const Graph = ({ isLoading }) => {
             color: selectText.color.replace(/"/g,""),
             //textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
           }}>
-            <b>{selectText.label.replace(/"/g,"")}</b>
+            <b>{selectText.type.replace(/"/g,"")}</b>
           </h4>
           <h6 style={{textAlign:"center"}}>{selectText.data.replace(/"/g,"")}</h6>
           <div style={{color:"white",fontSize:"large"}}>
             <h5>Details</h5>
-            <h6>Cybex Count:</h6>
+            <hr/>
+            <h6>CYBEX Count:</h6>
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
               Benign = {selectText.count}, Malicious = {selectText.countMalicious}
-            <hr/>
-            <h5>Highlight Related:</h5>
+            {/* <hr/> */}
+            {/* <h5>Highlight Related:</h5>
             <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px",marginRight:'10px'}}>Attributes</button>
-            <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px"}}>Events</button>
+            <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px"}}>Events</button> */}
           </div>
         </div>
       )}

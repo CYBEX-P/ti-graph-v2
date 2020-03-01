@@ -21,8 +21,9 @@ def processExport(dataObject):
                         threatLevel = 2
                     # else: 
                     #     threatLevel = 0
-            key['label'] = bucket(key['label'][0])
-            
+            #key['label'] = bucket(key['label'][0])
+            key['label'] = key['label'][0]
+            key['properties']['type'] = key['label']
             # Initialize color defaults and set special color classes
             key['color'] = {'border':'rgba(151,194,252,1)','background':'rgba(151,194,252,1)'}
             # if 'source' in key['properties']:
@@ -128,11 +129,19 @@ def processExport(dataObject):
                 #key['color'] = "#92fd6c"
                 key['color'] = 'rgba(151,194,252,1)'
                 key['shape'] = 'hexagon'
-            # else:
+            else:
+                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
             #     # key['color'] = 'rgba(151,194,252,1)'
             #     #key['shape'] = 'hexagon'
             #     key['color'] = 'rgba(255,255,255,1)'
             #     #key['color'] = 'rgba(151,252,158,1)', 
+
+            # Change label to represent the actual node data, rather than node type
+            # Original logic relied on label property, so this is a stopgap measure.
+            # Ideally, all prior logic should be rewritten to not use IOC type as label.
+            # New property.type in nodedata now exists to contain this information.
+            labelString = str(key['properties']['data'])
+            key['label'] = (labelString[:11] + '...') if len(labelString) > 14 else labelString  
 
     for x in dataObject["Neo4j"][1]:
         for key in x['edges']:
@@ -160,13 +169,13 @@ def threatColor(threatLevel):
     return color
 
 def bucket(label):
-    if label == 'ip':
+    if label == 'ip' or label == 'ipv4':
         label = 'IP'
     elif label == 'asn':
         label = 'ASN'
     elif label == 'port':
         label = 'Ports'
-    elif label == 'url':
+    elif label == 'url' or label == 'uri' or label == 'url-t':
         label = 'URL'
     elif label == 'domain':
         label = 'Domain'
