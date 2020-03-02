@@ -108,7 +108,7 @@ const App = props => {
               <h3 style={{paddingLeft: "20%", paddingRight: "25%", marginLeft: "20%", marginTop: "5%",color:"white"}}>Macros</h3>
               <hr style={{marginLeft: "12.5%"}}/>
               <div style={{marginLeft: "20%", marginTop: "5%", backgroundColor: "white",borderRadius:'5px',padding:'5px',paddingLeft:"20%",boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"}}>
-                Macro 1
+                Phishing
                 <div
                   style={{display:"inline"}}
                   >
@@ -144,8 +144,27 @@ const App = props => {
                 </div>  
               </div>
               <div style={{marginLeft: "20%", marginTop: "5%", backgroundColor: "white",borderRadius:'5px',padding:'5px',paddingLeft:"20%",boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"}}>
-                Macro 2
-                <div style={{display:"inline"}}>
+                CYBEX-P
+                <div 
+                  style={{display:"inline"}}
+                  onClick={() => {
+                    setLoading(true);
+                    axios.get('/api/v1/macroCybex')
+                    .then(() => {
+                      axios
+                        .get('/api/v1/neo4j/export')
+                        .then(({ data }) => {
+                          setNeo4jData(data);
+                          setLoading(false);
+                        })
+                        .catch(() => {
+                          dispatchModal('Error');
+                          setLoading(false);
+                        });
+                      })
+                      //setLoading(false);
+                    }}
+                >
                   <FontAwesomeIcon 
                     size="lg" 
                     icon={faPlayCircle} 
@@ -172,13 +191,13 @@ const App = props => {
                       position: "fixed",
                       minHeight:"25%", 
                       maxHeight:"87%",
-                      width: '25%',
+                      maxWidth: '300px',
                       top:'56px', 
                       left: "334px",
                       padding: '10px',
                       backgroundColor:"black",
                       color:"white",
-                      opacity:'0.95',
+                      opacity:'0.9',
                       borderRadius:'15px',
                       border:'solid',
                       borderColor:'#0277bd',
@@ -203,7 +222,7 @@ const App = props => {
                       <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{float:'right'}}/>
                     </div>
                     <FontAwesomeIcon size="2x" icon={faInfoCircle} style={{float:'left',color:'#0277bd'}}/>
-                    <h4 style={{textAlign:'center'}}>Macro 1 Details</h4>
+                    <h4 style={{textAlign:'center'}}>Phishing Macro Details</h4>
                     <hr></hr>
                     <div style={{display:'inline-block',margin:'10px'}}>
                       <h6>URL</h6>
@@ -266,7 +285,8 @@ const App = props => {
                   backgroundColor: '#171717',
                   color:'white',
                   display: 'grid',
-                  gridTemplateRows: '150px 110px 70px auto',
+                  // gridTemplateRows: '150px 110px 70px auto',
+                  gridTemplateRows: 'auto',
                   justifyContent: 'center',
                   gridTemplateColumns: '80%',
                   paddingTop:"20px"

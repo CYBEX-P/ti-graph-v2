@@ -31,7 +31,7 @@ from gip import geoip, ASN, geoip_insert, asn_insert
 from wipe_db import wipeDB
 from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
-from exportDB import export, processExport
+from exportDB import export, processExport, bucket
 from cybex import insertCybex, insertRelated, replaceType, insertRelatedAttributes, insertCybexCount
 from enrichments import insert_domain_and_user, insert_domain, insert_netblock, resolveHost, getNameservers, getRegistrar, getMailServer
 
@@ -415,41 +415,53 @@ def insert(Ntype, data):
 @app.route('/api/v1/enrich/cybexCount', methods = ['POST'])
 @login_required
 def cybexCount():
-    graph = connect2graph()
     req = request.get_json()
     Ntype = str(req['Ntype'])
-    Ntype1 = replaceType(Ntype)
     data1 = req['value']
+    status = cybexCountHandler(Ntype,data1)
+
+    
+    return jsonify({"insert status" : status})
+
+# Description: Handler for cybexCount() and also designed to be called seperately
+# Parameters: <string>Ntype - The type of the originating node
+#             <string>data1 - JSON data for the originating node
+# Returns: 1 if successful
+# Author: Adam Cassell
+def cybexCountHandler(Ntype,data1):
+    graph = connect2graph()
+    Ntype1 = replaceType(Ntype)
 
     # First, query total count
     url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/count"
     headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
-    data = { Ntype1 : data1, "from" : "2019/8/30 00:00", "to" : "2019/12/5 6:00am", "tzname" : "US/Pacific" }
+    data = { Ntype1 : data1, "from" : "2019/8/30 00:00", "to" : "2020/3/1 6:00am", "tzname" : "US/Pacific" }
     data = json.dumps(data)
     print("Fetching cybexCount...")
     r = requests.post(url, headers=headers, data=data)
     res = json.loads(r.text)
-    print(res)
+    #print(res)
 
     # Next, query malicious count
     urlMal = "http://cybexp1.acs.unr.edu:5000/api/v1.0/count/malicious"
     headersMal = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
-    dataMal = { Ntype1 : data1, "from" : "2019/8/30 00:00", "to" : "2019/12/5 6:00am", "tzname" : "US/Pacific" }
+    dataMal = { Ntype1 : data1, "from" : "2019/8/30 00:00", "to" : "2020/3/1 6:00am", "tzname" : "US/Pacific" }
     dataMal = json.dumps(dataMal)
     print("Fetching cybexCountMalicious...")
     rMal = requests.post(urlMal, headers=headersMal, data=dataMal)
     resMal = json.loads(rMal.text)
-    print(resMal)
+    #print(resMal)
 
     try:
         numOccur = res["data"]
         numMal = resMal["data"]
         #status = insertCybex(numOccur, graph, data1)
-        status = insertCybexCount(numOccur,numMal,graph,Ntype1,data1)
-        return jsonify({"insert status" : status})
+        status = insertCybexCount(numOccur,numMal,graph,data1,Ntype)
+        #return jsonify({"insert status" : status})
+        return status
 
     except:
-        return jsonify({"insert status" : 0})
+        return 0
 
 @app.route('/api/v1/enrich/cybexRelated', methods = ['POST'])
 @login_required
@@ -480,7 +492,7 @@ def CybexRelated():
 
 @app.route('/api/v1/enrich/<enrich_type>/<value>')
 @login_required
-def enrich(enrich_type, value):
+def enrich(enrich_type, value, node_type = None):
     graph = connect2graph()
     if(enrich_type == "asn"):
             a_results = ASN(value)
@@ -530,6 +542,10 @@ def enrich(enrich_type, value):
 
     elif enrich_type == "mailservers":
             status = getMailServer(value, graph)
+            return jsonify({"insert status" : status})
+    elif enrich_type == "cybexCount":
+            #status = insertCybexCount(value, graph)
+            status = cybexCountHandler(node_type,value)
             return jsonify({"insert status" : status})
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
@@ -684,19 +700,20 @@ def macro1():
 
     for node in nodes:
         value = node["properties"]["data"]
+        nType = node["properties"]["type"]
         print("--> Enriching", value)
 
-        if node["label"] == "URL": 
+        if nType == "URL": 
             # deconstruct URL
             status = insert_domain(value, graph)
             print(str(status))
 
-        elif node["label"] == "Email":
+        elif nType == "Email":
             # deconstruct Email
             status = insert_domain_and_user(value, graph)
             print(str(status))
 
-        elif node["label"] == "Host":
+        elif nType == "Host":
             # resolve IP, MX, nameservers
             try:
                 status1 = resolveHost(value, graph)
@@ -717,7 +734,7 @@ def macro1():
             except:
                 print("No registrar")
         
-        elif node["label"] == "Domain":
+        elif nType == "Domain":
             # resolve IP, MX, nameservers
             try:
                 status1 = resolveHost(value, graph)
@@ -738,7 +755,7 @@ def macro1():
             except:
                 print("No registrar")
 
-        elif node["label"] == "IP":
+        elif nType == "IP":
             # enrich all + ports + netblock 
             enrich('asn', value)
             enrich('gip', value)
@@ -751,6 +768,23 @@ def macro1():
             status2 = insert_netblock(value, graph)
         
         print("Done with", str(value))
+
+    return jsonify(nodes)
+
+@app.route('/api/v1/macroCybex')
+@login_required
+def macroCybex():
+    graph = connect2graph()
+    data = processExport(export(graph))
+    nodes = data["Neo4j"][0][0]["nodes"]
+
+    for node in nodes:
+        value = node["properties"]["data"]
+        nType = node["properties"]["type"]
+        if nType == "URL" or nType == "Host" or nType == "Domain" or nType == "IP" or nType == "ASN" or nType == "filename": 
+            print("--> Enriching", value)
+            enrich('cybexCount',value, nType)
+            print("Done with", str(value))
 
     return jsonify(nodes)
 
