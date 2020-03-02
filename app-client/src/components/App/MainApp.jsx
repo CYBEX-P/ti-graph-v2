@@ -285,7 +285,8 @@ const App = props => {
                   backgroundColor: '#171717',
                   color:'white',
                   display: 'grid',
-                  gridTemplateRows: '150px 110px 70px auto',
+                  // gridTemplateRows: '150px 110px 70px auto',
+                  gridTemplateRows: 'auto',
                   justifyContent: 'center',
                   gridTemplateColumns: '80%',
                   paddingTop:"20px"
