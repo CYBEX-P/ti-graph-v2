@@ -21,12 +21,17 @@ function InitializeGraph(data) {
     layout: { improvedLayout: true },
     height: '99vh',
     nodes: {
-      shape: 'circle',
+      shape: 'circularImage',
+      image: '/static/SVG/DataAnalytics/svg_other.svg',
+      borderWidth: 4,
+      color: {border:'rgba(151,194,252,1)',background:'rgba(151,194,252,1)'},
       widthConstraint: 100,
       font:{color:'white',strokeWidth:3,strokeColor:"black"}
     },
     edges: {
-      length: 200
+      length: 200,
+      //color: {'inherit':false},
+      //dashes: true
     },
     interaction: {
       hover: true,
@@ -37,6 +42,7 @@ function InitializeGraph(data) {
   const nw = new Network(container, dataObject, options);
   return nw;
 }
+
 
 const Graph = ({ isLoading }) => {
   const { neo4jData, setNeo4jData, config } = useContext(NetworkContext);
@@ -111,7 +117,8 @@ const Graph = ({ isLoading }) => {
           y: e.event.clientY,
           data: JSON.stringify(nodeObj[0].properties.data),
           label: JSON.stringify(nodeObj[0].label),
-          color: JSON.stringify(nodeObj[0].color),
+          color: JSON.stringify(nodeObj[0].color.background),
+          type: JSON.stringify(nodeObj[0].properties.type),
           percentMal: percent,
         });
       }
@@ -127,11 +134,15 @@ const Graph = ({ isLoading }) => {
       Object.keys(nw.body.nodes).forEach(function(currentId){
         if (!currentId.includes("edgeId"))
         {
+          // Need to store both background and border color
           var orgColorStr = nw.body.nodes[currentId].options.color.background;
+          var orgBrdColorStr = nw.body.nodes[currentId].options.color.border;
           // split color string into array with indices corresponding to r,g,b, and a
           var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
+          var orgBrdColorArr = orgBrdColorStr.split('(')[1].split(')')[0].split(',');
           var opacityNormal = 1;
           nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')';
+          nw.body.nodes[currentId].options.color.border = 'rgb('+orgBrdColorArr[0]+',' + orgBrdColorArr[1] + ',' + orgBrdColorArr[2]+','+opacityNormal+')';
         }
       });
       setSelectText(false)
@@ -147,11 +158,14 @@ const Graph = ({ isLoading }) => {
         {
           if (currentId != nodeId)
           {
+            // Need to store both background and border color
             var orgColorStr = nw.body.nodes[currentId].options.color.background;
+            var orgBrdColorStr = nw.body.nodes[currentId].options.color.border;
             // split color string into array with indices corresponding to r,g,b, and a
             var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
+            var orgBrdColorArr = orgBrdColorStr.split('(')[1].split(')')[0].split(',');
             nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
-            nw.body.nodes[currentId].options.color.border = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
+            nw.body.nodes[currentId].options.color.border = 'rgb('+orgBrdColorArr[0]+',' + orgBrdColorArr[1] + ',' + orgBrdColorArr[2]+','+opacityBlurred+')';
           }
         }
       });
@@ -160,12 +174,12 @@ const Graph = ({ isLoading }) => {
         text: JSON.stringify(nodeObj[0].properties),
         data: JSON.stringify(nodeObj[0].properties.data),
         label: JSON.stringify(nodeObj[0].label),
-        color: JSON.stringify(nodeObj[0].color),
+        color: JSON.stringify(nodeObj[0].color.background),
         count: JSON.stringify(nodeObj[0].properties.count),
         countMalicious: JSON.stringify(nodeObj[0].properties.countMal),
+        type: JSON.stringify(nodeObj[0].properties.type)
       });
     });
-  
 
     // Set state when drag starts and ends. Used to determine whether to draw radial menu or not
     nw.on('dragStart', () => {
@@ -427,7 +441,7 @@ const Graph = ({ isLoading }) => {
                 pointerEvents: 'none',
                 backgroundColor: "black",
                 color: "white",
-                opacity: "0.95",
+                opacity: "0.85",
                 borderRadius: "10px",
                 padding: "10px",
                 boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
@@ -437,7 +451,7 @@ const Graph = ({ isLoading }) => {
             color: hoverText.color.replace(/"/g,""),
             textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
           }}>
-            <b>{hoverText.label.replace(/"/g,"")}</b>
+            <b>{hoverText.type.replace(/"/g,"")}</b>
           </h4>
           <hr/>
           <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
@@ -472,18 +486,19 @@ const Graph = ({ isLoading }) => {
             color: selectText.color.replace(/"/g,""),
             //textShadow: "-1px 0 grey, 0 1px grey, 1px 0 grey, 0 -1px grey"
           }}>
-            <b>{selectText.label.replace(/"/g,"")}</b>
+            <b>{selectText.type.replace(/"/g,"")}</b>
           </h4>
           <h6 style={{textAlign:"center"}}>{selectText.data.replace(/"/g,"")}</h6>
           <div style={{color:"white",fontSize:"large"}}>
             <h5>Details</h5>
-            <h6>Cybex Count:</h6>
+            <hr/>
+            <h6>CYBEX Count:</h6>
             <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
               Benign = {selectText.count}, Malicious = {selectText.countMalicious}
-            <hr/>
-            <h5>Highlight Related:</h5>
+            {/* <hr/> */}
+            {/* <h5>Highlight Related:</h5>
             <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px",marginRight:'10px'}}>Attributes</button>
-            <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px"}}>Events</button>
+            <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px"}}>Events</button> */}
           </div>
         </div>
       )}
