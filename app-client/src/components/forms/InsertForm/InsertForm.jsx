@@ -166,27 +166,25 @@ const InsertForm = props => {
   }
 
   function handleHighlightNode(values, actions) {
-    const { dataToHighlight ,  typeToHighlight  } = values;
-    
+    const { dataToHighlight, typeToHighlight} = values;
     setLoading(true);
     axios
-              .get('/api/v1/neo4j/export')
-              .then(response => {
-                const data = response.data;
+      .get('/api/v1/neo4j/export')
+      .then(({data}) => {
+        let idx = -1;
 
-                var idx = -1;
+        // This can be made faster with a .filter I believe
+        for (var num in data['Neo4j'][0][0]['nodes']) {
+          if (data['Neo4j'][0][0]['nodes'][num].properties.data === dataToHighlight) {
+            idx = num;
+            break;
+          }
+        }
 
-                for (var num in data['Neo4j'][0][0]['nodes']) {
-                  if (data['Neo4j'][0][0]['nodes'][num].properties.data === dataToHighlight) {
-                    idx = num;
-                    break;
-                  }
-                }
-
-                data['Neo4j'][0][0]['nodes'][idx]['color'] = "rgba(	204, 255, 0, 1)";
-                setNeo4jData(data);
-                setLoading(false);
-              })
+        data['Neo4j'][0][0]['nodes'][idx]['color'] = "rgba(	204, 255, 0, 1)";
+        setNeo4jData(data);
+        setLoading(false);
+      })
   }
 
   return (
