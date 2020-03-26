@@ -25,7 +25,7 @@ def processExport(dataObject):
             key['label'] = key['label'][0]
             key['properties']['type'] = key['label']
             # Initialize color defaults and set special color classes
-            key['color'] = {'border':'rgba(151,194,252,1)','background':'rgba(151,194,252,1)'}
+            key['color'] = 'rgba(151,194,252,1)'
             # if 'source' in key['properties']:
             #     if (key['properties']['source'] == 'cybex'):
             #         key['color']['border'] = 'rgba(255,255,255,1)'
@@ -33,7 +33,7 @@ def processExport(dataObject):
 
             if key['label'] == 'IP':
                 key['image'] = '/static/SVG/DataAnalytics/svg_ip.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
                 # else:
                 #     #key['color'] = "#B37469"
                 #     #key['color'] = 'rgba(151,252,158,1)'
@@ -41,12 +41,12 @@ def processExport(dataObject):
                 #key['widthConstraint'] = 120
             elif key['label'] == 'Host':
                 key['image'] = '/static/SVG/DataAnalytics/svg_host.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
                 #key['color'] = '#FB7E81'
                 #key['color'] = 'rgba(247, 151, 77, 1)'
             elif key['label'] == 'URL':
                 key['image'] = '/static/SVG/DataAnalytics/svg_ip.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
                 # else:
                 #     #key['color'] = "#B37469"
                 #     #key['color'] = 'rgba(151,252,158,1)'
@@ -57,7 +57,7 @@ def processExport(dataObject):
                 key['color'] = '#5B8E7D'
             elif key['label'] == 'Email':
                 key['image'] = '/static/SVG/DataAnalytics/svg_email.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
                 #key['color'] = '#34E5FF'
                 # key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Hash':
@@ -67,13 +67,13 @@ def processExport(dataObject):
                 #key['color'] = 'rgba(168, 50, 50)'
                 # key['color'] = 'rgba(151,194,252,1)'
                 key['image'] = '/static/SVG/DataAnalytics/svg_asn.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
             elif key['label'] == 'Country':
                 #key['color'] = '#F4A259'
                 #key['color'] = 'rgba(247, 151, 77, 1)'
                 # key['color'] = 'rgba(151,194,252,1)'
                 key['image'] = '/static/SVG/DataAnalytics/svg_country_alt.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
             elif key['label'] == 'BTC':
                 key['color'] = '#3185FC'
             elif key['label'] == 'MAC':
@@ -84,7 +84,7 @@ def processExport(dataObject):
                 key['color'] = '#E8E8E8'
             elif key['label'] == 'Domain':
                 key['image'] = '/static/SVG/DataAnalytics/svg_ip.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
                 # if threatLevel == 0:
                 #     key['color']['background']  = 'rgba(151,252,158,1)'
                 #     key['color']['border']  = 'rgba(151,252,158,1)'
@@ -100,7 +100,7 @@ def processExport(dataObject):
                 #     key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Ports':
                 key['image'] = '/static/SVG/DataAnalytics/svg_ports.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
                 #key['color'] = "#ff41e2"
                 # key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Whois':
@@ -112,13 +112,13 @@ def processExport(dataObject):
                 # key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Registrar':
                 key['image'] = '/static/SVG/DataAnalytics/svg_registrar.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
                 # key['color'] = "#06de9e"
             elif key['label'] == 'Nameserver':
                  key['color'] = "#cf4cf3"
             elif key['label'] == 'MailServer':
                 key['image'] = '/static/SVG/DataAnalytics/svg_mail.svg'
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
                 # key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'User':
                  key['color'] = "#d8e5f6"
@@ -130,7 +130,7 @@ def processExport(dataObject):
                 key['color'] = 'rgba(151,194,252,1)'
                 key['shape'] = 'hexagon'
             else:
-                key['color']['background'] = key['color']['border'] = threatColor(threatLevel)
+                key['color'] = threatColor(threatLevel)
             #     # key['color'] = 'rgba(151,194,252,1)'
             #     #key['shape'] = 'hexagon'
             #     key['color'] = 'rgba(255,255,255,1)'
