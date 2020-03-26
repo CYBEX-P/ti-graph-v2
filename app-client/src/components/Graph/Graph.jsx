@@ -24,7 +24,7 @@ function InitializeGraph(data) {
       shape: 'circularImage',
       image: '/static/SVG/DataAnalytics/svg_other.svg',
       borderWidth: 4,
-      color: {border:'rgba(151,194,252,1)',background:'rgba(151,194,252,1)'},
+      color: 'rgba(151,194,252,1)',
       widthConstraint: 100,
       font:{color:'white',strokeWidth:3,strokeColor:"black"}
     },
@@ -117,7 +117,7 @@ const Graph = ({ isLoading }) => {
           y: e.event.clientY,
           data: JSON.stringify(nodeObj[0].properties.data),
           label: JSON.stringify(nodeObj[0].label),
-          color: JSON.stringify(nodeObj[0].color.background),
+          color: JSON.stringify(nodeObj[0].color),
           type: JSON.stringify(nodeObj[0].properties.type),
           percentMal: percent,
         });
@@ -130,19 +130,17 @@ const Graph = ({ isLoading }) => {
     // Change the selection state whenever a node is selected and deselected
     nw.on('deselectNode', (params) => 
     {
+      var opacityNormal = 1;
       setSelection(nw.getSelection())
       Object.keys(nw.body.nodes).forEach(function(currentId){
         if (!currentId.includes("edgeId"))
         {
-          // Need to store both background and border color
+          // Need to store both original node color
           var orgColorStr = nw.body.nodes[currentId].options.color.background;
-          var orgBrdColorStr = nw.body.nodes[currentId].options.color.border;
           // split color string into array with indices corresponding to r,g,b, and a
           var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
-          var orgBrdColorArr = orgBrdColorStr.split('(')[1].split(')')[0].split(',');
-          var opacityNormal = 1;
-          nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')';
-          nw.body.nodes[currentId].options.color.border = 'rgb('+orgBrdColorArr[0]+',' + orgBrdColorArr[1] + ',' + orgBrdColorArr[2]+','+opacityNormal+')';
+          var opaqueColorStr = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityNormal+')'
+          nw.body.nodes[currentId].options.color.background = nw.body.nodes[currentId].options.color.border = opaqueColorStr;
         }
       });
       setSelectText(false)
@@ -158,14 +156,12 @@ const Graph = ({ isLoading }) => {
         {
           if (currentId != nodeId)
           {
-            // Need to store both background and border color
+            // Need to store original node color
             var orgColorStr = nw.body.nodes[currentId].options.color.background;
-            var orgBrdColorStr = nw.body.nodes[currentId].options.color.border;
             // split color string into array with indices corresponding to r,g,b, and a
             var orgColorArr = orgColorStr.split('(')[1].split(')')[0].split(',');
-            var orgBrdColorArr = orgBrdColorStr.split('(')[1].split(')')[0].split(',');
-            nw.body.nodes[currentId].options.color.background = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
-            nw.body.nodes[currentId].options.color.border = 'rgb('+orgBrdColorArr[0]+',' + orgBrdColorArr[1] + ',' + orgBrdColorArr[2]+','+opacityBlurred+')';
+            var transColorStr = 'rgb('+orgColorArr[0]+',' + orgColorArr[1] + ',' + orgColorArr[2]+','+opacityBlurred+')';
+            nw.body.nodes[currentId].options.color.background = nw.body.nodes[currentId].options.color.border = transColorStr
           }
         }
       });
@@ -174,7 +170,7 @@ const Graph = ({ isLoading }) => {
         text: JSON.stringify(nodeObj[0].properties),
         data: JSON.stringify(nodeObj[0].properties.data),
         label: JSON.stringify(nodeObj[0].label),
-        color: JSON.stringify(nodeObj[0].color.background),
+        color: JSON.stringify(nodeObj[0].color),
         count: JSON.stringify(nodeObj[0].properties.count),
         countMalicious: JSON.stringify(nodeObj[0].properties.countMal),
         type: JSON.stringify(nodeObj[0].properties.type)
