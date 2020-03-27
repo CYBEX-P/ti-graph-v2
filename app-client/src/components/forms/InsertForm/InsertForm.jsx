@@ -348,7 +348,7 @@ const InsertForm = props => {
               <option value="none">None</option>
               {neo4jData &&
                 neo4jData.Neo4j[0].map(({ nodes }) =>
-                  nodes.filter(node => node.label === selectedIOC3)
+                  nodes.filter(node => node.properties.type === selectedIOC3)
                   .map(({ label, properties, id }) => {
                     return (
                       properties.data && label && (
