@@ -30,7 +30,7 @@ const SplashScreenBody = styled.div`
 const NavBarStyle = styled.nav`
   z-index: 6;
   width: 100%;
-  background-color: ${primaryBlue};
+  background-color: rgba(0,0,0,0.5);
   height: 56px;
   grid-column: 1 / span 5;
   grid-row: 1;
@@ -38,6 +38,8 @@ const NavBarStyle = styled.nav`
   align-items: center;
   position: fixed;
   color: ${secondaryGrey};
+  boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)";
+  backdrop-filter: blur(25px);
 `;
 
 const UnstyledButton = styled.button`

@@ -269,7 +269,7 @@ const Graph = ({ isLoading }) => {
       {!filterState && ( 
         <div style={{
           position:"absolute",
-          right:"10px",
+          right:"1%",
           top:"65px",
           zIndex: 5,
           backgroundColor: "black",
