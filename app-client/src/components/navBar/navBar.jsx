@@ -28,9 +28,9 @@ const NavBar = (props) => {
             <FontAwesomeIcon size="lg" icon="user" color="#e0e0e0" />
           </a>
       </UnstyledButton>*/}
-      <div style={{float:"right", marginRight:"1%",borderRadius:"4px",backgroundColor:"#6c757d", padding:"7px 18px"}}>
+      <button style={{float:"right", marginRight:"1%",borderRadius:"4px",borderColor:"#6c757d",backgroundColor:"#6c757d", color:"white", padding:"7px 18px"}}>
         <FontAwesomeIcon size="lg" icon={faChartBar}/>
-      </div>
+      </button>
       </NavBarStyle>
       {isExpanded === 'top' && (
         <div
