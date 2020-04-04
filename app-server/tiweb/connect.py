@@ -7,7 +7,7 @@ def connectDev():
 
 # Production connection
 # connect to user's individual container 
-def connectProd(user, passw, addr, port):
-    URI = "bolt://" + addr + ":" + str(port)
+def connectProd(user, passw, addr, bolt_port):
+    URI = "bolt://" + addr + ":" + str(bolt_port)
     graph = Graph(URI, auth=(user, passw))
     return graph

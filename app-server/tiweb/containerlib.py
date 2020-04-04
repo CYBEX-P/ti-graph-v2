@@ -25,6 +25,23 @@ class client:
         self.clusterid = clusterid
         self.workload_name = workload_name
         self.cluster_ip = cluster_ip
+
+    def find_free_ports():
+
+        bolt = randrange(7687, 9000) 
+        http = randrange(7474, 7674) 
+        #find first free port for bolt listener
+        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+            s.bind(('', 0))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            bolt = s.getsockname()[1]
+            #find second free port for http listener while bolt listener is still up
+            with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as x:
+                x.bind(('', 0))
+                x.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                http = x.getsockname()[1]
+    
+        return bolt,http
     
     def get_database_info(self):
         return self._get_database_info()
@@ -47,26 +64,50 @@ class client:
         return(self._delete_service() and self._delete_database())
      
     def add_database(self):
-        if(self.workload_name is None):
-            self.workload_name = 'neo4j-db-' + str(uuid.uuid4())
-            if(self._valid()):        
-                password = pw_gen()
-                node = self._get_node_yaml(password)
-                service = self._get_service_yaml()
-                yaml_template = str(yaml.dump(node, default_flow_style=False, allow_unicode=True, encoding=None)) + '\r\n' + '---' + '\r\n' + str(yaml.dump(service, default_flow_style=False, allow_unicode=True, encoding=None))
+        (bolt,http) = find_free_ports()
+        bindip = '127.0.0.1'
+        newpass = pw_gen(15)
 
-                post_data = {'defaultNamespace': None, 'namespace': None, 'projectId': None, 'yaml': yaml_template}
-                headers = {'Content-Type': 'application/json', 'Authorization': self.bearer}
-                url = self.url + "clusters/" + self.clusterid + "?action=importYaml"
-                r = requests.post(url=url, data=json.dumps(post_data).encode("utf-8"), headers=headers)
-                if r.status_code < 200 or r.status_code >= 300:
-                    return {"status": False, "error": r.text, "data": None}
-                else:
-# give rancher a couple seconds to create the objects so we can just return them
-                    time.sleep(2)
-                    return self._get_database_info()
+        envir_o = ['JAVA_OPTS=-Xmx1g','NEO4J_AUTH=neo4j/' + newpass]
+        port_o = {'7687/tcp':(bindip,bolt),'7474/tcp':(bindip,http)}
+        container_o = 'neo4j:3.0'
+
+        client = docker.from_env()
+        c = client.containers.run(container_o,environment=envir_o,ports=port_o,detach=True)
+
+        while(True):
+            time.sleep(2)
+            c.reload()
+            if(c.status == 'running'):
+                break        
+
+        containerstats = {"bolt_port": bolt, "http_port": http, "ip": bindip, "id": c.id, "password": newpass}
+        r = {}
+        r['data'] = containerstats 
+        r['status'] = True
+
+        return json.dumps(r,indent=4,sort_keys=True)
+
+#         if(self.workload_name is None):
+#             self.workload_name = 'neo4j-db-' + str(uuid.uuid4())
+#             if(self._valid()):        
+#                 password = pw_gen()
+#                 node = self._get_node_yaml(password)
+#                 service = self._get_service_yaml()
+#                 yaml_template = str(yaml.dump(node, default_flow_style=False, allow_unicode=True, encoding=None)) + '\r\n' + '---' + '\r\n' + str(yaml.dump(service, default_flow_style=False, allow_unicode=True, encoding=None))
+
+#                 post_data = {'defaultNamespace': None, 'namespace': None, 'projectId': None, 'yaml': yaml_template}
+#                 headers = {'Content-Type': 'application/json', 'Authorization': self.bearer}
+#                 url = self.url + "clusters/" + self.clusterid + "?action=importYaml"
+#                 r = requests.post(url=url, data=json.dumps(post_data).encode("utf-8"), headers=headers)
+#                 if r.status_code < 200 or r.status_code >= 300:
+#                     return {"status": False, "error": r.text, "data": None}
+#                 else:
+# # give rancher a couple seconds to create the objects so we can just return them
+#                     time.sleep(2)
+#                     return self._get_database_info()
    
-        return {"status": False, "error": "Database already exists","data": None}
+#         return {"status": False, "error": "Database already exists","data": None}
 
     def _valid(self):
         if(self.url is not None and self.bearer is not None and self.projectid is not None and self.clusterid is not None and self.workload_name is not None):
