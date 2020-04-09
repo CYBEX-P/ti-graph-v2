@@ -52,7 +52,7 @@ const UnstyledButton = styled.button`
 
 const MenuBarStyle = styled(UnstyledButton)`
   background-color: ${primaryLightBlue};
-  z-index: 6;
+  z-index: 3;
   ${props => {
     if (props.side === 'left') {
       return `
@@ -100,7 +100,7 @@ const MenuBarStyle = styled(UnstyledButton)`
 const ExpandedMenuBar = styled.div`
   background-color: #171717;
   border: 3px solid ${primaryBlue};
-  z-index: 6;
+  z-index: 4;
   ${props => {
     if (props.side === 'left') {
       return `
@@ -201,6 +201,42 @@ const GraphMenuInputStyle = styled.input`
   color: #111111;
 `;
 
+const TrendPanelStyle = styled.div`
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(100% - 56px);
+  position: absolute;
+  top: 56px;
+  z-index: 5; 
+  padding: 1%;
+  background-color: rgba(35, 35, 35,0.5);
+  color: white;
+  backdrop-filter: blur(30px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+`;
+
+const TrendBoxStyle = styled.div`
+  height: 100%;
+  z-index: 6;
+  background-color: rgba(255, 255, 255,0.4);;
+  color: black;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+`;
+
+const TrendRowStyle = styled.div`
+  height: 100%;
+  padding: 1%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+`;
+
 export {
   AppContainer,
   SplashScreenBody,
@@ -213,5 +249,8 @@ export {
   ContentContainerStyle,
   ModalContentStyle,
   StyledButtonChild,
-  GraphMenuInputStyle
+  GraphMenuInputStyle,
+  TrendPanelStyle,
+  TrendBoxStyle,
+  TrendRowStyle
 };

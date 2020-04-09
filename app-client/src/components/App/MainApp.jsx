@@ -17,6 +17,8 @@ import Button from '../Button/Button';
 import InsertForm from '../forms/InsertForm/InsertForm';
 import EventInsertForm from '../EventInsertForm/EventInsertForm';
 import ImportJson from '../forms/InsertForm/ImportJson'
+import Trends from '../modal/Trends';
+import TrendsContext from './TrendsContext';
 
 const App = props => {
   const [isLoading, setLoading] = useState(false);
@@ -104,6 +106,9 @@ const App = props => {
               <Graph isLoading={isLoading} />
             </ContentContainerStyle>
             <NavBar />
+            <TrendsContext.Provider value={true}>
+              <Trends title = "Trends"/>
+            </TrendsContext.Provider>
             <MenuBar side="left" icon="search">
               <h3 style={{paddingLeft: "20%", paddingRight: "25%", marginLeft: "20%", marginTop: "5%",color:"white"}}>Macros</h3>
               <hr style={{marginLeft: "12.5%"}}/>

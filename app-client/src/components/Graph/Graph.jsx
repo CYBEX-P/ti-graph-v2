@@ -6,6 +6,7 @@ import { CircleLoader } from 'react-spinners';
 import NetworkContext from '../App/DataContext';
 import RadialMenu from '../radialMenu/radialMenu';
 import withNodeType from '../radialMenu/withNodeType';
+import Trends from '../modal/Trends';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle, faArrowRight,faTimesCircle, faFilter } from '@fortawesome/free-solid-svg-icons';
 
@@ -265,13 +266,14 @@ const Graph = ({ isLoading }) => {
           backgroundColor: '#232323'
         }}
       />
+      <Trends></Trends>
       {/* TODO: Turn filter box into seperate component */}
       {!filterState && ( 
         <div style={{
           position:"absolute",
           right:"1%",
           top:"65px",
-          zIndex: 5,
+          zIndex: 4,
           backgroundColor: "black",
           color: "white",
           opacity: "0.95",
@@ -291,7 +293,7 @@ const Graph = ({ isLoading }) => {
         width:"300px", 
         right:"10px",
         top:"65px",
-        zIndex: 5,
+        zIndex: 4,
         // backgroundColor: '#111', // Used for classic Card styling only.
         backgroundColor: "black",
         color: "white",
