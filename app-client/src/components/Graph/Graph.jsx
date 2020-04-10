@@ -7,7 +7,7 @@ import NetworkContext from '../App/DataContext';
 import RadialMenu from '../radialMenu/radialMenu';
 import withNodeType from '../radialMenu/withNodeType';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamationCircle, faArrowRight,faTimesCircle, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faArrowRight,faTimesCircle, faFilter, faMapPin, faCircleNotch, faDotCircle, faCommentDollar, faCommentDots, faArrowCircleUp } from '@fortawesome/free-solid-svg-icons';
 
 function InitializeGraph(data) {
   if (typeof data.Neo4j === 'undefined') {
@@ -61,6 +61,7 @@ const Graph = ({ isLoading }) => {
   const [network, setNetwork] = useState(null);
 
   const [filterState,setFilterState] = useState(false);
+  const [commentState,setCommentState] = useState(false);
 
   function UpdatePositions() {
     if (network === null || selection === null) {
@@ -144,6 +145,7 @@ const Graph = ({ isLoading }) => {
         }
       });
       setSelectText(false)
+      setCommentState(false)
     });
     nw.on('selectNode', (params) => {
       setSelection(nw.getSelection());
@@ -459,22 +461,25 @@ const Graph = ({ isLoading }) => {
         </div>
       )}
       {/* TODO: Turn selectText box into seperate component */}
+      {/* {selectText && ( */}
       {selectText && (
-        <div style={{
-          position:"absolute",
-          width:"300px", 
-          right:"10px",
-          bottom:"10px",
-          zIndex: 5,
-          // backgroundColor: '#111', // Used for classic Card styling only.
-          pointerEvents: 'none',
-          backgroundColor: "black",
-          color: "white",
-          opacity: "0.95",
-          borderRadius: "10px",
-          padding: "20px",
-          boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
+        <div>
+          <div style={{
+            position:"absolute",
+            width:"300px", 
+            right:"10px",
+            bottom:"10px",
+            zIndex: 5,
+            // backgroundColor: '#111', // Used for classic Card styling only.
+            pointerEvents: 'none',
+            backgroundColor: "rgba(0,0,0,0.7)",
+            color: "white",
+            borderRadius: "10px",
+            padding: "20px",
+            boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)",
+            backdropFilter: "blur(20px)"
           }}>
+          <FontAwesomeIcon size="2x" icon={faMapPin} style={{position:'absolute',left:'10px',top:'10px'}}/>
           <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{position:'absolute',right:'10px',top:'10px'}}/>
           <h4 style={{
             textAlign:"center",
@@ -484,18 +489,68 @@ const Graph = ({ isLoading }) => {
             <b>{selectText.type.replace(/"/g,"")}</b>
           </h4>
           <h6 style={{textAlign:"center"}}>{selectText.data.replace(/"/g,"")}</h6>
-          <div style={{color:"white",fontSize:"large"}}>
-            <h5>Details</h5>
-            <hr/>
-            <h6>CYBEX Count:</h6>
-            <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/>
+          <div style={{color:"white"}}>
+            <div style = {{backgroundColor: "#232323",borderRadius: "10px", padding: "10px",marginBottom:"10px",backdropFilter: "blur(20px)"}}>
+              <div style = {{display: "flex", justifyContent: "space-between"}}>
+                <div>Comments (2)</div>
+                <button onClick={() => setCommentState(true)} style={{pointerEvents: 'auto', backgroundColor:"#white",color:"black",border:"none",borderRadius:"5px"}}>
+                <FontAwesomeIcon size="1x" icon={faCommentDots}/>
+                  View/Add
+                  </button>
+              </div>
+            </div>
+          </div>
+          <div style={{color:"white"}}>
+            {/* <h6>CYBEX-P Sightings</h6> */}
+            <div style = {{backgroundColor: "#232323",borderRadius: "10px", padding: "10px",}}>
+              <h6 >CYBEX-P Sightings:</h6>
+              {/* <FontAwesomeIcon size="1x" icon={faExclamationCircle} style={{marginRight:"3px"}}/> */}
               Benign = {selectText.count}, Malicious = {selectText.countMalicious}
+            </div>
             {/* <hr/> */}
             {/* <h5>Highlight Related:</h5>
             <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px",marginRight:'10px'}}>Attributes</button>
             <button style={{backgroundColor:"#232323",color:"white",border:"none",borderRadius:"5px"}}>Events</button> */}
           </div>
         </div>
+        {commentState && (
+          <div style={{
+            position:"absolute",
+            width:"300px", 
+            right:"10px",
+            bottom:"10px",
+            height: "230px",
+            zIndex: 5,
+            // backgroundColor: '#111', // Used for classic Card styling only.
+            backgroundColor: "black",
+            color: "white",
+            opacity: "1",
+            borderRadius: "10px",
+            padding: "5px",
+            boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)",
+          }}>
+            <div style={{width: "100%", height: "100%", backgroundColor: "#171717", borderRadius: "5px", padding: "10px",backdropFilter: "blur(20px)"}}>
+              <div onClick={() => setCommentState(false)}>
+                <FontAwesomeIcon size="1x" icon={faTimesCircle} style={{position:'absolute',right:'10px',top:'10px'}}/>
+              </div>
+              <div style={{color: selectText.color.replace(/"/g,"")}}>{selectText.data.replace(/"/g,"")}</div>
+              <h5>Comments</h5>
+              <div style={{height: "80px", padding:"0px 0px 0px 5px",overflow: "hide",backgroundColor: "black", marginLeft: "5px", marginRight: "5px",padding: "5px",borderRadius:"5px"}}>
+                <p>4-7-2020 9:02: Test.</p>
+                <p>4-7-2020 9:07: Test 123.</p>
+              </div>
+              <div style={{display: "flex", justifyContent: "space-between",padding: "5px"}}>
+                <textarea rows="2" style={{width: "220px", borderColor:"#232323", borderRadius: "5px",backgroundColor: "black", color: "white"}}></textarea>
+                <div style={{color:"white",border:"none",borderRadius:"5px", display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                  <FontAwesomeIcon size="2x" icon={faArrowCircleUp}/>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        </div>
+        
+        
       )}
     </div>
   );
