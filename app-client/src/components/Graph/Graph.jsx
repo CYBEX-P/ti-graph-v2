@@ -268,7 +268,6 @@ const Graph = ({ isLoading }) => {
           backgroundColor: '#232323'
         }}
       />
-      <Trends></Trends>
       {/* TODO: Turn filter box into seperate component */}
       {!filterState && ( 
         <div style={{

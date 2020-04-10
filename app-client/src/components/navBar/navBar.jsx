@@ -3,14 +3,15 @@ import React, { useState, useContext } from 'react';
 import { NavBarStyle } from '../__styles__/styles';
 import MenuContext from '../App/MenuContext';
 import NewDropdown from './Dropdown';
+import Trends from '../modal/Trends';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartBar } from '@fortawesome/free-solid-svg-icons';
+import { faChartBar, faProjectDiagram } from '@fortawesome/free-solid-svg-icons';
 
 const NavBar = (props) => {
   const { isExpanded, dispatchExpand } = useContext(MenuContext);
   
-  // const [trendState,setTrendState] = useState(false);
+  const [trendState,setTrendState] = useState(false);
 
   return (
     <>
@@ -28,20 +29,39 @@ const NavBar = (props) => {
             <FontAwesomeIcon size="lg" icon="user" color="#e0e0e0" />
           </a>
       </UnstyledButton>*/}
-      <button 
-        style={{
-          float:"right", 
-          marginRight:"1%",
-          borderRadius:"4px",
-          borderColor:"#6c757d",
-          backgroundColor:"#6c757d", 
-          color:"white", 
-          padding:"7px 18px"
-        }}
-        // onClick={}
+      {!trendState && (
+        <button 
+          style={{
+            float:"right", 
+            marginRight:"1%",
+            borderRadius:"4px",
+            borderColor:"#6c757d",
+            backgroundColor:"#6c757d", 
+            color:"white", 
+            padding:"7px 18px"
+          }}
+          onClick={() => setTrendState(true)}
         >
         <FontAwesomeIcon size="lg" icon={faChartBar}/>
       </button>
+      )}
+      {trendState && (
+        <button 
+          style={{
+            float:"right", 
+            marginRight:"1%",
+            borderRadius:"4px",
+            borderColor:"#6c757d",
+            backgroundColor:"#6c757d", 
+            color:"white", 
+            padding:"7px 15px"
+          }}
+          onClick={() => setTrendState(false)}
+        >
+        <FontAwesomeIcon size="lg" icon={faProjectDiagram}/>
+      </button>
+      )}
+      
       </NavBarStyle>
       {isExpanded === 'top' && (
         <div
@@ -56,6 +76,9 @@ const NavBar = (props) => {
         >  
         
         </div>
+      )}
+      {trendState && (
+        <Trends title = "Trends"/>
       )}
     </>
   );
