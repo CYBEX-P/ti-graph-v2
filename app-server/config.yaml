@@ -41,7 +41,7 @@ IOC:
       - gip
       - hostname
       - whois
-      - cybexCount
+      # - cybexCount
       - cybexRelated
       - netblock
       - ports
