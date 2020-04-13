@@ -28,10 +28,10 @@ const Trends = (props) => {
             <TrendPanelStyle>
                 <div style ={{padding: "1%",textAlign: "center", fontSize: "2em"}}>{props.title}</div>
                 <TrendRow>
-                    <TrendBox title = "Waiting on MongoDB trends to go here" size = "large"></TrendBox>
+                    <TrendBox title = "Waiting on MongoDB trends to go here" url = "http://cybexp1.acs.unr.edu/mongodb-charts-rxzhv/embed/charts?id=0d62d774-8aed-4ec2-a679-101f3c6fefa6&tenant=b83cdb1d-7ae9-4d7b-be7d-7932f473a41e" size = "large"></TrendBox>
                 </TrendRow>
                 <TrendRow>
-                    <TrendBox title = "Waiting on MongoDB trends to go here" size = "small"></TrendBox>
+                    <TrendBox title = "Waiting on MongoDB trends to go here" url = "http://cybexp1.acs.unr.edu/mongodb-charts-rxzhv/embed/charts?id=425b9e45-f82e-4959-b34b-9513d04f23ea&tenant=b83cdb1d-7ae9-4d7b-be7d-7932f473a41e" size = "small"></TrendBox>
                     <TrendBox title = "Waiting on MongoDB trends to go here" size = "small"></TrendBox>
                 </TrendRow>
             </TrendPanelStyle>)}

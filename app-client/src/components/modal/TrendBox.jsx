@@ -13,8 +13,8 @@ const TrendBox = (props) => {
     return (
             <div style={{width: width}}>
                 <TrendBoxStyle>
-                    <div></div>
-                    <div>{props.title}</div>
+                    <iframe width="100%" height="100%" style={{borderRadius: "5px", border: "none"}}src={props.url}></iframe>
+                    {/* <div>{props.title}</div> */}
                 </TrendBoxStyle>
             </div>
     );
