@@ -8,11 +8,13 @@ def processExport(dataObject):
         for key in x['nodes']:
             #print(x['nodes'])
             # Before assigning color, referene malicious counts to assign threat level.
-            threatLevel = -1 #default to -1 for inconclusive threat level
+            threatLevel = -1 # default to -1 for inconclusive threat level
+            sightings = -1 # default to -1 for unknown sightings
             if 'countMal' in str(key):
                 if (key['properties']['count'] != 0):
                 #if (key['properties']['countMal'] != 0) and (key['properties']['count'] != 0):
-                    ratioMal = key['properties']['countMal']/(key['properties']['count'] + key['properties']['countMal'])
+                    sightings = key['properties']['count'] + key['properties']['countMal'] # sightings = total count in cybex
+                    ratioMal = key['properties']['countMal']/sightings
                     if ratioMal == 0:
                         threatLevel = 0
                     elif 0 < ratioMal < 0.5:
@@ -30,7 +32,7 @@ def processExport(dataObject):
             #     if (key['properties']['source'] == 'cybex'):
             #         key['color']['border'] = 'rgba(255,255,255,1)'
             #         #key['color']['background'] = 'rgba(255,255,255,1)'
-
+            key['value'] = sightings
             if key['label'] == 'IP':
                 key['image'] = '/static/SVG/DataAnalytics/svg_ip.svg'
                 key['color'] = threatColor(threatLevel)
@@ -104,8 +106,8 @@ def processExport(dataObject):
                 #key['color'] = "#ff41e2"
                 # key['color'] = 'rgba(151,194,252,1)'
             elif key['label'] == 'Whois':
-                key['color'] = "#4070f4"
-                # key['color'] = 'rgba(151,194,252,1)'
+                #key['color'] = "#4070f4"
+                key['color'] = threatColor(threatLevel)
             elif key['label'] == 'Subnet':
                 key['image'] = '/static/SVG/DataAnalytics/svg_subnet.svg'
                 #key['color'] = "#eeee58"
