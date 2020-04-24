@@ -33,6 +33,7 @@ from runner import full_load, insertNode, insertHostname
 from whoisXML import whois, insertWhois
 from exportDB import export, processExport, bucket
 from cybex import insertCybex, insertRelated, replaceType, insertRelatedAttributes, insertCybexCount
+from comments import insertComment
 from enrichments import insert_domain_and_user, insert_domain, insert_netblock, resolveHost, getNameservers, getRegistrar, getMailServer
 
 from connect import connectDev, connectProd
@@ -445,7 +446,7 @@ def cybexCountHandler(Ntype,data1):
     # Next, query malicious count
     urlMal = "http://cybexp1.acs.unr.edu:5000/api/v1.0/count/malicious"
     headersMal = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
-    dataMal = { Ntype1 : data1, "from" : "2019/8/30 00:00", "to" : "2020/3/1 6:00am", "tzname" : "US/Pacific" }
+    dataMal = { Ntype1 : data1, "from" : "2019/8/30 00:00", "to" : "2020/4/23 6:00am", "tzname" : "US/Pacific" }
     dataMal = json.dumps(dataMal)
     print("Fetching cybexCountMalicious...")
     rMal = requests.post(urlMal, headers=headersMal, data=dataMal)
@@ -485,6 +486,34 @@ def CybexRelated():
     try:
         #status = insertRelated(str(res), graph, data1)
         status = insertRelatedAttributes(str(res), graph, data1)
+        return jsonify({"insert status" : status})
+
+    except:
+        return jsonify({"insert status" : 0})
+
+@app.route('/api/v1/enrich/comment', methods = ['POST'])
+@login_required
+def addComment():
+    graph = connect2graph()
+    req = request.get_json()
+    Ntype = str(req['Ntype'])
+    comment = str(req['comment'])
+    #Ntype1 = replaceType(Ntype)
+    data1 = req['value']
+    #print(req)
+
+    # url = "http://cybexp1.acs.unr.edu:5000/api/v1.0/related/attribute/summary"
+    # headers = {'content-type': 'application/json', 'Authorization' : 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1NTQyNTI2ODcsIm5iZiI6MTU1NDI1MjY4NywianRpIjoiODU5MDFhMGUtNDRjNC00NzEyLWJjNDYtY2FhMzg0OTU0MmVhIiwiaWRlbnRpdHkiOiJpbmZvc2VjIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.-Vb_TgjBkAKBcX_K3Ivq3H2N-sVkpIudJOi2a8mIwtI'}
+    # data = { Ntype1 : data1, "from" : "2019/8/30 00:00", "to" : "2019/12/5 6:00am", "tzname" : "US/Pacific" }
+    # data = json.dumps(data) # data is jsonified request
+
+    # r = requests.post(url, headers=headers, data=data)
+    # res = json.loads(r.text)
+    #print(res)
+
+    try:
+        #status = insertRelated(str(res), graph, data1)
+        status = insertComment(comment, graph, data1, Ntype)
         return jsonify({"insert status" : status})
 
     except:
@@ -547,6 +576,12 @@ def enrich(enrich_type, value, node_type = None):
             #status = insertCybexCount(value, graph)
             status = cybexCountHandler(node_type,value)
             return jsonify({"insert status" : status})
+    # elif enrich_type == "comment":
+    #         # req = request.get_json()
+    #         # Ntype = str(req['Ntype'])
+    #         # value = str(req['value'])
+    #         status = insertComment("test comment", graph, value, "Domain")
+    #         return jsonify({"insert status" : status})
     else:
         return "Invalid enrichment type. Try 'asn', 'gip', 'whois', or 'hostname'."
 
