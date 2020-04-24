@@ -229,6 +229,7 @@ const Graph = ({ isLoading }) => {
       setNetwork(InitializeGraph(neo4jData));
       setEventListenersAdded(false);
       setRadialPosition(null);
+      // console.log(neo4jData);
     }
   }, [neo4jData]);
 
