@@ -9,8 +9,11 @@ import { TrendPanelStyle } from '../__styles__/styles';
 import TrendRow from './TrendRow';
 
 const Trends = (props) => {
-    // const trendDisplay = useContext(TrendsContext);
+    // const trendDisplay = useContext(TrendsContext); // Only used if Trends panel toggle is context-driven
     return (
+        /* Below is only used if Trends panel toggle becomes context-driven. 
+           Context would be better practice than current state implementation, but this is not a current priority.
+           To be removed in future release if trends panel remains state-driven within navbar component */
         // <div>
         //     {trendDisplay && (
         //     <TrendPanelStyle>

@@ -106,6 +106,9 @@ const App = props => {
               <Graph isLoading={isLoading} />
             </ContentContainerStyle>
             <NavBar />
+            {/* Below TrendsContext component should be used if we move from state to context for trends panel.
+             At the moment, the trends component gets placed into the navbar, and is rendered dependent on a state within the navbar component.
+            To more properly treat Trends as an independent component, context can be used in future reworking of the Trend panel logic */}
             {/* <TrendsContext.Provider value={false}>
               <Trends title = "Trends"/>
             </TrendsContext.Provider> */}
