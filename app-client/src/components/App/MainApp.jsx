@@ -17,6 +17,8 @@ import Button from '../Button/Button';
 import InsertForm from '../forms/InsertForm/InsertForm';
 import EventInsertForm from '../EventInsertForm/EventInsertForm';
 import ImportJson from '../forms/InsertForm/ImportJson'
+import Trends from '../modal/Trends';
+import TrendsContext from './TrendsContext';
 
 const App = props => {
   const [isLoading, setLoading] = useState(false);
@@ -104,6 +106,12 @@ const App = props => {
               <Graph isLoading={isLoading} />
             </ContentContainerStyle>
             <NavBar />
+            {/* Below TrendsContext component should be used if we move from state to context for trends panel.
+             At the moment, the trends component gets placed into the navbar, and is rendered dependent on a state within the navbar component.
+            To more properly treat Trends as an independent component, context can be used in future reworking of the Trend panel logic */}
+            {/* <TrendsContext.Provider value={false}>
+              <Trends title = "Trends"/>
+            </TrendsContext.Provider> */}
             <MenuBar side="left" icon="search">
               <h3 style={{paddingLeft: "20%", paddingRight: "25%", marginLeft: "20%", marginTop: "5%",color:"white"}}>Macros</h3>
               <hr style={{marginLeft: "12.5%"}}/>
