@@ -1,9 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 import { Network } from 'vis';
 import PropTypes from 'prop-types';
 import { CircleLoader } from 'react-spinners';
 
 import NetworkContext from '../App/DataContext';
+import MenuContext from '../App/MenuContext';
 import RadialMenu from '../radialMenu/radialMenu';
 import withNodeType from '../radialMenu/withNodeType';
 import Trends from '../modal/Trends';
@@ -27,7 +29,7 @@ function InitializeGraph(data) {
       borderWidth: 4,
       color: 'rgba(151,194,252,1)',
       widthConstraint: 100,
-      font:{color:'white',strokeWidth:3,strokeColor:"black"}
+      font:{color:'white',strokeWidth:3,strokeColor:"black",background:undefined}
     },
     edges: {
       length: 200,
@@ -46,6 +48,7 @@ function InitializeGraph(data) {
 
 
 const Graph = ({ isLoading }) => {
+  const { setLoading } = useContext(MenuContext);
   const { neo4jData, setNeo4jData, config } = useContext(NetworkContext);
 
   const [isStabilized, setIsStabilized] = useState(true);
@@ -63,6 +66,8 @@ const Graph = ({ isLoading }) => {
 
   const [filterState,setFilterState] = useState(false);
   const [commentState,setCommentState] = useState(false);
+
+  const [commentTextState, setCommentTextState] = useState('');
 
   function UpdatePositions() {
     if (network === null || selection === null) {
@@ -132,6 +137,7 @@ const Graph = ({ isLoading }) => {
     // Change the selection state whenever a node is selected and deselected
     nw.on('deselectNode', (params) => 
     {
+      setCommentState(false)
       var opacityNormal = 1;
       setSelection(nw.getSelection())
       Object.keys(nw.body.nodes).forEach(function(currentId){
@@ -146,13 +152,12 @@ const Graph = ({ isLoading }) => {
         }
       });
       setSelectText(false)
-      setCommentState(false)
     });
     nw.on('selectNode', (params) => {
       setSelection(nw.getSelection());
       var opacityBlurred = 0.1;
       var nodeId = params.nodes[0];
-      // nodeObj is the Neo4j object that representes the currently hovered node. Note: Slightly different here than with on('hoverNode')
+      // nodeObj is the Neo4j object that representes the currently selected node. Note: Slightly different here than with on('hoverNode')
       var nodeObj = data.Neo4j[0][0].nodes.filter(properties => properties.id === nodeId);
       Object.keys(nw.body.nodes).forEach(function(currentId){
         if (!currentId.includes("edgeId"))
@@ -176,7 +181,7 @@ const Graph = ({ isLoading }) => {
         color: JSON.stringify(nodeObj[0].color),
         count: JSON.stringify(nodeObj[0].properties.count),
         countMalicious: JSON.stringify(nodeObj[0].properties.countMal),
-        type: JSON.stringify(nodeObj[0].properties.type)
+        type: JSON.stringify(nodeObj[0].properties.type),
       });
     });
 
@@ -208,6 +213,42 @@ const Graph = ({ isLoading }) => {
       }
     });
     return true;
+  }
+
+  function handleComment()
+  {
+    // axios.get('/api/v1/macroCybex')
+    // .then(() => {
+    //   axios
+    //     .get('/api/v1/neo4j/export')
+    //     .then(({ data }) => {
+    //       setNeo4jData(data);
+    //       // setLoading(false);
+    //     })
+    //     .catch(() => {
+    //       alert('Error');
+    //       // setLoading(false);
+    //     });
+    //   })
+    setSelectText(null);
+    setCommentState(false);
+    setLoading(true);
+    axios
+      .post(`/api/v1/enrich/comment`, {Ntype: `${selectedNodeType.properties.type}`, value: `${selectedNodeType.properties.data}`, comment: `${commentTextState}`})
+      .then(({ data }) => {
+        if (data['insert status'] !== 0) {
+          axios
+            .get('/api/v1/neo4j/export')
+            .then(response => {
+              setNeo4jData(response.data);
+              setLoading(false);
+            })
+            .catch(() => {
+              alert('Error');
+              setLoading(false);
+            });
+        }
+      }); 
   }
 
   useEffect(() => {
@@ -494,7 +535,7 @@ const Graph = ({ isLoading }) => {
           <div style={{color:"white"}}>
             <div style = {{backgroundColor: "#232323",borderRadius: "10px", padding: "10px",marginBottom:"10px",backdropFilter: "blur(20px)"}}>
               <div style = {{display: "flex", justifyContent: "space-between"}}>
-                <div>Comments (2)</div>
+                <div>Comments</div>          
                 <button onClick={() => setCommentState(true)} style={{pointerEvents: 'auto', backgroundColor:"#white",color:"black",border:"none",borderRadius:"5px"}}>
                 <FontAwesomeIcon size="1x" icon={faCommentDots}/>
                   View/Add
@@ -537,13 +578,30 @@ const Graph = ({ isLoading }) => {
               </div>
               <div style={{color: selectText.color.replace(/"/g,"")}}>{selectText.data.replace(/"/g,"")}</div>
               <h5>Comments</h5>
-              <div style={{height: "80px", padding:"0px 0px 0px 5px",overflow: "hide",backgroundColor: "black", marginLeft: "5px", marginRight: "5px",padding: "5px",borderRadius:"5px"}}>
+              {/* <div style={{height: "80px", padding:"0px 0px 0px 5px",overflow: "hide",backgroundColor: "black", marginLeft: "5px", marginRight: "5px",padding: "5px",borderRadius:"5px"}}>
                 <p>4-7-2020 9:02: Test.</p>
                 <p>4-7-2020 9:07: Test 123.</p>
-              </div>
+              </div> */}
               <div style={{display: "flex", justifyContent: "space-between",padding: "5px"}}>
-                <textarea rows="2" style={{width: "220px", borderColor:"#232323", borderRadius: "5px",backgroundColor: "black", color: "white"}}></textarea>
-                <div style={{color:"white",border:"none",borderRadius:"5px", display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                <div style={{height: "130px",padding: "5px",backgroundColor: "black",borderRadius: "5px"}}>
+                  <textarea 
+                    // rows="5" 
+                    style={{width: "200px", height: "100%", border: "none", borderRadius: "5px",backgroundColor: "black", color: "white"}}
+                    onChange={event => setCommentTextState(event.target.value)}>
+                      {selectedNodeType.properties.comment}
+                  </textarea>
+                </div>
+                <div 
+                  style={{
+                    color:"white",
+                    border:"none",
+                    borderRadius:"5px", 
+                    display: "flex", 
+                    flexDirection: "column",
+                    justifyContent: "center"
+                  }}
+                  onClick={() => handleComment()}
+                >
                   <FontAwesomeIcon size="2x" icon={faArrowCircleUp}/>
                 </div>
               </div>
