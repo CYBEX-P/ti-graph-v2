@@ -24,6 +24,8 @@ def processExport(dataObject):
                     # else: 
                     #     threatLevel = 0
             #key['label'] = bucket(key['label'][0])
+            if 'comment' in str(key):
+                key['font'] = {'color':'black','strokeWidth':0,'strokeColor':"white",'background':threatColor(threatLevel)}
             key['label'] = key['label'][0]
             key['properties']['type'] = key['label']
             # Initialize color defaults and set special color classes

@@ -279,9 +279,14 @@ const App = props => {
                       <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{float:'right'}}/>
                     </div>
                     <FontAwesomeIcon size="2x" icon={faInfoCircle} style={{float:'left',color:'#0277bd'}}/>
-                    <h4 style={{textAlign:'center'}}>Macro 2 Details</h4>
+                    <h4 style={{textAlign:'center'}}>CYBEX-P Macro Details</h4>
                     <hr></hr>
-                    <h6 style={{textAlign:'center'}}>Macro 2 does not yet exist.</h6>
+                    <h6>Performs threat analysis on all supported IOC nodes.</h6>
+                    <ul>
+                        <li>Determines IOC threat level</li>
+                        <li>Scales IOC nodes according to relative number of sightings</li>
+                        <li>NOTE: Currently, exposing related attributes found in CYBEX-P must be done manually on each node. For that functionality, select a desired node and use the "Cybex Related" radial menu option.</li>
+                      </ul>
                   </div>
                   }
             </MenuBar>
