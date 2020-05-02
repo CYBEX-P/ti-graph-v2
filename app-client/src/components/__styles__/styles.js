@@ -98,8 +98,9 @@ const MenuBarStyle = styled(UnstyledButton)`
 `;
 
 const ExpandedMenuBar = styled.div`
-  background-color: #171717;
-  border: 3px solid ${primaryBlue};
+  background-color: rgba(23,23,23,0.7);
+  border: 3px solid #171717;
+  backdrop-filter: blur(20px);
   z-index: 4;
   ${props => {
     if (props.side === 'left') {
@@ -110,11 +111,12 @@ const ExpandedMenuBar = styled.div`
         grid-row: 2 /span 3;
         height: 100%;
         width: 100%;
-        border-top-right-radius: 16px;
+        border-top-right-radius: 0px;
         border-bottom-right-radius: 16px;
         align-self: center;
         align-items: center;
         justify-items: end;
+        border-top: none;
         `;
     }
     if (props.side === 'right') {
@@ -123,13 +125,14 @@ const ExpandedMenuBar = styled.div`
         display: grid;
         height: 100%;
         width: 100%;
-        border-top-left-radius: 16px;
+        border-top-left-radius: 0px;
         border-bottom-left-radius: 16px;
         grid-column: 4 / span 2;
         grid-row: 2 / span 3;
         align-self: center;
         justify-self: end;
         align-items: center;
+        border-top: none;
         `;
     }
     if (props.side === 'bottom') {
@@ -157,6 +160,7 @@ const MenuBarChildStyle = styled.div`
   grid-row: ${({ side }) => (side === 'bottom' ? 2 : 1)};
   width: 100%;
   height: 100%;
+  overflow: 'auto';
 `;
 
 const MenuBarIconStyle = styled.div`
