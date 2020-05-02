@@ -249,7 +249,7 @@ const InsertForm = props => {
 
           <form onSubmit={handleSubmit}>
             <select
-              style={{marginTop:"40px", width: '100%', height: '36px', backgroundColor: '#232323', color: 'white',border:"none" }}
+              style={{marginTop:"20px", width: '100%', height: '36px', backgroundColor: '#232323', color: 'white',border:"none" }}
               name="IOCType"
               value={values.IOCType}
               onChange={e => {
@@ -320,7 +320,7 @@ const InsertForm = props => {
 
           <form onSubmit={handleSubmit}>
             <select
-              style={{marginTop:"150px", width: '100%', height: '36px', backgroundColor: '#232323', color: 'white',border:"none" }}
+              style={{marginTop:"20px", width: '100%', height: '36px', backgroundColor: '#232323', color: 'white',border:"none" }}
               name="IOCType2"
               value={values.IOCType2}
               onChange={e => {

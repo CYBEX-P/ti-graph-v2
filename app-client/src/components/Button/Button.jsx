@@ -10,7 +10,7 @@ const Button = props => {
   return (
     <ReactStrapButton
       className="d-flex"
-      style={{ width, height: '56px' }}
+      style={{ width, height: '40px' }}
       color="primary"
       type={type}
       onClick={onClickFunction}

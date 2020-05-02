@@ -197,11 +197,10 @@ const App = props => {
                   <div 
                     style={{
                       position: "fixed",
-                      minHeight:"25%", 
-                      maxHeight:"87%",
-                      maxWidth: '300px',
-                      top:'56px', 
-                      left: "334px",
+                      height:"90%",
+                      width: '100%',
+                      top:'10%', 
+                      left: "340px",
                       padding: '10px',
                       backgroundColor:"black",
                       color:"white",
@@ -274,7 +273,7 @@ const App = props => {
                   </div>
                   }
                   {macroDetails == "macro2" &&
-                  <div style={{position: "fixed", minHeight:"25%", width: '40%',top:'56px', left: "334px",padding: '10px',backgroundColor:"black",color:"white",opacity:'0.95',borderRadius:'15px',border:'solid',borderColor:'#0277bd'}}>
+                  <div style={{position: "fixed", minHeight:"25%", width: '100%',top:'10%', left: "340px",padding: '10px',backgroundColor:"black",color:"white",opacity:'0.95',borderRadius:'15px',border:'solid',borderColor:'#0277bd'}}>
                     <div onClick={() => setMacroDetails("none")}>
                       <FontAwesomeIcon size="2x" icon={faTimesCircle} style={{float:'right'}}/>
                     </div>
@@ -295,7 +294,6 @@ const App = props => {
                 style={{
                   width: '100%',
                   height: '100%',
-                  backgroundColor: '#171717',
                   color:'white',
                   display: 'grid',
                   // gridTemplateRows: '150px 110px 70px auto',
@@ -320,31 +318,20 @@ const App = props => {
                   flexWrap: 'wrap',
                   height: '100%',
                   width: '100%',
-                  backgroundColor: '#171717',
                   color: "white",
                   gridTemplateRows: '70px 70px auto',
                   gridTemplateColumns: '33.33% 33.33% 33.33%',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  padding: '10px'
                 }}
               >
-                <div style={{ gridColumn: '1 / span 3' }}>
-                  <Button
-                    width="100%"
-                    hasIcon
-                    onClickFunction={() => {
-                      dispatchModal('Database Management');
-                    }}
-                  >
-                    <FontAwesomeIcon size="lg" icon="server" />
-                    Database Management
-                  </Button>
+                <div style={{ gridColumn: '1 / span 3' ,margin: '0 auto'}}>
+                  <h3>Database Management</h3>
                 </div>
                 <div style={{ gridColumn: 1 }}>
-                  <Button width="40%" type="button" onClickFunction={() => dispatchModal('Neo4j Data')}>
+                  <Button width="55%" type="button" onClickFunction={() => dispatchModal('Neo4j Data')}>
                     Export JSON
                   </Button>
-                </div>
-                <div style={{ gridColumn: 2 }}>
                   <Button
                     type="button"
                     onClickFunction={() => {
@@ -354,14 +341,27 @@ const App = props => {
                         });
                       });
                     }}
-                    width="40%"
+                    width="55%"
                   >
                     Wipe DB
                   </Button>
                 </div>
-                <div style={{ gridColumn: 3 }}>
-                  <ImportJson/>
-                  
+                <div style={{ gridColumn: 2 }}>
+                <ImportJson/>   
+                </div>
+                <div style={{ gridColumn: 3}}>
+                  <div style={{width: "55%",float: "right"}}>
+                    <Button
+                        width="100%"
+                        hasIcon
+                        onClickFunction={() => {
+                          dispatchModal('Database Management');
+                        }}
+                      >
+                        <FontAwesomeIcon size="lg" icon="server" />
+                        More...
+                    </Button>
+                  </div>          
                 </div>
               </div>
               
