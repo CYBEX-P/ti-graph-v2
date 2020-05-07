@@ -38,8 +38,11 @@ def insert_domain_and_user(emailString, graph):
 
 
 def insert_domain(URLString, graph):
-        domain = URLString.split("/")
-        domain = str(domain[2])
+        # Check if URL string contains '/'. Then parse accordingly.
+        domain = URLString
+        if ('/' in URLString):
+                domain = URLString.split("/")
+                domain = str(domain[2])
 
         c = Node("Domain", data=domain)
         URL_node = graph.nodes.match("URL", data=URLString).first()
