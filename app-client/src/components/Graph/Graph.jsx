@@ -138,6 +138,7 @@ const Graph = ({ isLoading }) => {
     nw.on('deselectNode', (params) => 
     {
       setCommentState(false)
+      setCommentTextState('');
       var opacityNormal = 1;
       setSelection(nw.getSelection())
       Object.keys(nw.body.nodes).forEach(function(currentId){
@@ -217,38 +218,29 @@ const Graph = ({ isLoading }) => {
 
   function handleComment()
   {
-    // axios.get('/api/v1/macroCybex')
-    // .then(() => {
-    //   axios
-    //     .get('/api/v1/neo4j/export')
-    //     .then(({ data }) => {
-    //       setNeo4jData(data);
-    //       // setLoading(false);
-    //     })
-    //     .catch(() => {
-    //       alert('Error');
-    //       // setLoading(false);
-    //     });
-    //   })
-    setSelectText(null);
-    setCommentState(false);
-    setLoading(true);
-    axios
-      .post(`/api/v1/enrich/comment`, {Ntype: `${selectedNodeType.properties.type}`, value: `${selectedNodeType.properties.data}`, comment: `${commentTextState}`})
-      .then(({ data }) => {
-        if (data['insert status'] !== 0) {
-          axios
-            .get('/api/v1/neo4j/export')
-            .then(response => {
-              setNeo4jData(response.data);
-              setLoading(false);
-            })
-            .catch(() => {
-              alert('Error');
-              setLoading(false);
-            });
-        }
-      }); 
+    if (commentTextState != '')
+    {
+      setSelectText(null);
+      setCommentState(false);
+      setLoading(true);
+      axios
+        .post(`/api/v1/enrich/comment`, {Ntype: `${selectedNodeType.properties.type}`, value: `${selectedNodeType.properties.data}`, comment: `${commentTextState}`})
+        .then(({ data }) => {
+          if (data['insert status'] !== 0) {
+            axios
+              .get('/api/v1/neo4j/export')
+              .then(response => {
+                setNeo4jData(response.data);
+                setCommentTextState('');
+                setLoading(false);
+              })
+              .catch(() => {
+                alert('Error');
+                setLoading(false);
+              });
+          }
+        }); 
+    }
   }
 
   useEffect(() => {
