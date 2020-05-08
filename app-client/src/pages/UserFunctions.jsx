@@ -10,7 +10,7 @@ export const register =  newUser => {
       password: newUser.password,
      admin:newUser.admin
     }).then(res => {
-      // console.log(res);
+      console.log(res);
       if (res.status === 200){
         if (res.data.Error === "1"){
           return {"Exit" : "1"}
@@ -22,7 +22,7 @@ export const register =  newUser => {
       }
     })
     .catch((err) => {
-      // console.log(err);
+      console.log(err);
       return {"Exit" : "1", "Type" : "1"}
     });
 };
