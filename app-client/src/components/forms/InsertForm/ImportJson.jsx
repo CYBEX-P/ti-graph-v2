@@ -24,7 +24,7 @@ const ImportJson = props => {
     
     }
     return(
-        <div style={{backgroundColor: "black", padding: "10px", borderRadius: "5px",minHeight: "90px"}}>
+        <div style={{backgroundColor: "rgba(0,0,0,0.3)", padding: "10px", borderRadius: "5px",minHeight: "90px"}}>
         <form >
             <label>Import JSON</label>
             <input type ="file" name="file" onChange={onChange}/> 

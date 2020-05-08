@@ -31,8 +31,7 @@ IOC:
     - Registrar
     - Nameserver
     - MailServer
-    - CybexCount
-    - CybexRelated
+    - Phone
 
 
   enrichments:

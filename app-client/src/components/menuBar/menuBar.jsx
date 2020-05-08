@@ -28,7 +28,7 @@ const MenuBar = props => {
               }}
               type="button"
             >
-              <FontAwesomeIcon icon={iconToUse} color="#e0e0e0" size="3x" />
+              <FontAwesomeIcon icon={iconToUse} color="#e0e0e0" size="2x" />
             </UnstyledButton>
           </MenuBarIconStyle>
         </ExpandedMenuBar>

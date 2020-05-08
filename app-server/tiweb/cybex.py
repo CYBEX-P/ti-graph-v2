@@ -81,10 +81,13 @@ def insertRelatedAttributes(data,graph,value):
             c_node = graph.nodes.match(attr, data = nodeData).first()
 
             if(c_node):
+                if (ip_node != c_node):
                     rel = Relationship(ip_node, "CYBEX", c_node)
                     #rel['color'] = 'rgb(255,255,255)'
                     graph.create(rel)
                     print("Existing CybexRelated node linked")
+                else:
+                    print("Related node is same as origin node. Skipped.")
             else:
                 graph.create(c)
                 rel = Relationship(ip_node, "CYBEX", c)

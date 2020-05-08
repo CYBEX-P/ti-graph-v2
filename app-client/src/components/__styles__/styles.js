@@ -99,7 +99,7 @@ const MenuBarStyle = styled(UnstyledButton)`
 
 const ExpandedMenuBar = styled.div`
   background-color: rgba(23,23,23,0.7);
-  border: 3px solid #171717;
+  border: 3px solid rgba(0,0,0,0.3);;
   backdrop-filter: blur(20px);
   z-index: 4;
   ${props => {
@@ -176,6 +176,7 @@ const MenuBarIconStyle = styled.div`
   display: grid;
   justify-content: center;
   align-content: center;
+  background-color: rgba(0,0,0,0.3);
 `;
 
 const ContentContainerStyle = styled.div`
