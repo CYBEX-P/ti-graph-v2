@@ -31,8 +31,13 @@ class Register extends Component {
 
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value});
-    this.setState({msg: '', msf: ''});
+    this.setState({msg: '', msf: '', first_nameError: '',
+    last_nameError: '',
+    emailError: '',
+    usernameError: '',
+    passwordError: ''});
   }
+  
   handleInputChange(e) {
     this.setState({
       [e.target.name]: e.target.checked

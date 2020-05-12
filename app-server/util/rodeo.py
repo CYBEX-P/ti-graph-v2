@@ -13,7 +13,7 @@ clusterIP = "134.197.7.5"
 
 # Create client
 c = client(bearer, urlBase, projectid, clusterid, None, ClusterIP)
-#Add a database
+# Add a database
 r = c.add_database()
 #return value containes status and error information
 if(r and r["status"]):

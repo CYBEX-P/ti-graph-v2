@@ -178,7 +178,7 @@ def connect2graph():
 @roles_required('admin')
 def register():
     form = RegistrationForm()
-    
+    print('test')
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method = 'sha256')
         new_user = User(public_id=str(uuid.uuid4()),first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data, username = form.username.data, password = hashed_password, admin = form.admin.data)
@@ -197,6 +197,9 @@ def register():
 
         c = client(app.config['CONTAINER_BEARER'], app.config['CONTAINER_URLBASE'], app.config['CONTAINER_PROJECTID'], app.config['CONTAINER_CLUSTERID'], None, app.config['CONTAINER_CLUSTERIP'])
         r = c.add_database()
+
+        with open('./log.txt', 'w') as f:
+            f.write(r)
         
         if(r and r["status"]):
             print("Created Database: " + r["data"]["id"])
@@ -204,16 +207,14 @@ def register():
             print("Error: " + r["error"])
 
         r = c.get_database_info()
-        #print(r)
-        #sys.stdout.flush()
 
         if(r and r["status"]):
-           #print(json.dumps(r['data']))
+            print(json.dumps(r['data']))
             user = s.query(User).filter(User.username == form.username.data).first() 
             user.db_ip= r['data']['ip']
             user.db_port = r['data']['port']
             us = r['data']['auth']
-            print(us)
+            # print(us)
             a = us.split('/')
 
             user.db_username = a[0]        
