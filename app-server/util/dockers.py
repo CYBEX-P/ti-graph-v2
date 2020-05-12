@@ -15,8 +15,8 @@ def killall(client):
         container.kill()
 
 def find_free_ports():
-    bolt = randrange(7687, 9000) 
-    http = randrange(7474, 7674) 
+    bolt = 7687 
+    http = 7474 
     #find first free port for bolt listener
 #    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
 #        s.bind(('', 0))
@@ -48,7 +48,7 @@ def create_db(client):
     enviro = ['JAVA_OPTS=-Xmx1g','NEO4J_AUTH=neo4j/' + newpass]
     porto = {'7687/tcp':(bindip,bolt),'7474/tcp':(bindip,http)}
     #if we need persistence.  Which we don't right now
-    #volumeo = {'/logs': {'bind': '/logs', 'mode': 'rw'},'/data': {'bind': '/data','mode':'rw'}}
+    volumeo = {'/logs': {'bind': '/logs', 'mode': 'rw'},'/data': {'bind': '/data','mode':'rw'}}
     containero = 'neo4j:3.0'
 
     c = client.containers.run(containero,environment=enviro,ports=porto,detach=True)
