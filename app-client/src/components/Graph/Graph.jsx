@@ -55,6 +55,7 @@ const Graph = ({ isLoading }) => {
   const [dragStart, setDragStart] = useState(false);
 
   const [hoverText, setHoverText] = useState(null);
+  const [hoverTextEdge, setHoverTextEdge] = useState(null);
   // selectText is like hoverText, but is to be persistently shown when node is selected
   const [selectText, setSelectText] = useState(null);
   // pinnedText is like selectText, but stays stored and displayed if user pins an IOC
@@ -143,6 +144,9 @@ const Graph = ({ isLoading }) => {
     // blurNode fires when leaving a node
     nw.on('blurNode', () => setHoverText(null));
 
+    // blurEdge fires when leaving an edge
+    nw.on('blurEdge', () => setHoverTextEdge(null));
+
     // Change the selection state whenever a node is selected and deselected
     nw.on('deselectNode', (params) => 
     {
@@ -166,6 +170,7 @@ const Graph = ({ isLoading }) => {
     });
     nw.on('selectNode', (params) => {
       setSelection(nw.getSelection());
+      setHoverText(null); // No need for hovertext after selection, redundant
       var opacityBlurred = 0.1;
       var nodeId = params.nodes[0];
       // nodeObj is the Neo4j object that representes the currently selected node. Note: Slightly different here than with on('hoverNode')
@@ -228,6 +233,20 @@ const Graph = ({ isLoading }) => {
       //   nw.unselectAll();
       //   setSelection(null);
       // }
+    });
+
+    nw.on('hoverEdge', e => 
+    {
+      if (typeof data.Neo4j !== 'undefined') {
+        var edgeObj = data.Neo4j[1][0].edges.filter(properties => properties.id === e.edge);
+        setHoverTextEdge({
+          // Set the select text to the properties of the data
+          data: JSON.stringify(edgeObj[0].type),
+          x: e.event.clientX,
+          y: e.event.clientY,
+          //label: JSON.stringify(nodeObj[0].label),
+        });
+      }
     });
 
     return true;
@@ -546,7 +565,7 @@ const Graph = ({ isLoading }) => {
           }}>
             <b>{hoverText.type.replace(/"/g,"")}</b>
           </h4>
-          <hr/>
+          {/* <hr/> */}
           <h6 style={{textAlign:"center"}}>{hoverText.data.replace(/"/g,"")}</h6>
           {hoverText.percentMal != "" && (
             <div style={{color:"white",fontSize:"large",textAlign:"center"}}>
@@ -554,6 +573,25 @@ const Graph = ({ isLoading }) => {
             {hoverText.percentMal}
           </div>
           )}
+        </div>
+      )}
+      {hoverTextEdge && (
+        <div
+          style={{
+                position: 'absolute',
+                zIndex: 1000,
+                top: hoverTextEdge.y,
+                left: hoverTextEdge.x,
+                // backgroundColor: '#111', // Used for classic Card styling only.
+                pointerEvents: 'none',
+                backgroundColor: "black",
+                color: "white",
+                opacity: "0.85",
+                borderRadius: "10px",
+                padding: "10px",
+                boxShadow: "0px 2px 5px 0px rgba(31,30,31,1)"
+              }}>
+          <h6 style={{textAlign:"center"}}>{hoverTextEdge.data.replace(/"/g,"")}</h6>
         </div>
       )}
       {/* TODO: Turn selectText box into seperate component */}
